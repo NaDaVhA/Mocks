@@ -21,9 +21,9 @@ public class Application {
 	private dbActions dbActionRunner;
 	
 	
-	public Application(){
+	public Application(String password){
 		
-		this.connectionPool = new ConnectionPool("localhost", "3306", "db_project_1", "root", "!om3GAsilverhead"); 
+		this.connectionPool = new ConnectionPool("localhost", "3306", "db_project_1", "root", password); 
 		this.applicationStatus = false;
 		this.DdbStatus = false;
 		this.dbActionRunner = new dbActions(this.connectionPool);

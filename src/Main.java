@@ -6,7 +6,7 @@ public class Main {
 	public static void main(String[] args) {
 					
 		//Create new application
-		Application app = new Application();
+		Application app = new Application("enter password here");
 		
 		//Run the application
 		app.runApplication();
