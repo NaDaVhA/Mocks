@@ -3,6 +3,7 @@ package swt;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Button;
@@ -115,7 +116,7 @@ public class mainScreen extends Screen{
 
 		//song list label
 		
-		song_list_label=new Label(getShell(), SWT.BORDER);
+		song_list_label=new Label(getShell(), SWT.NONE);
 		song_list_label.setAlignment(SWT.CENTER);
 		song_list_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		song_list_label.setFont(SWTResourceManager.getFont("MV Boli", 14, SWT.BOLD));
@@ -123,7 +124,7 @@ public class mainScreen extends Screen{
 		FormData data5 = new FormData ();
 		data5.width=100;
 		
-		data5.right = new FormAttachment (25, 0);
+		data5.right = new FormAttachment (23, 0);
 		data5.bottom = new FormAttachment (35, 0);
 		song_list_label.setLayoutData(data5);
 		
@@ -143,9 +144,10 @@ public class mainScreen extends Screen{
 			}
 		});
 		
+		
 		//friend list label
 		
-		friend_list_label=new Label(getShell(), SWT.BORDER);
+		friend_list_label=new Label(getShell(), SWT.NONE);
 		friend_list_label.setAlignment(SWT.CENTER);
 		friend_list_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		friend_list_label.setFont(SWTResourceManager.getFont("MV Boli", 14, SWT.BOLD));
@@ -173,6 +175,29 @@ public class mainScreen extends Screen{
 			}
 		});
 		
+		//song list
+		songList=new List(getShell(), SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
+		for (int i=0; i<128; i++) songList.add ("Song " + i); //QAQA CHANGE WITH REAL SONGS
+		
+		songList.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		FormData data9 = new FormData ();
+		data9.width=250;
+		data9.height=200;
+		data9.right = new FormAttachment (40, 0);
+		data9.bottom = new FormAttachment (80, 0);
+		songList.setLayoutData(data9); 
+		
+		//friend list
+		friendList=new List(getShell(), SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
+		for (int i=0; i<128; i++) friendList.add ("Friend " + i); //QAQA CHANGE WITH REAL SONGS
+		
+		friendList.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		FormData data10 = new FormData ();
+		data10.width=270;
+		data10.height=200;
+		data10.right = new FormAttachment (90, 0);
+		data10.bottom = new FormAttachment (80, 0);
+		friendList.setLayoutData(data10);
 		
 		
 		
@@ -181,14 +206,14 @@ public class mainScreen extends Screen{
 	}
 	
 	private void disposeMainScreen(){
-		//this.add_new_friend.dispose();
-		//this.add_new_song.dispose();
+		this.add_new_friend.dispose();
+		this.add_new_song.dispose();
 		this.change_status_song.dispose();
-		//this.friend_list_label.dispose();
-		//this.friendList.dispose();
+		this.friend_list_label.dispose();
+		this.friendList.dispose();
 		this.sign_out.dispose();
-		//this.song_list_label.dispose();
-		//this.songList.dispose();
+		this.song_list_label.dispose();
+		this.songList.dispose();
 		this.status_song_label.dispose();
 		this.user_label.dispose();
 	}

@@ -3,6 +3,8 @@
  */
 package swt;
 
+import java.util.List;
+
 /**
  * @author Nadav
  *
@@ -48,5 +50,12 @@ public interface Application {
 	 */
 	
 	public boolean changeStatusSong(String song); //qaqa
+	
+	/**
+	 * 
+	 * @param username
+	 * @return the song list of the user
+	 */
+	public List<String> getSongList(String username);
 
 }
