@@ -44,7 +44,7 @@ public class welcomeScreen {
 		
 		splash.open();
 		try {
-			Thread.sleep(500);  // == 0.5 SECONDS
+			Thread.sleep(1000);  // == 1.0 SECONDS
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
