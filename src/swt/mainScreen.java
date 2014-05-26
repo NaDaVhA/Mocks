@@ -144,6 +144,9 @@ public class mainScreen extends Screen{
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed add new song");
+				disposeMainScreen();
+				addNewSongScreen newSong=new addNewSongScreen(getDisplay(), getShell());
+				newSong.createAddNewSongScreen();
 			}
 		});
 		
