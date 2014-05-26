@@ -29,6 +29,9 @@ public class mainScreen extends Screen{
 	private List songList=null;
 	private List friendList=null;
 	
+	private Button entertain_me=null;
+	private Button whats_humming=null;
+	
 	
 	//QAQA add here the rest
 	
@@ -199,7 +202,38 @@ public class mainScreen extends Screen{
 		data10.bottom = new FormAttachment (80, 0);
 		friendList.setLayoutData(data10);
 		
+		//entertain me button
+		entertain_me=new Button(getShell(),SWT.NONE);
+		entertain_me.setText("Entertain Me!");
+		FormData data11 = new FormData ();
+		data11.width=115;
+		data11.height=30;
+		data11.right = new FormAttachment (32, 0);
+		data11.bottom = new FormAttachment (90, 0);
+		entertain_me.setLayoutData(data11); 
+		entertain_me.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected (SelectionEvent e) {
+				System.out.println("qaqa - pressed entertain me");
+			}
+		});
 		
+		//whats humming button
+		whats_humming=new Button(getShell(),SWT.NONE);
+		whats_humming.setText("whats_humming?");
+		FormData data12 = new FormData ();
+		data12.width=115;
+		data12.height=30;
+		data12.right = new FormAttachment (82, 0);
+		data12.bottom = new FormAttachment (90, 0);
+		whats_humming.setLayoutData(data12); 
+		whats_humming.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected (SelectionEvent e) {
+				System.out.println("qaqa - pressed whats humming");
+			}
+		});
+			
 		
 		this.getShell().layout();
 		
@@ -216,6 +250,8 @@ public class mainScreen extends Screen{
 		this.songList.dispose();
 		this.status_song_label.dispose();
 		this.user_label.dispose();
+		this.whats_humming.dispose();
+		this.entertain_me.dispose();
 	}
 
 }
