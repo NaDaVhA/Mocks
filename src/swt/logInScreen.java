@@ -5,23 +5,19 @@ package swt;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-//import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 
-public class logInScreen {
+public class logInScreen extends Screen {
+	
 	//members
-	private Display display=null;
-	private Shell shell=null;
 	private Label headline=null;
 	private Label username=null;
 	private Label password=null;
@@ -33,40 +29,39 @@ public class logInScreen {
 	String username_s;
 	String password_s;
 	
+
+
+	public logInScreen(Display display,Shell shell) {
+		super(display, shell);	
+	}
 	
-	public String getUsername_s() {
+	
+	private String getUsername_s() {
 		return username_s;
 	}
 
 
-	public void setUsername_s(String username_s) {
+	private void setUsername_s(String username_s) {
 		this.username_s = username_s;
 	}
 
 
-	public String getPassword_s() {
+	private String getPassword_s() {
 		return password_s;
 	}
 
 
-	public void setPassword_s(String password_s) {
+	private void setPassword_s(String password_s) {
 		this.password_s = password_s;
-	}
-
-
-	public logInScreen(Display display,Shell shell) {
-		 this.display=display;
-		 this.shell=shell;
-		
 	}
 	
 	
 public void createLogInscreen(){
         //set the label (headline of the app)
-		headline= new Label(shell, SWT.NONE);
+		headline= new Label(getShell(), SWT.NONE);
 		headline.setAlignment(SWT.CENTER);
 		headline.setText("The Musical Network ");
-		headline.setForeground(display.getSystemColor(SWT.COLOR_WHITE)); //change color to white
+		headline.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE)); //change color to white
 		headline.setFont(SWTResourceManager.getFont("MV Boli", 32, SWT.BOLD));
 
 		FormData data = new FormData ();
@@ -74,10 +69,10 @@ public void createLogInscreen(){
 		data.right = new FormAttachment (100, 0);
 		headline.setLayoutData(data);
 		
-		username= new Label(shell, SWT.NONE);
+		username= new Label(getShell(), SWT.NONE);
 		username.setAlignment(SWT.CENTER);
 		username.setText("Username:");
-		username.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
+		username.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		//username.setFont(SWTResourceManager.getFont("David", 12, SWT.BOLD));
 		FormData data1 = new FormData ();
 		data1.width=65;
@@ -87,9 +82,9 @@ public void createLogInscreen(){
 		username.setLayoutData(data1);
 		
 		
-		 user=new Text(shell, SWT.BORDER);
-		user.setForeground(display.getSystemColor(SWT.COLOR_BLACK));;
-		user.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+		 user=new Text(getShell(), SWT.BORDER);
+		user.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));;
+		user.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
 		FormData data2 = new FormData ();
 		data2.width=110;
@@ -99,10 +94,10 @@ public void createLogInscreen(){
 
 		
 		
-		password= new Label(shell, SWT.NONE);
+		password= new Label(getShell(), SWT.NONE);
 		password.setAlignment(SWT.CENTER);
 		password.setText("Password:");
-		password.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
+		password.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		FormData data3 = new FormData ();
 		data3.width=70;
 		data3.right = new FormAttachment (65, 2);
@@ -110,9 +105,9 @@ public void createLogInscreen(){
 		password.setLayoutData(data3);
 		
 		
-		pass=new Text(shell, SWT.PASSWORD | SWT.BORDER);
-		pass.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
-		pass.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+		pass=new Text(getShell(), SWT.PASSWORD | SWT.BORDER);
+		pass.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
+		pass.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
 		FormData data4 = new FormData ();
 		data4.width=110;
@@ -121,7 +116,7 @@ public void createLogInscreen(){
 		pass.setLayoutData(data4);
 		
 		
-		logIn=new Button(shell,  SWT.NONE);
+		logIn=new Button(getShell(),  SWT.NONE);
 		logIn.setText("Log in");
 		FormData data5 = new FormData ();
 		data5.width=110;
@@ -137,22 +132,21 @@ public void createLogInscreen(){
 				setPassword_s(pass.getText());
 				System.out.println(getUsername_s());//qaqa
 				System.out.println(getPassword_s());//qaqa
-				//isUserRegistred in the interface
-				if(getUsername_s().compareTo("true")==0){ //QAQA  - PUT REAL FUNCTION HERE!
-					disposeLogIn();
-					mainScreen mainScreen=new mainScreen(display,shell);
-					mainScreen.runMainWindow();
+				//QAQA - isUserRegistred in the interface
+				//QAQA - use asyncExec or syncExec runnable
+				if(getUsername_s().compareTo("true")==0){ //QAQA  - PUT REAL FUNCTION HERE 
+
+					disposeLogIn(); //he is registerd!
+					mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),getUsername_s());
+					mainScreen.createMainWindow();
 				}
 				else{
-					MessageBox messageBox =   new MessageBox(shell, SWT.OK| SWT.ICON_ERROR);
-					messageBox.setText("Log In Error");
-					messageBox.setMessage("Details given do not match a valid user.\n"+"Retype username and password.");
-					messageBox.open();
+					errorPop("Log In Error", "Details given do not match a valid user.\n"+"Retype username and password.");
 				}
 			}
 		});
 		
-		signUp=new Button(shell,  SWT.NONE);
+		signUp=new Button(getShell(),  SWT.NONE);
 		signUp.setText("Sign Up!");
 		FormData data6 = new FormData ();
 		data6.width=110;
@@ -166,14 +160,16 @@ public void createLogInscreen(){
 				System.out.println("qaqa - pressed sign up"); //qaqa
 				disposeLogIn();
 				//run other screen
-				signUpScreen sign_up=new signUpScreen(display, shell);
-				sign_up.signUpScreen();
+				signUpScreen sign_up=new signUpScreen(getDisplay(), getShell());
+				sign_up.createSignUpScreen();
 			}
 		});
+		
+		this.getShell().layout();
 
 	}
 
-public void disposeLogIn(){
+private void disposeLogIn(){
 	this.headline.dispose();
 	this.logIn.dispose();
 	this.password.dispose();

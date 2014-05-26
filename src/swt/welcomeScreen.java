@@ -1,7 +1,6 @@
 package swt;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -18,12 +17,10 @@ public class welcomeScreen {
 	
 	
 	public welcomeScreen(Display display) {
-		this.display = display;
-		
-		showWelcome(display);
+		this.display = display;	
 	}
 	
-	public void showWelcome(Display display){
+	public void showWelcome(){
 		
 		final Shell splash = new Shell(SWT.ON_TOP);
 		FormLayout layout = new FormLayout();
@@ -47,7 +44,7 @@ public class welcomeScreen {
 		
 		splash.open();
 		try {
-			Thread.sleep(3000);  // == 3 SECONDS
+			Thread.sleep(2500);  // == 2.5 SECONDS
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
