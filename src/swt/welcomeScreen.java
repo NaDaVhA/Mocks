@@ -26,7 +26,7 @@ public class welcomeScreen {
 		FormLayout layout = new FormLayout();
 		splash.setLayout(layout);
 		
-		Image bg1_image=new Image(display,"C:\\Users\\Nadav\\git\\Mocks\\images\\ear2.jpg");	//qaqa put here welcome img
+		Image bg1_image=new Image(display,"C:\\Users\\Nadav\\git\\Mocks\\images\\ear23.jpg");	//qaqa put here welcome img
 		splash.setBackgroundImage(bg1_image);
 		splash.setBackgroundMode(SWT.INHERIT_FORCE);
 				

@@ -28,7 +28,7 @@ public class theMusicalNetwork {
 		formLayout.spacing = 10;
 		shell.setLayout(formLayout);
 		//set the bg image
-		bg_image=new Image(display,"C:\\Users\\Nadav\\git\\Mocks\\images\\ear2.jpg");	
+		bg_image=new Image(display,"C:\\Users\\Nadav\\git\\Mocks\\images\\ear23.jpg");	
 		shell.setBackgroundImage(bg_image);
 		shell.setBackgroundMode(SWT.INHERIT_FORCE);
 		

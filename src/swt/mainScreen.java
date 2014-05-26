@@ -175,6 +175,9 @@ public class mainScreen extends Screen{
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed add new friend");
+				disposeMainScreen();
+				addNewFriendScreen newFriend=new addNewFriendScreen(getDisplay(), getShell());
+				newFriend.createAddNewFriendScreen();
 			}
 		});
 		

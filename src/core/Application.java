@@ -58,6 +58,7 @@ public class Application {
 		if(qaqa) System.out.println("\n\nrunApplication: ************************\nApplication is ready to go...\n");
 		
 		
+		/*
 		///////////////////////////////////////////////////////////
 		//	First screen
 		///////////////////////////////////////////////////////////
@@ -102,7 +103,7 @@ public class Application {
 		
 		// TODO
 
-		
+		*/
 		
 	}
 	
