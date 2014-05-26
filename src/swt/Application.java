@@ -57,5 +57,8 @@ public interface Application {
 	 * @return the song list of the user
 	 */
 	public List<String> getSongList(String username);
+	
+	
+	public List<String> getFriendList(String username);
 
 }
