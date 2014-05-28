@@ -47,10 +47,11 @@ public interface Application {
 	
 	/**
 	 * 
-	 * @param song - song name
+	 * @param username
+	 * @param song
 	 * @return true iff the change succeeded
 	 */
-	public boolean changeStatusSong(String song); //qaqa
+	public boolean changeStatusSong(String username,String song); //qaqa
 	
 	
 	
@@ -78,7 +79,7 @@ public interface Application {
 	
 	/**
 	 * for add a friend screen
-	 * @param friend_name - name to search in the user db
+	 * @param friend_name - name to search in the users db
 	 * @return list of the search results 
 	 */
 	public List<String> getSearchResultsFriends(String friend_name);
@@ -96,6 +97,13 @@ public interface Application {
 	 * @return list of the search results
 	 */
 	public List<String> getSearchResultsByArtist(String artist_name);
+	
+	/**
+	 * for add song screen
+	 * @param song_name -- the song name to search by
+	 * @return list of the search results
+	 */
+	public List<String> getSearchResultsBySong(String song_name);
 	
 	/**
 	 * 

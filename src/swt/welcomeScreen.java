@@ -22,15 +22,15 @@ public class welcomeScreen {
 	
 	public void showWelcome(){
 		
-		final Shell splash = new Shell(SWT.ON_TOP);
+		final Shell shell = new Shell(SWT.ON_TOP);
 		FormLayout layout = new FormLayout();
-		splash.setLayout(layout);
+		shell.setLayout(layout);
 		
 		Image bg1_image=new Image(display,"C:\\Users\\Nadav\\git\\Mocks\\images\\ear23.jpg");	//qaqa put here welcome img
-		splash.setBackgroundImage(bg1_image);
-		splash.setBackgroundMode(SWT.INHERIT_FORCE);
+		shell.setBackgroundImage(bg1_image);
+		shell.setBackgroundMode(SWT.INHERIT_FORCE);
 				
-		welcome=new Label(splash, SWT.NONE);
+		welcome=new Label(shell, SWT.NONE);
 		welcome.setAlignment(SWT.CENTER);
 		welcome.setText("Welcome! -QAQA add app logo here!");
 		welcome.setForeground(display.getSystemColor(SWT.COLOR_WHITE)); //change color to white
@@ -42,14 +42,14 @@ public class welcomeScreen {
 		data.bottom= new FormAttachment(50,0);
 		welcome.setLayoutData(data);
 		
-		splash.open();
+		shell.open();
 		try {
 			Thread.sleep(1000);  // == 1.0 SECONDS
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		splash.dispose();
+		shell.dispose();
 	}
 	
 	
