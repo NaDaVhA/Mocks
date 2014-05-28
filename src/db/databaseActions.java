@@ -4,29 +4,29 @@ import java.sql.Connection;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import core.User;
 
 
 public interface databaseActions {
 
+	public Collection<String> getSongsList();
 	
-	//Database Getters
-
-	//Music DB
+	public Collection<String> getSongsArtistList();
+	
 	public Collection<String> getBandsList();
 
+	public List<String> getSingersList();
 
-	public LinkedHashMap<String, String> getSingersList();
 
 
-	public Collection<String> getSongsList();
 	
 	
 	
 	//Users DB
 	
-	public Collection<User> getUsersList();
+	public List<String> getUsersList();
 		
 	public String getUserName(int userID);
 	
@@ -38,7 +38,7 @@ public interface databaseActions {
 	
 	public boolean disconnectUser(int userID);
 	
-	public LinkedHashMap<Integer, String> getUserSongList(int userID);
+	public List<String> getUserSongList(int userID);
 	
 	public String getUserStatusSong(int userID);
 	
@@ -46,13 +46,8 @@ public interface databaseActions {
 	
 	
 	
-	//Database Modifiers
-	
-	//Music DB
-	public boolean addSongToDB();
-	
-	public boolean addArtistToDB();
-	
+	//connectiion
+
 
 	//Users DB
 	public boolean registerNewUser(String username, String password);
@@ -63,6 +58,8 @@ public interface databaseActions {
 	
 	public boolean setUserStatusSong(int userID, int songID);
 	
-	public String addSongToUserSongList(int userID);
+	public boolean addArtistToUser(String user_id, String artist_id);
+	
+	public boolean addSongToUser(String user_id, String song_id);
 	
 }
