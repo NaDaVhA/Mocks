@@ -55,8 +55,8 @@ public class logInScreen extends Screen {
 		this.password_s = password_s;
 	}
 	
-	
-public void createLogInscreen(){
+	@Override
+	public void createScreen(){
         //set the label (headline of the app)
 		headline= new Label(getShell(), SWT.NONE);
 		headline.setAlignment(SWT.CENTER);
@@ -82,7 +82,7 @@ public void createLogInscreen(){
 		username.setLayoutData(data1);
 		
 		
-		 user=new Text(getShell(), SWT.BORDER);
+		user=new Text(getShell(), SWT.BORDER);
 		user.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));;
 		user.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
@@ -124,6 +124,29 @@ public void createLogInscreen(){
 		data5.right = new FormAttachment (92, 0);
 		data5.bottom = new FormAttachment (55, 0);
 		logIn.setLayoutData(data5);
+		/*******/
+		class CheckUserRegisterd implements Runnable {
+
+			@Override
+			public void run() {
+				final boolean isUserRegisterd=theMusicalNetwork.nadav.isUserRegisterd(getUsername_s(), getPassword_s());
+				getDisplay().asyncExec(new Runnable() {
+					public void run() {
+						if(isUserRegisterd){ //QAQA  - PUT REAL FUNCTION HERE 
+							disposeScreen(); //he is registerd!
+							mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),getUsername_s());
+							mainScreen.createScreen();
+						}
+						else{
+							errorPop("Log In Error", "Details given do not match a valid user.\n"+"Retype username and password.");
+						}
+					}
+				});
+				
+			}
+		}
+		
+		/*******/
 		logIn.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
@@ -134,15 +157,13 @@ public void createLogInscreen(){
 				System.out.println(getPassword_s());//qaqa
 				//QAQA - isUserRegistred in the interface
 				//QAQA - use asyncExec or syncExec runnable
-				if(getUsername_s().compareTo("true")==0){ //QAQA  - PUT REAL FUNCTION HERE 
-
-					disposeLogIn(); //he is registerd!
-					mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),getUsername_s());
-					mainScreen.createMainWindow();
-				}
-				else{
-					errorPop("Log In Error", "Details given do not match a valid user.\n"+"Retype username and password.");
-				}
+								
+				/***/
+				// create a thread to check if user registerd
+				Thread t = new Thread(new CheckUserRegisterd());
+				t.start();
+				/***/
+			
 			}
 		});
 		
@@ -158,26 +179,28 @@ public void createLogInscreen(){
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed sign up"); //qaqa
-				disposeLogIn();
+				disposeScreen();
 				//run other screen
 				signUpScreen sign_up=new signUpScreen(getDisplay(), getShell());
-				sign_up.createSignUpScreen();
+				sign_up.createScreen();
 			}
 		});
 		
 		this.getShell().layout();
 
 	}
-
-private void disposeLogIn(){
-	this.headline.dispose();
-	this.logIn.dispose();
-	this.password.dispose();
-	this.signUp.dispose();
-	this.username.dispose();
-	this.pass.dispose();
-	this.user.dispose();
-}
+	
+	
+	@Override
+	protected void disposeScreen(){
+		this.headline.dispose();
+		this.logIn.dispose();
+		this.password.dispose();
+		this.signUp.dispose();
+		this.username.dispose();
+		this.pass.dispose();
+		this.user.dispose();
+	}
 	
 	
 

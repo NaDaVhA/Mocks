@@ -43,8 +43,8 @@ public class signUpScreen extends Screen{
 	}
 	
 	
-	
-	public void createSignUpScreen() {
+	@Override
+	public void createScreen() {
 		// TODO Auto-generated method stub
 		username= new Label(getShell(), SWT.NONE);
 		username.setAlignment(SWT.CENTER);
@@ -120,7 +120,63 @@ public class signUpScreen extends Screen{
 		data7.height=40;
 		data7.right = new FormAttachment (97, 0);
 		data7.bottom = new FormAttachment (98, 0);
-		signUp.setLayoutData(data7); 
+		signUp.setLayoutData(data7);
+		
+		
+		/*******/
+		class CheckUserTaken implements Runnable {
+
+			@Override
+			public void run() {
+				final boolean isUserTaken=theMusicalNetwork.nadav.isUsernameTaken(signUpScreen.this.username_s);
+				getDisplay().asyncExec(new Runnable() {
+					public void run() {
+						if(isUserTaken){ //QAQA  - PUT REAL FUNCTION HERE 
+							errorPop("Sign up Error", "Username already taken");
+						}
+						else{//username is not taken and pass is ok..  sign up the user
+							//QAQA-in interface signUpUser
+							/*******/
+							class SignUpUser implements Runnable {
+
+								@Override
+								public void run() {
+									final boolean signUpUser=theMusicalNetwork.nadav.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
+									getDisplay().asyncExec(new Runnable() {
+										public void run() {
+											if(!signUpUser){ //QAQA  - PUT REAL FUNCTION HERE 
+												errorPop("Sign up Error", "Failed to Sign up..");
+											}
+											else{//Sign up success.. go to main screen
+												
+												disposeScreen();
+												mainScreen main_screen=new mainScreen(getDisplay(), getShell(),signUpScreen.this.username_s);
+												main_screen.createScreen();
+												//else{...}
+											}
+										}
+									});
+									
+								}
+							}
+							
+							/*******/
+							
+							/***/
+							// create a thread to check if user registerd
+							Thread t1 = new Thread(new SignUpUser());
+							t1.start();
+							/***/
+						}
+					}
+				});
+				
+			}
+		}
+		
+		/*******/
+		
+		
 		signUp.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
@@ -132,27 +188,16 @@ public class signUpScreen extends Screen{
 				System.out.println("qaqa - pass: "+signUpScreen.this.password_s); //qaqa
 				System.out.println("qaqa - pass repeat: "+signUpScreen.this.password_repeat_s); //qaqa
 				if(signUpScreen.this.password_s.compareTo(signUpScreen.this.password_repeat_s)!=0){
-					errorPop("Sign up Error", "Passwords doesnt match");
+					errorPop("Sign up Error", "Passwords doesnt match.\nPlease try again.");
 				}
 				else{
-					//QAQA- IS USERNAME TAKEN IN INTERDACE
-					//QAQA - USE asnyc or sync
-					if(signUpScreen.this.username_s.compareTo("QAQA")==0){ //QAQA change to real function here!! check if username taken
-						errorPop("Sign up Error", "Username already taken");
-					}
-					else{ //username is not taken and pass is ok..  sign up the user
-						//QAQA-in interface signUpUser
-						
-						//if(signUpUser(username,password){...}
-						disposeSignUpScreen();
-						mainScreen main_screen=new mainScreen(getDisplay(), getShell(),signUpScreen.this.username_s);
-						main_screen.createMainWindow();
-						//else{...}
-						
-						//QAQA - change after interface
-						
-						
-					}
+					
+					/***/
+					// create a thread to check if user registerd
+					Thread t = new Thread(new CheckUserTaken());
+					t.start();
+					/***/
+				
 				}
 				
 			}
@@ -162,7 +207,8 @@ public class signUpScreen extends Screen{
 		
 	}
 	
-	private void disposeSignUpScreen(){
+	@Override
+	protected void disposeScreen(){
 		this.pass.dispose();
 		this.password.dispose();
 		this.R_pass.dispose();

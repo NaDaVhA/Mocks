@@ -30,7 +30,7 @@ public class mainScreen extends Screen{
 	private List friendList=null;
 	
 	private Button entertain_me=null;
-	private Button whats_humming=null;
+	private Button view_friend=null;
 	
 	
 	//QAQA add here the rest
@@ -44,8 +44,8 @@ public class mainScreen extends Screen{
 	
 	
 
-
-	public void createMainWindow() {
+	@Override
+	public void createScreen() {
 		
 		this.status_song="qaqa -  status song";//qaqa add call to getStatusSong in interface
 	
@@ -77,9 +77,9 @@ public class mainScreen extends Screen{
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed sign out");
-				disposeMainScreen();
+				disposeScreen();
 				logInScreen logIn=new logInScreen(getDisplay(),getShell());
-				logIn.createLogInscreen();
+				logIn.createScreen();
 			}
 		});
 		
@@ -144,9 +144,9 @@ public class mainScreen extends Screen{
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed add new song");
-				disposeMainScreen();
+				disposeScreen();
 				addNewSongScreen newSong=new addNewSongScreen(getDisplay(), getShell());
-				newSong.createAddNewSongScreen();
+				newSong.createScreen();
 			}
 		});
 		
@@ -178,9 +178,9 @@ public class mainScreen extends Screen{
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed add new friend");
-				disposeMainScreen();
+				disposeScreen();
 				addNewFriendScreen newFriend=new addNewFriendScreen(getDisplay(), getShell());
-				newFriend.createAddNewFriendScreen();
+				newFriend.createScreen();
 			}
 		});
 		
@@ -225,18 +225,18 @@ public class mainScreen extends Screen{
 		});
 		
 		//whats humming button
-		whats_humming=new Button(getShell(),SWT.NONE);
-		whats_humming.setText("whats_humming?");
+		view_friend=new Button(getShell(),SWT.NONE);
+		view_friend.setText("View friend");
 		FormData data12 = new FormData ();
 		data12.width=115;
 		data12.height=30;
 		data12.right = new FormAttachment (82, 0);
 		data12.bottom = new FormAttachment (90, 0);
-		whats_humming.setLayoutData(data12); 
-		whats_humming.addSelectionListener(new SelectionAdapter() {
+		view_friend.setLayoutData(data12); 
+		view_friend.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed whats humming");
+				System.out.println("qaqa - pressed view friend");
 			}
 		});
 			
@@ -245,7 +245,8 @@ public class mainScreen extends Screen{
 		
 	}
 	
-	private void disposeMainScreen(){
+	@Override
+	protected void disposeScreen(){
 		this.add_new_friend.dispose();
 		this.add_new_song.dispose();
 		this.change_status_song.dispose();
@@ -256,7 +257,7 @@ public class mainScreen extends Screen{
 		this.songList.dispose();
 		this.status_song_label.dispose();
 		this.user_label.dispose();
-		this.whats_humming.dispose();
+		this.view_friend.dispose();
 		this.entertain_me.dispose();
 	}
 

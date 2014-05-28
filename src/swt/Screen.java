@@ -63,5 +63,8 @@ public abstract class Screen {
 	}
 	
 	//QAQA - maybe add create screen method
+	public abstract void createScreen();
+	
+	protected abstract void disposeScreen();
 
 }

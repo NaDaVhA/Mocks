@@ -5,6 +5,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.*;
 
+import core.NadavDevelopmentClass;
+
 /**
  * @author Nadav
  *
@@ -14,6 +16,9 @@ public class theMusicalNetwork {
 	private Display display=null;
 	private Shell shell=null;
 	private Image bg_image=null;
+	
+	//QAQA-DELETE AFTER QA
+	public static NadavDevelopmentClass nadav;  //qaqa this  design is not good
 
 
 	
@@ -32,6 +37,9 @@ public class theMusicalNetwork {
 		shell.setBackgroundImage(bg_image);
 		shell.setBackgroundMode(SWT.INHERIT_FORCE);
 		
+		//qaqa - to delete
+		this.nadav=new NadavDevelopmentClass();
+		
 	}
 	
 	
@@ -42,7 +50,7 @@ public void openShell(){
 		welcomeScreen welcome=new welcomeScreen(display);
 		welcome.showWelcome();
 		logInScreen logIn=new logInScreen(display,shell);
-		logIn.createLogInscreen();
+		logIn.createScreen();
 		shell.open();
       
         while (!shell.isDisposed()) {

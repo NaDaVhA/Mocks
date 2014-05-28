@@ -39,7 +39,8 @@ public class addNewSongScreen extends Screen{
 		super(display, shell);
 	}
 	
-	public void createAddNewSongScreen(){
+	@Override
+	public void createScreen(){
 	
 			//headline
 			head=new Label(getShell(), SWT.NONE);
@@ -306,9 +307,9 @@ public class addNewSongScreen extends Screen{
 					@Override
 					public void widgetSelected (SelectionEvent e) {
 						System.out.println("qaqa - pressed back home");
-						disposeAddNewSongScreen();
+						disposeScreen();
 						mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),"QAQA - USERNAME"); //QAQA ADD USERNAME
-						mainScreen.createMainWindow();
+						mainScreen.createScreen();
 					}
 				});
 				
@@ -317,7 +318,8 @@ public class addNewSongScreen extends Screen{
 		
 	}
 	
-	private void disposeAddNewSongScreen(){
+	@Override
+	protected void disposeScreen(){
 		this.add_song_button.dispose();
 		this.back_button.dispose();
 		this.head.dispose();

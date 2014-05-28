@@ -36,7 +36,8 @@ public class addNewFriendScreen extends Screen {
 		super(display, shell);
 	}
 
-	public void createAddNewFriendScreen(){
+	@Override
+	public void createScreen(){
 		//headline
 		head=new Label(getShell(), SWT.NONE);
 		head.setAlignment(SWT.CENTER);
@@ -208,9 +209,9 @@ public class addNewFriendScreen extends Screen {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed back home");
-				disposeAddNewFriendScreen();
+				disposeScreen();
 				mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),"QAQA - USERNAME"); //QAQA ADD USERNAME
-				mainScreen.createMainWindow();
+				mainScreen.createScreen();
 			}
 		});
 		
@@ -218,7 +219,8 @@ public class addNewFriendScreen extends Screen {
 		this.getShell().layout();
 	}
 	
-	private void disposeAddNewFriendScreen(){
+	@Override
+	protected void disposeScreen(){
 		this.add_friend_button.dispose();
 		this.back_button.dispose();
 		this.friend_result_label.dispose();
