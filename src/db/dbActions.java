@@ -4,8 +4,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import core.User;
 
@@ -15,83 +17,105 @@ public class dbActions implements databaseActions{
 	private boolean qaqa = false;
 	private ConnectionPool connectionPool;
 	
+
+	public Collection<String> getSongsList(){
+		
+		String sql_query ="Select song_name, song_id " + 
+				"From songs";
+		return executeQuery(sql_query,true); // true for  query is_select 
+			
+	}
+	
+	public Collection<String> getSongsArtistList(){
+	
+		String sql_query ="Select song_name, artist_name " + 
+				"From songs,artist_song,artists " +
+				"Where songs.song_id = artist_song.song_id And artists.artist_id = artist_song.artist_id";
+		
+	
+		return executeQuery(sql_query,true);
+			
+	}
+
+	public List<String> getUsersList(){
+		
+		String sql_query ="Select user_id, user_name, status_song_id " + 
+				"From users ";	
+		return executeQuery(sql_query,true); // true for  query is_select
+		
+	}
 	
 	
+	//Users DB// need to check
+	public boolean addSongToUser(String user_id, String song_id){
+		String sql_query ="INSERT INTO `project`.`user_songs` " +
+				"(`user_id`, `song_id`) VALUES ('"+user_id+"', '"+song_id+"');";
+			
+		if (executeQuery(sql_query,false)==null)
+			return false; // true for  query is_select
+	
+		return true;
+	}
+	
+	// need to check 
+	public boolean addArtistToUser(String user_id, String artist_id){
+		String sql_query ="INSERT INTO `project`.`user_artist` " +
+				"(`user_id`, `artist_id`) VALUES ('"+user_id+"', '"+artist_id+"');";
+		
+		if (executeQuery(sql_query,false)==null)
+			return false; // true for  query is_select
+	
+		return true;
+		
+	}
+	
+
+	// need to check 
+	public String getUserName(int userID) {
+
+		
+		String userId_as_String = ConvertIntegerToString(userID);
+		
+		String sql_query ="Select user_name, " + 
+				"From users" +
+				"Where users.user_id = " + userId_as_String;
+		
+
+		return  executeQuery(sql_query,true).get(0); // true for  query is_select 
+	}
+	
+	
+	
+	
+	
+	//gil
 	public dbActions(ConnectionPool pool){
 		this.connectionPool = pool;
 	}
 
 	
 	@Override
-	public LinkedHashMap<String, String> getSingersList() {
+	public List<String> getSingersList() {
 		
-		//Get connection from pool
-		Connection connection = this.connectionPool.getConnectionFromPool();
-		
-		LinkedHashMap<String, String> singersList = new LinkedHashMap<String, String>();
-		
-		String selectAllBandsQuery = "SELECT singer, singer_classification " + 
-				"FROM singers";
-		
-		Statement stmt = null;
-		ResultSet rs = null;
-
-		try {
-			stmt = connection.createStatement();
-			rs = stmt.executeQuery(selectAllBandsQuery);
-			
-			while (rs.next() == true){
-				String singerName = rs.getString("singer");
-				String singerClass = rs.getString("singer_classification");
-				
-				System.out.println("Singer: " + rs.getString("singer") + ", Singer's category: " + rs.getString("singer_classification"));
-				singersList.put(singerName, singerClass);
-			}
-			
-			
-		} catch (SQLException e) {
-			System.out.println("ERROR getSingersList - " + e.getMessage());
-		} finally {
-			
-			DataBaseManager.safelyClose(stmt, rs);
-			
-			//Return connection to pool
-			this.connectionPool.returnConnectionToPool(connection);
-		}
-				
-		return singersList;
+		String sql_query ="Select artist_id, artist_name " + 
+				"From artists " +
+				"Where artists.artist_type=1 ";
+		return  executeQuery(sql_query,true);
 		
 	}
 
 
 	@Override
 	public Collection<String> getBandsList() {
-		// TODO Auto-generated method stub
-		return null;
+		String sql_query ="Select artist_id, artist_name " + 
+				"From artists " +
+				"Where artists.artist_type=0 ";
+		return  executeQuery(sql_query,true);
 	}
 
 
-	@Override
-	public Collection<String> getSongsList() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-
-	@Override
-	public Collection<User> getUsersList() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public String getUserName(int userID) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
+	//gil
 	@Override
 	public boolean usernameExists(String username) {
 
@@ -121,20 +145,8 @@ public class dbActions implements databaseActions{
 		
 	}
 
-	@Override
-	public boolean addSongToDB() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
-
-	@Override
-	public boolean addArtistToDB() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
+	//gil
 	@Override
 	public boolean registerNewUser(String userName, String password) {
 		
@@ -165,7 +177,7 @@ public class dbActions implements databaseActions{
 	}
 
 
-	
+	//gil
 	@Override
 	public boolean authenticateUser(String username, String password) {
 
@@ -188,26 +200,30 @@ public class dbActions implements databaseActions{
 
 
 	@Override
-	public boolean connectUser(int userID) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	@Override
-	public LinkedHashMap<Integer, String> getUserSongList(int userID) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<String> getUserSongList(int userID) {
+		String StringUserID= ConvertIntegerToString(userID);
+		
+		String sql_query ="Select song_name, artist_name " + 
+				"From user_songs, songs, artist_song, artists " +
+				"Where user_songs.user_id=" + StringUserID + " And songs.song_id =user_songs.song_id And songs.song_id = artist_song.song_id And artists.artist_id = artist_song.artist_id"; 
+		
+		return executeQuery(sql_query,true);
 	}
 
 
 	@Override
 	public String getUserStatusSong(int userID) {
-		// TODO Auto-generated method stub
-		return null;
+		String StringUserID= ConvertIntegerToString(userID);
+		
+		String sql_query ="Select song_name " + 
+				"From users, songs " +
+				"Where users.user_id=" + StringUserID + " And songs.song_id =users.status_song_id"; 
+		
+		return executeQuery(sql_query,true).get(0);
 	}
 
 
+	//gil
 	@Override
 	public boolean setUserStatusSong(int userID, int songID) {
 		
@@ -219,12 +235,6 @@ public class dbActions implements databaseActions{
 		return this.tableUpdate("users", columns, values, whereSentence);
 	}
 
-
-	@Override
-	public String addSongToUserSongList(int userID) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
 	@Override
@@ -419,9 +429,100 @@ public class dbActions implements databaseActions{
 		return status;
 	}
 
-
+	
+	
 	
 
+	@Override
+	public boolean connectUser(int userID) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+
+
+	
+    /*
+     *general for sql query 
+     * 
+     */
+	
+	
+	private String ConvertIntegerToString(int num)
+	{
+		return Integer.toString(num);
+	}
+	
+	
+	//split columns of select
+	private String[] parseSelectQuery(String Query)
+	{
+			String SelectColtemp = Query.substring(Query.indexOf("Select") +7, Query.indexOf(" From"));
+			String[] SelectCol = SelectColtemp.split(", ");
+			return SelectCol;
+	}
+	
+	//return list by number of columns : if num col of select is 3 so list (a1,a2,a3,b1,b2,b3...) 
+	private List<String> ReturnSelectQuery(ResultSet rs , int NumOfColInResult , String[] SelectCol)
+	{
+		
+		List<String> songsList = new ArrayList<String>();
+		
+		try {
+			while (rs.next() == true){
+				
+				for (int i =0; i<NumOfColInResult; i++)
+				{
+					String stringCol = rs.getString(SelectCol[i]); //same as select
+					songsList.add(stringCol);
+				}
+				
+			}	
+		} catch (SQLException e) {
+				System.out.println("ERROR executeFailed - " + e.getMessage());
+		}
+		
+		return songsList;
+	}
+	
+	
+	
+	/*( without select "*") 
+	 *   null is error, else true
+	 * */ 
+	private  List<String> executeQuery(String sql_query,boolean is_Select)
+	{
+		Connection connection = this.connectionPool.getConnectionFromPool();
+		List<String> List = new ArrayList<String>();
+		Statement stmt = null;
+		ResultSet rs = null;
+
+		try {
+			stmt = connection.createStatement();
+			rs = stmt.executeQuery(sql_query);
+			if (is_Select)
+			{
+				String[] SelectCol = parseSelectQuery(sql_query);
+				int  SelectColLength = SelectCol.length;
+				List = ReturnSelectQuery(rs,SelectColLength,SelectCol);
+			}
+			
+			
+			
+		} catch (SQLException e) {
+			List=null;
+			System.out.println("ERROR execute_query_Failed - " + e.getMessage());
+		
+		} finally {
+			this.connectionPool.returnConnectionToPool(connection);
+			DataBaseManager.safelyClose(stmt, rs);
+		}
+	
+		return List;
+		
+	}
+	
 
 	
 }
