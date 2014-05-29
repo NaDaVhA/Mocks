@@ -1,5 +1,7 @@
 package swt;
 
+import java.io.File;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormLayout;
@@ -32,8 +34,15 @@ public class theMusicalNetwork {
 		formLayout.marginHeight = 10;
 		formLayout.spacing = 10;
 		shell.setLayout(formLayout);
+		
+		
 		//set the bg image
-		bg_image=new Image(display,"C:\\Users\\Nadav\\git\\Mocks\\images\\ear23.jpg");	
+		
+		String path = new File("").getAbsolutePath();
+		String npath= new File(path+"\\images\\ear23.jpg").getAbsolutePath();
+		
+		
+		bg_image=new Image(display,npath);	
 		shell.setBackgroundImage(bg_image);
 		shell.setBackgroundMode(SWT.INHERIT_FORCE);
 		

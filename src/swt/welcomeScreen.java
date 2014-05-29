@@ -1,5 +1,7 @@
 package swt;
 
+import java.io.File;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
@@ -26,7 +28,10 @@ public class welcomeScreen {
 		FormLayout layout = new FormLayout();
 		shell.setLayout(layout);
 		
-		Image bg1_image=new Image(display,"C:\\Users\\Nadav\\git\\Mocks\\images\\ear23.jpg");	//qaqa put here welcome img
+		String path = new File("").getAbsolutePath();
+		String npath= new File(path+"\\images\\ear23.jpg").getAbsolutePath();
+		
+		Image bg1_image=new Image(display,npath);	//qaqa put here welcome img
 		shell.setBackgroundImage(bg1_image);
 		shell.setBackgroundMode(SWT.INHERIT_FORCE);
 				
