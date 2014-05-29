@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 public class signUpScreen extends Screen{
 	
@@ -19,6 +20,7 @@ public class signUpScreen extends Screen{
 	private String password_s;
 	private String password_repeat_s;
 	
+	private Label headline=null;
 	private Label username=null;
 	private Text user=null;
 	private Label password=null;
@@ -46,6 +48,19 @@ public class signUpScreen extends Screen{
 	@Override
 	public void createScreen() {
 		// TODO Auto-generated method stub
+		//headline
+		headline= new Label(getShell(), SWT.NONE);
+		headline.setAlignment(SWT.CENTER);
+		headline.setText("The Musical Network ");
+		headline.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE)); //change color to white
+		headline.setFont(SWTResourceManager.getFont("MV Boli", 32, SWT.BOLD));
+
+		FormData data = new FormData ();
+		data.width=1000;
+		data.right = new FormAttachment (100, 0);
+		headline.setLayoutData(data);
+		
+		
 		username= new Label(getShell(), SWT.NONE);
 		username.setAlignment(SWT.CENTER);
 		username.setText("Select Username:");
