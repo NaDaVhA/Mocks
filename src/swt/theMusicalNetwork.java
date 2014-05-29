@@ -47,7 +47,7 @@ public class theMusicalNetwork {
 		shell.setBackgroundMode(SWT.INHERIT_FORCE);
 		
 		//qaqa - to delete
-		this.nadav=new NadavDevelopmentClass();
+		//this.nadav=new NadavDevelopmentClass();
 		
 	}
 	
