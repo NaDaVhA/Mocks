@@ -4,8 +4,7 @@ import java.util.Scanner;
 
 import org.eclipse.swt.widgets.Display;
 
-import swt.theMusicalNetwork;
-import core.Application;
+import ui.theMusicalNetwork;
 
 
 public class Main {
