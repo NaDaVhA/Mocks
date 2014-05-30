@@ -10,8 +10,8 @@ public class User {
 	
 	private int userID;
 	private boolean connectionStatus;
-	private String username;
-	private String statusSong;
+	private String[] username;
+	private String[] statusSong;
 	private LinkedList<String> playlist;
 	private dbActions dbActions;
 	
@@ -36,7 +36,7 @@ public class User {
 	
 	//Getters
 	
-	public String getStatusSong(){
+	public String[] getStatusSong(){
 		return this.statusSong;
 	}
 	

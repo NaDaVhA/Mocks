@@ -16,9 +16,16 @@ public class dbActions implements databaseActions{
 
 	private boolean qaqa = false;
 	private ConnectionPool connectionPool;
-	//aaa
 
-	public Collection<String> getSongsList(){
+	//aaa
+	//Constructor
+	public dbActions(ConnectionPool cp){
+		
+		this.connectionPool = cp;
+	}
+	
+	
+	public ArrayList<String[]> getSongsList(){
 		
 		String sql_query ="Select song_name, song_id " + 
 				"From songs";
@@ -26,7 +33,7 @@ public class dbActions implements databaseActions{
 			
 	}
 	
-	public Collection<String> getSongsArtistList(){
+	public ArrayList<String[]> getSongsArtistList(){
 	
 		String sql_query ="Select song_name, artist_name " + 
 				"From songs,artist_song,artists " +
@@ -37,7 +44,7 @@ public class dbActions implements databaseActions{
 			
 	}
 
-	public List<String> getUsersList(){
+	public ArrayList<String[]> getUsersList(){
 		
 		String sql_query ="Select user_id, user_name, status_song_id " + 
 				"From users ";	
@@ -71,7 +78,7 @@ public class dbActions implements databaseActions{
 	
 
 	// need to check 
-	public String getUserName(int userID) {
+	public String[] getUserName(int userID) {
 
 		
 		String userId_as_String = ConvertIntegerToString(userID);
@@ -89,13 +96,11 @@ public class dbActions implements databaseActions{
 	
 	
 	//gil
-	public dbActions(ConnectionPool pool){
-		this.connectionPool = pool;
-	}
+
 
 	
 	@Override
-	public List<String> getSingersList() {
+	public ArrayList<String[]> getSingersList() {
 		
 		String sql_query ="Select artist_id, artist_name " + 
 				"From artists " +
@@ -106,7 +111,7 @@ public class dbActions implements databaseActions{
 
 
 	@Override
-	public Collection<String> getBandsList() {
+	public ArrayList<String[]> getBandsList() {
 		String sql_query ="Select artist_id, artist_name " + 
 				"From artists " +
 				"Where artists.artist_type=0 ";
@@ -200,7 +205,7 @@ public class dbActions implements databaseActions{
 
 
 	@Override
-	public List<String> getUserSongList(int userID) {
+	public ArrayList<String[]> getUserSongList(int userID) {
 		String StringUserID= ConvertIntegerToString(userID);
 		
 		String sql_query ="Select song_name, artist_name " + 
@@ -209,10 +214,23 @@ public class dbActions implements databaseActions{
 		
 		return executeQuery(sql_query,true);
 	}
+	
+	@Override
+	public ArrayList<String[]> getUserArtistList(int userID) {
+		String StringUserID= ConvertIntegerToString(userID);
+		String sql_query ="Select artist_name " + 
+				"From user_artist, artists " +
+				"Where user_artist.user_id=" + StringUserID + " And artists.artist_id =user_artist.artist_id"; 
+		
+		return executeQuery(sql_query,true);
+		
+		
+		
+	}
 
 
 	@Override
-	public String getUserStatusSong(int userID) {
+	public String[] getUserStatusSong(int userID) {
 		String StringUserID= ConvertIntegerToString(userID);
 		
 		String sql_query ="Select song_name " + 
@@ -464,26 +482,28 @@ public class dbActions implements databaseActions{
 	}
 	
 	//return list by number of columns : if num col of select is 3 so list (a1,a2,a3,b1,b2,b3...) 
-	private List<String> ReturnSelectQuery(ResultSet rs , int NumOfColInResult , String[] SelectCol)
+	private ArrayList<String[]> ReturnSelectQuery(ResultSet rs , int NumOfColInResult , String[] SelectCol)
 	{
 		
-		List<String> songsList = new ArrayList<String>();
-		
+		ArrayList<String[]> List = new ArrayList<String[]>();
+	
 		try {
 			while (rs.next() == true){
-				
+				String[] groupOfStrings=new String[NumOfColInResult];
 				for (int i =0; i<NumOfColInResult; i++)
 				{
-					String stringCol = rs.getString(SelectCol[i]); //same as select
-					songsList.add(stringCol);
+					
+					groupOfStrings[i]= rs.getString(SelectCol[i]);//same as select
+					
 				}
+				List.add(groupOfStrings);
 				
 			}	
 		} catch (SQLException e) {
 				System.out.println("ERROR executeFailed - " + e.getMessage());
 		}
 		
-		return songsList;
+		return List;
 	}
 	
 	
@@ -491,10 +511,10 @@ public class dbActions implements databaseActions{
 	/*( without select "*") 
 	 *   null is error, else true
 	 * */ 
-	private  List<String> executeQuery(String sql_query,boolean is_Select)
+	private  ArrayList<String[]> executeQuery(String sql_query,boolean is_Select)
 	{
 		Connection connection = this.connectionPool.getConnectionFromPool();
-		List<String> List = new ArrayList<String>();
+		ArrayList<String[]> List = new ArrayList<String[]>();
 		Statement stmt = null;
 		ResultSet rs = null;
 

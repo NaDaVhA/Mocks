@@ -1,6 +1,7 @@
 package db;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -11,13 +12,17 @@ import core.User;
 
 public interface databaseActions {
 
-	public Collection<String> getSongsList();
+	//[song_name, song_id]
+	public ArrayList<String[]> getSongsList();
 	
-	public Collection<String> getSongsArtistList();
+	//[song_name, artist_name]
+	public ArrayList<String[]> getSongsArtistList();
 	
-	public Collection<String> getBandsList();
+	//[artist_id, artist_name]
+	public ArrayList<String[]> getBandsList();
 
-	public List<String> getSingersList();
+	//[artist_id, artist_name]
+	public ArrayList<String[]> getSingersList();
 
 
 
@@ -26,9 +31,11 @@ public interface databaseActions {
 	
 	//Users DB
 	
-	public List<String> getUsersList();
+	//[user_id, user_name, status_song_id]
+	public ArrayList<String[]> getUsersList();
 		
-	public String getUserName(int userID);
+	//[user_name]
+	public String[] getUserName(int userID);
 	
 	public int getUserId(String username);
 	
@@ -38,9 +45,15 @@ public interface databaseActions {
 	
 	public boolean disconnectUser(int userID);
 	
-	public List<String> getUserSongList(int userID);
 	
-	public String getUserStatusSong(int userID);
+	//[song_name, artist_name]
+	public ArrayList<String[]> getUserSongList(int userID);
+	
+	//[artist_name]
+	public ArrayList<String[]> getUserArtistList(int userID);
+	
+	//[song_name]
+	public String[] getUserStatusSong(int userID);
 	
 	
 	

@@ -1,8 +1,11 @@
 package core;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
-import swt.Application;
+import ui.Application;
+import utilities.Pair;
 
 /**
  * 
@@ -16,7 +19,7 @@ public class NadavDevelopmentClass implements Application {
 	public boolean isUserRegisterd(String username, String password) {
 		// TODO Auto-generated method stub
 		int i=0;
-		while(i<1000000){
+		while(i<1000){
 			i++;
 			System.out.println(i);
 		}
@@ -30,7 +33,7 @@ public class NadavDevelopmentClass implements Application {
 	public boolean isUsernameTaken(String username) {
 		// TODO Auto-generated method stub
 				int i=0;
-				while(i<1000000){
+				while(i<1000){
 					i++;
 					System.out.println(i);
 				}
@@ -44,7 +47,7 @@ public class NadavDevelopmentClass implements Application {
 	public boolean signUpUser(String username, String password) {
 		// TODO Auto-generated method stub
 				int i=0;
-				while(i<1000000){
+				while(i<1000){
 					i++;
 					System.out.println(i);
 				}
@@ -55,13 +58,13 @@ public class NadavDevelopmentClass implements Application {
 	}
 
 	@Override
-	public String getStatusSong(String username) {
+	public Pair<String, String> getStatusSong(String username) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public boolean changeStatusSong(String song) {
+	public boolean changeStatusSong(String username,String song) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -73,9 +76,21 @@ public class NadavDevelopmentClass implements Application {
 	}
 
 	@Override
-	public List<String> getFriendList(String username) {
+	public LinkedList<String> getFriendList(String username) {
 		// TODO Auto-generated method stub
-		return null;
+		int j=0;
+		while(j<1000){
+			j++;
+			System.out.println(j);
+		}
+		LinkedList<String> l=new LinkedList<String>();
+		if(username.compareTo("nadav")==0){
+			
+			for(int i=0;i<100;i++){
+				l.add("friend "+i);
+			}
+		}
+		return l;
 	}
 
 	@Override
@@ -101,11 +116,21 @@ public class NadavDevelopmentClass implements Application {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public List<String> getSearchResultsBySong(String song_name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 
 	@Override
-	public boolean addSong(String username, String song) {
+	public boolean addSong(String username, String artist, String song_name) {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	
 
 }
