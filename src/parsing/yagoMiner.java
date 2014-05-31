@@ -18,11 +18,11 @@ public class yagoMiner {
 	 * @param attributes
 	 * @return
 	 */
-	public static RawDataUnit mineDataUnit(String filename, String attribute, int indexInLine, String[] attributes){
+	public static RawDataUnit mineDataUnit(String filename, String[] attributes, int indexInLine){
 		
-		RawDataUnit dataUnit = new RawDataUnit(attributes);
+		RawDataUnit dataUnit = new RawDataUnit();
 		
-		LinkedList<String[]> lines = lineMiner(filename, attribute, indexInLine);
+		LinkedList<String[]> lines = lineMiner(filename, attributes, indexInLine);
 		
 		for(String[] line : lines)	
 			dataUnit.addLine(line);
@@ -39,10 +39,10 @@ public class yagoMiner {
 	 * @param attribute
 	 * @param indexInLine between 0 and line.size-1
 	 */
-	private static LinkedList<String[]> lineMiner(String inputFileName, String attribute, int indexInLine){
+	private static LinkedList<String[]> lineMiner(String inputFileName, String[] attributes, int indexInLine){
 				
 		LinkedList<String[]> listOfLines = new LinkedList<String[]>();
-		
+				
 		try
 		{
 			FileInputStream in = new FileInputStream(inputFileName);
@@ -51,22 +51,32 @@ public class yagoMiner {
 			
 			while((strLine = br.readLine())!= null){
 		  		
-		  		if(strLine.contains(attribute)){
-		  			
-		  			//Some lines might start with tabs, so we drop it
-					if(strLine.startsWith("\t"))
-						strLine = strLine.substring(1);
-		  			
-		  			String[] array = parseClosesTabs(strLine);
-		  			
-		  			if(indexInLine>=array.length){
-		  				System.out.println("parseFileByAttribute: error: indexInLine >= array.length!");
-		  				continue;
-		  			}
-		  			
-		  			if(array[indexInLine].contains(attribute))
-		  				listOfLines.add(array);
-		  		}
+				//if(qaqa) System.out.println(strLine);
+				
+				for(String attribute : attributes){
+					
+					if(strLine.contains(attribute)){
+			  			
+			  			//Some lines might start with tabs, so we drop it
+						if(strLine.startsWith("\t"))
+							strLine = strLine.substring(1);
+			  			
+			  			String[] array = parseClosesTabs(strLine);
+			  			
+			  			if(indexInLine>=array.length){
+			  				System.out.println("parseFileByAttribute: error: indexInLine >= array.length!");
+			  				continue;
+			  			}
+			  			
+			  			if(array[indexInLine].contains(attribute)){
+			  				listOfLines.add(array);
+			  			}
+			  				
+			  			
+			  			break;
+					}
+				}
+				
 			}
 			
 			br.close();
@@ -81,14 +91,18 @@ public class yagoMiner {
 	
 
 	/**
-	 * Splits line around "\t", returns "closes"
+	 * Splits line around "\t", returns "closes", in lowercase.
 	 * @param Line
 	 * @return
 	 */
 	private static String[] parseClosesTabs(String Line){
 		
 		String[] array = Line.split("\t");
-	
+		
+		for(int i=0; i<array.length; i++){
+			array[i] = array[i].toLowerCase();
+		}
+		
 		return array;
 	}
 	

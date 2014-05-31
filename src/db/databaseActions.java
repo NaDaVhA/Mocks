@@ -75,4 +75,12 @@ public interface databaseActions {
 	
 	public boolean addSongToUser(String user_id, String song_id);
 	
+	
+	//Database management	
+	public boolean initializeDatabase(String yagoFilesPath);
+
+	public boolean buildMusicDB(String yagoFilesPath);
+	
+	public boolean updateMusicDB(String yagoFilesPath);
+	
 }

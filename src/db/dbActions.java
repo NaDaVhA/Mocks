@@ -543,6 +543,70 @@ public class dbActions implements databaseActions{
 		
 	}
 	
+	
+	
+	///////////////////////////////////////
+	// 		Database manager code
+	///////////////////////////////////////
+	
+	
+	public boolean initializeDatabase(String yagoFilesPath){
+		
+		boolean status = true;
+		
+		Connection connection = this.connectionPool.getConnectionFromPool();
+		
+		if(DataBaseManager.getDatabaseInitializationStatus(connection) != true){
+			
+			status = this.buildMusicDB(yagoFilesPath);
+			
+			if(status)
+				status = DataBaseManager.setDatabaseStatusToInitialized(connection);
+			
+		}
+		
+		this.connectionPool.returnConnectionToPool(connection);
+		
+		return status;
+		
+	}
+	
 
+	/**
+	 * Builds the music database.
+	 * @param connection
+	 * @param yagoFilesPath - path to the Yago files.
+	 * @return true if succeeded, false otherwise.
+	 */
+	public boolean buildMusicDB(String yagoFilesPath){
+		
+		Connection connection = this.connectionPool.getConnectionFromPool();
+		
+		boolean status = DataBaseManager.buildMusicDatabase(connection, yagoFilesPath);
+		
+		this.connectionPool.returnConnectionToPool(connection);
+		
+		return status;
+		
+	}
+	
+	
+	/**
+	 * Updates the music database.
+	 * @param connection
+	 * @param yagoFilesPath - path to the Yago files.
+	 * @return true if succeeded, false otherwise.
+	 */
+	public boolean updateMusicDB(String yagoFilesPath){
+		
+		Connection connection = this.connectionPool.getConnectionFromPool();
+		
+		boolean status = DataBaseManager.updateMusicDatabase(connection, yagoFilesPath);
+		
+		this.connectionPool.returnConnectionToPool(connection);
+		
+		return status;
+		
+	}
 	
 }
