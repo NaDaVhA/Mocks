@@ -11,6 +11,8 @@ public class Main {
 
 	public static void main(String[] args) {
 		
+		System.out.println("Hello Mocks!");
+		
 	//	Scanner in = new Scanner(System.in);	 //just for qa
 		//Create new db
 	//	String pass;
