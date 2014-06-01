@@ -2,6 +2,8 @@ package parsing;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 
@@ -11,18 +13,22 @@ public class yagoMiner {
 	
 	
 	/**
-	 * 
+	 * Extracts data from the given file. 
 	 * @param filename
 	 * @param attribute
 	 * @param indexInLine
 	 * @param attributes
-	 * @return
+	 * @return RawDataUnit containing the extracted data, or null in case of a failure.
 	 */
 	public static RawDataUnit mineDataUnit(String filename, String[] attributes, int indexInLine){
 		
 		RawDataUnit dataUnit = new RawDataUnit();
 		
 		LinkedList<String[]> lines = lineMiner(filename, attributes, indexInLine);
+		
+		if(lines == null){
+			return null;
+		}
 		
 		for(String[] line : lines)	
 			dataUnit.addLine(line);
@@ -33,11 +39,12 @@ public class yagoMiner {
 	
 	
 	/**
-	 * 
+	 * Reads data from input file. 
+	 * Parses each line into words and insert each work into String array.
 	 * @param inputFileName
-	 * @param outputFileName
-	 * @param attribute
-	 * @param indexInLine between 0 and line.size-1
+	 * @param attributes
+	 * @param indexInLine
+	 * @return LinkedList<String[]> of parsed lines, or null if failed.
 	 */
 	private static LinkedList<String[]> lineMiner(String inputFileName, String[] attributes, int indexInLine){
 				
@@ -82,8 +89,14 @@ public class yagoMiner {
 			br.close();
 			in.close();
 		 
-		}catch(Exception e){
-			System.out.println(e);
+		} catch (FileNotFoundException e) {
+			System.out.println("Couldn't find YAGO file: " + inputFileName + ". Verify path and start application again.");
+			e.printStackTrace();
+			return null;
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		return listOfLines;

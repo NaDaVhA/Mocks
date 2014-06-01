@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Set;
 import parsing.RawDataUnit;
 import parsing.yagoMiner;
 
@@ -122,79 +121,6 @@ public class DataBaseManager {
 		
 		return status;
 		
-	}
-	
-	
-	/**
-	 * Populates a table out of the given RawDataUnit.
-	 * Uses batch insertion.
-	 * @param table
-	 * @param dataUnit
-	 * @return
-	 */
-	public static boolean batchInsertionIntoDB(Connection connection, String tableName, RawDataUnit dataUnit) {
-		
-		//Prepare statement arguments
-		int schemaSize = 0;// dataUnit.getAttributes().length;
-		String tableSchema = tableName + "(";
-		String[] attributes = null;//dataUnit.getAttributes();
-		for(int i=0; i<attributes.length; i++){
-			tableSchema = tableSchema.concat(attributes[i]);
-			if(i!=attributes.length-1)
-				tableSchema = tableSchema.concat(",");
-		}
-			
-		
-		tableSchema = tableSchema.concat(")");
-		String dbInsertAction = "INSERT INTO " + tableSchema + "VALUES(";
-		for(int i=0; i<schemaSize; i++){
-			dbInsertAction = dbInsertAction.concat("?");
-			if(i!=schemaSize-1)
-				dbInsertAction = dbInsertAction.concat(", ");
-		}
-			
-		
-		dbInsertAction = dbInsertAction.concat(")");
-		PreparedStatement pstmt = null;
-		
-		try {
-			
-			pstmt = connection.prepareStatement(dbInsertAction);
-		
-			//Begin batch insertion line-by-line
-			Iterator<String[]> linesIter = dataUnit.iterator();
-			int count = 0;
-			int batch = 0;
-			
-			while(linesIter.hasNext()){
-								
-				String[] currentLine = linesIter.next();
-				for(int i=0; i<schemaSize; i++)
-					pstmt.setString(i+1, currentLine[i]);
-				
-				pstmt.addBatch();
-				count++;
-				
-				//Limit insertion - execute batch every 1000 entries
-				if(count==1000){
-					count = 0;
-					pstmt.executeBatch();
-					if(qaqa) System.out.println("batchInsertionIntoDB: batch #" + ++batch);
-				};
-			}
-				
-			
-			if(qaqa) System.out.println("Success - completed batchInsertionIntoDB");
-						
-		} catch (SQLException e) {
-			System.out.println("ERROR batchInsertionIntoDB - "
-					+ e.getMessage());
-			return false;
-		}finally{
-			safelyClose(pstmt);
-		}
-		
-		return true;
 	}
 	
 	
@@ -363,9 +289,7 @@ public class DataBaseManager {
 	 * @return LinkedList<String[]> of lines.
 	 */
 	private static RawDataUnit extractRawLinesByAttribute(RawDataUnit source, int index, String attribute, RawDataUnit target){
-		
-		LinkedList<String[]> result = new LinkedList<String[]>();
-		
+				
 		for(String[] line : source){
 			if(line[index].contains(attribute))
 				target.addLine(line);
@@ -399,8 +323,8 @@ public class DataBaseManager {
 			if(!resultDataStructure.contains(array))
 				resultDataStructure.add(array);
 			
-			if(resultDataStructure.size() == 50000)
-				break;
+			/*if(resultDataStructure.size() == 50000)
+				break; QAQA */
 		}
 		
 		return resultDataStructure;
@@ -507,8 +431,8 @@ public class DataBaseManager {
 		boolean status = true;
 				
 		PreparedStatement stmt = null;
-		String insertaionAction = "INSERT INTO configuration(parameter, dbStatus) VALUES('initialized',1)";
-
+		String insertaionAction = "UPDATE configuration SET dbStatus = 1 WHERE parameter LIKE 'initialized'";
+		
 		stmt = null;
 		
 		try {
@@ -532,7 +456,6 @@ public class DataBaseManager {
 	////////////////////////////////////
 
 	
-	
 	/**
 	 * Builds the music database tables.
 	 * @param connection
@@ -541,12 +464,13 @@ public class DataBaseManager {
 	 */
 	public static boolean buildMusicDatabase(Connection connection, String pathToYagoFiles){
 		
+		System.out.println("Building music database. This might take more than a few minutes...");
+		
 		boolean status = true;		
 		
 		//Yago files' paths
 		String yagoFactsFile = pathToYagoFiles + "yagoFacts.tsv";
 		String YagoTransitiveTypeFile = pathToYagoFiles + "YagoTransitiveType.tsv";
-		String yagoTypesFile = pathToYagoFiles + "yagoTypes.tsv";
 		
 		//Prepare data
 		
@@ -556,7 +480,12 @@ public class DataBaseManager {
 		String[] factsAttributes = {"<created>"};
 		RawDataUnit rawCreatorCreationsData = yagoMiner.mineDataUnit(yagoFactsFile, factsAttributes, 2);
 		
-		//Extract raw data from Yago - singers, musical groups, songs
+		if((rawMusicData == null)||(rawCreatorCreationsData == null)){
+			System.out.println("Data extraction failed.");
+			return false;
+		}
+		
+		//Extract raw data from mined data - singers, musical groups, songs
 		RawDataUnit rawSinger = new RawDataUnit();
 		rawSinger = extractRawLinesByAttribute(rawMusicData, 2, "_singers>", rawSinger);
 		RawDataUnit rawMusicalGroups = new RawDataUnit();
@@ -568,13 +497,18 @@ public class DataBaseManager {
 		
 		//Artists data base creation
 		status = buildArtistsTable(connection, rawSinger, rawMusicalGroups);
+		if(!status) return false;
 		
 		//Songs data base creation
 		status = buildSongsTables(connection, rawSongs);
+		if(!status) return false;
 		
-		//	Prepare Creator-Creations data structure
+		//Creator-Creations links data creation
 		status = buildCreatorCreationsTable(connection, rawCreatorCreationsData);
-				
+		if(!status) return false;
+		
+		System.out.println("Database creation succeeded. Hooray!");
+		
 		return status;
 		
 	}
@@ -588,6 +522,8 @@ public class DataBaseManager {
 	 * @return true if succeeded, false otherwise.
 	 */
 	private static boolean buildArtistsTable(Connection connection, RawDataUnit rawSinger, RawDataUnit rawMusicalGroups) {
+		
+		System.out.println("Building the artists database.");
 		
 		boolean status = true;
 		String[] tableColumns;
@@ -637,21 +573,25 @@ public class DataBaseManager {
 		types[2] = 1;
 		
 		status = populateTable(connection, "artists_temp", tableColumns, types, sigersCategories);
+		if(!status) return false;
 		status = populateTable(connection, "artists_temp", tableColumns, types, musicalGroupsCategories);
+		if(!status) return false;
 
 		//populate artists table
 		statementToExecute = "INSERT INTO artists(artist_name, artist_type) "
 				+ "SELECT DISTINCT artist_name, artist_type "
 				+ "FROM artists_temp";
 		status = executeStatement(connection, statementToExecute);
-	
+		if(!status) return false;
+
 		
 		//populate categories_of_artists table
 		statementToExecute = "INSERT INTO categories_of_artists(category_name) "
 				+ "SELECT DISTINCT artist_category "
 				+ "FROM artists_temp";
 		status = executeStatement(connection, statementToExecute);
-			
+		if(!status) return false;
+
 		
 		//populate artist_category_temp table
 		//Create temp table: artist_category_temp
@@ -665,15 +605,16 @@ public class DataBaseManager {
 				+ "SELECT DISTINCT artist_name, artist_category "
 				+ "FROM artists_temp";
 		status = executeStatement(connection, statementToExecute);
-		
+		if(!status) return false;
+
 		//populate artist_category table
 		statementToExecute = "INSERT INTO artist_category(artist_id, category_id) "
 				+ "SELECT DISTINCT Artist.artist_id, Category.category_artist_id "
 				+ "FROM artist_category_temp AS Temp, artists AS Artist, categories_of_artists AS Category "
-				+ "WHERE Temp.artist = Artist.artist_name  AND  Temp.category = Category.category_name "
-				+ "LIMIT 2000";
+				+ "WHERE Temp.artist = Artist.artist_name  AND  Temp.category = Category.category_name ";
 		status = executeStatement(connection, statementToExecute);
-		
+		if(!status) return false;
+
 		
 		//Drop artist_category_temp table
 		dropTable(connection, "artist_category_temp");
@@ -690,6 +631,8 @@ public class DataBaseManager {
 	 * @return true if succeeded, false otherwise.
 	 */
 	private static boolean buildCreatorCreationsTable(Connection connection, RawDataUnit rawCreatorCreationsData) {
+		
+		System.out.println("Finishing the database creation. Hang on a while longer!");
 		
 		boolean status = true;
 		String[] tableColumns;
@@ -714,7 +657,8 @@ public class DataBaseManager {
 		types[0] = 2;
 		types[1] = 2;
 		status = populateTable(connection, "artist_song_temp", tableColumns, types, creatorCreation);
-
+		if(!status) return false;
+		
 		//Populate DISTINCT values
 		createTable(connection, "artist_song_temp_DISTINCT", 
 				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='artist_song_temp(artist, song)'", 
@@ -726,6 +670,7 @@ public class DataBaseManager {
 				+ "SELECT DISTINCT artist, song "
 				+ "FROM artist_song_temp";
 		status = executeStatement(connection, statementToExecute);
+		if(!status) return false;
 		
 		// (FINALLY !!!) populate artist_song table
 		statementToExecute = "INSERT INTO artist_song(song_id, artist_id) "
@@ -733,7 +678,7 @@ public class DataBaseManager {
 				+ "FROM artists as Artist, songs AS Song, artist_song_temp_distinct AS Temp "
 				+ "WHERE Temp.song = Song.song_name AND Temp.artist = Artist.artist_name";
 		status = executeStatement(connection, statementToExecute);
-		
+		if(!status) return false;
 		
 		//Drop temp tables: artist_song_temp, artist_song_temp_DISTINCT
 		dropTable(connection, "artist_song_temp");
@@ -752,6 +697,8 @@ public class DataBaseManager {
 	 */
 	private static boolean buildSongsTables(Connection connection, RawDataUnit rawSongs) {
 		
+		System.out.println("Building the songs database. Please wait...");
+		
 		String[] tableColumns;
 		int[] types;
 		String statementToExecute;
@@ -762,12 +709,17 @@ public class DataBaseManager {
 
 		LinkedList<String[]> songsAndCategories = extractDataFromRDT(rawSongs, indices);
 		
-		//Create temporary table: song_category_temp
-		createTable(connection, "song_category_temp", 
-				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='song_category_temp(song, category)'", 
+		//Create temporary tables: song_category_distinct, song_category_temp
+		createTable(connection, "song_category_distinct", 
+				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='song_category_distinct(song, category)'", 
 				"song varchar(100) NOT NULL, ",
 				"category varchar(100) NOT NULL, ",
 				"PRIMARY KEY (song, category)");
+		
+		createTable(connection, "song_category_temp", 
+				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='song_category_temp(song, category)'", 
+				"song varchar(100) NOT NULL, ",
+				"category varchar(100) NOT NULL");
 		
 		//populate songs_categories_temp with songs-categories
 		tableColumns = new String[2];
@@ -776,98 +728,43 @@ public class DataBaseManager {
 		types = new int[2];
 		types[0] = 2;
 		types[1] = 2;
-		populateTable(connection, "song_category_temp", tableColumns, types, songsAndCategories);
-
+		status = populateTable(connection, "song_category_temp", tableColumns, types, songsAndCategories);
+		if(!status) return false;
+		
+		//populate song_category_distinct with songs-categories distinct values
+		statementToExecute = "INSERT INTO song_category_distinct(song, category) "
+				+ "SELECT DISTINCT song, category "
+				+ "FROM song_category_temp";
+		status = executeStatement(connection, statementToExecute);		
+		if(!status) return false;
+		
+		
 		//populate songs table
 		statementToExecute = "INSERT INTO songs(song_name) "
 				+ "SELECT DISTINCT song "
-				+ "FROM song_category_temp";
+				+ "FROM song_category_distinct";
 		status = executeStatement(connection, statementToExecute);
+		if(!status) return false;
 		
 		//populate categories_of_songs table
 		statementToExecute = "INSERT INTO categories_of_songs(category_name) "
 				+ "SELECT DISTINCT category "
-				+ "FROM song_category_temp";
+				+ "FROM song_category_distinct";
 		status = executeStatement(connection, statementToExecute);
-		
+		if(!status) return false;
 		
 		//populate song_category table
 		statementToExecute = "INSERT INTO song_category(song_id, category_id) "
 				+ "SELECT DISTINCT Song.song_id, Category.category_id "
-				+ "FROM songs AS Song, categories_of_songs as Category, song_category_temp AS Temp "
+				+ "FROM songs AS Song, categories_of_songs as Category, song_category_distinct AS Temp "
 				+ "WHERE Temp.song = Song.song_name AND Temp.category = Category.category_name";
 		status = executeStatement(connection, statementToExecute);
+		if(!status) return false;
 		
-		//Drop temp table: song_category_temp
+		//Drop temp tables: song_category_temp, song_category_distinct
 		dropTable(connection, "song_category_temp");
+		dropTable(connection, "song_category_distinct");
 		
-		System.out.println("Good! we have songs!");
-		
-		return status;
-	}
-	
-	
-	
-	
-	/**
-	 * Builds the following tables:
-	 * songs, categories_of_songs, song_category.
-	 * @param connection
-	 * @param rawSongs
-	 * @return true if no problems were encountered, false otherwise.
-	 */
-	private static boolean buildArtistsTablesOLDVERSIONNOTSURE(Connection connection, RawDataUnit rawSongs) {
-		
-		String[] tableColumns;
-		int[] types;
-		String statementToExecute;
-		boolean status;
-			
-		//Extract song-category data from RDU
-		int[] indices = {0,2};
-
-		LinkedList<String[]> songsAndCategories = extractDataFromRDT(rawSongs, indices);
-		
-		//Create temporary table: song_category_temp
-		createTable(connection, "song_category_temp", 
-				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='song_category_temp(song, category)'", 
-				"song varchar(100) NOT NULL, ",
-				"category varchar(100) NOT NULL, ",
-				"PRIMARY KEY (song, category)");
-		
-		//populate songs_categories_temp with songs-categories
-		tableColumns = new String[2];
-		tableColumns[0] = "song";
-		tableColumns[1] = "category";
-		types = new int[2];
-		types[0] = 2;
-		types[1] = 2;
-		populateTable(connection, "song_category_temp", tableColumns, types, songsAndCategories);
-
-		//populate songs table
-		statementToExecute = "INSERT INTO songs(song_name) "
-				+ "SELECT DISTINCT song "
-				+ "FROM song_category_temp";
-		status = executeStatement(connection, statementToExecute);
-		
-		//populate categories_of_songs table
-		statementToExecute = "INSERT INTO categories_of_songs(category_name) "
-				+ "SELECT DISTINCT category "
-				+ "FROM song_category_temp";
-		status = executeStatement(connection, statementToExecute);
-		
-		
-		//populate song_category table
-		statementToExecute = "INSERT INTO song_category(song_id, category_id) "
-				+ "SELECT Song.song_id, Category.category_id "
-				+ "FROM songs AS Song, categories_of_songs as Category, song_category_temp AS Temp "
-				+ "WHERE Temp.song = Song.song_name AND Temp.category = Category.category_name "
-				+ "LIMIT 2000";
-		status = executeStatement(connection, statementToExecute);
-		
-		//Drop temp table: song_category_temp
-		dropTable(connection, "song_category_temp");
-				
 		return status;
 	}
 	
@@ -878,11 +775,223 @@ public class DataBaseManager {
 	////////////////////////////////////
 	
 	
+	
+	/**
+	 * Updates music database.
+	 * Leaves the old database unchanged and only inserts new information.
+	 * If one stage gets error, continues updating the rest anyway.
+	 * @param connection
+	 * @param pathToYagoFiles
+	 * @return true if succeeded, false otherwise.
+	 */
 	public static boolean updateMusicDatabase(Connection connection, String pathToYagoFiles){
 		
-		//TODO
+		boolean status = true;		
+		System.out.println("Updating music database. This might take more than a few minutes...");
+
+		//Yago files' paths
+		String yagoFactsFile = pathToYagoFiles + "yagoFacts.tsv";
+		String YagoTransitiveTypeFile = pathToYagoFiles + "YagoTransitiveType.tsv";
 		
-		return true;
+		//Prepare data
+		
+		//Mine relevant data from Yago in one batch-
+		String[] transitiveAttributes = {"_groups>", "_singers>", "_songs>"};
+		RawDataUnit rawMusicData = yagoMiner.mineDataUnit(YagoTransitiveTypeFile, transitiveAttributes, 2);
+		String[] factsAttributes = {"<created>"};
+		RawDataUnit rawCreatorCreationsData = yagoMiner.mineDataUnit(yagoFactsFile, factsAttributes, 2);
+		
+		if((rawMusicData == null)||(rawCreatorCreationsData == null)){
+			System.out.println("Data extraction failed.");
+			return false;
+		}
+		
+		
+		//Extract raw data from Yago - singers, musical groups, songs
+		RawDataUnit rawSinger = new RawDataUnit();
+		rawSinger = extractRawLinesByAttribute(rawMusicData, 2, "_singers>", rawSinger);
+		RawDataUnit rawMusicalGroups = new RawDataUnit();
+		rawMusicalGroups = extractRawLinesByAttribute(rawMusicData, 2, "_groups>", rawMusicalGroups);
+		RawDataUnit rawSongs = new RawDataUnit();
+		rawSongs = extractRawLinesByAttribute(rawMusicData, 2, "_songs>", rawSongs);
+	
+		//Update database
+		System.out.println("Finished extracting data from yago. Updating tables...");
+
+		//Artists data base update
+	//	status = updateArtistsTable(connection, rawSinger, rawMusicalGroups);
+		
+		//Songs data base update
+	//	status = updateSongsTables(connection, rawSongs);
+		
+		//Creator-Creations links data update
+	//	status = updateCreatorCreationsTable(connection, rawCreatorCreationsData);
+				
+		if(status)
+			System.out.println("Finished updating the database.");
+		
+		return status;
 		
 	}
+
+	/**
+	 * Updates the links between artists and songs.
+	 * @param connection
+	 * @param rawCreatorCreationsData
+	 * @return true if succeeded, false otherwise.
+	 */
+	private static boolean updateCreatorCreationsTable(Connection connection, RawDataUnit rawCreatorCreationsData) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	/**
+	 * Updates the songs tables: songs, categories_of_songs.
+	 * @param connection
+	 * @param rawSongs
+	 * @return true if succeeded, false otherwise.
+	 */
+	private static boolean updateSongsTables(Connection connection, RawDataUnit rawSongs) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	/**
+	 * Updates the artists tables: artists, categories_of_artists.
+	 * @param connection
+	 * @param rawSinger
+	 * @param rawMusicalGroups
+	 * @return true if succeeded, false otherwise.
+	 */
+	private static boolean updateArtistsTable(Connection connection, RawDataUnit rawSinger, RawDataUnit rawMusicalGroups) {
+
+		System.out.println("Updating the artists database...");
+		
+		boolean status = true;
+		String[] tableColumns;
+		int[] types;
+		String statementToExecute;
+	/*
+		//Prepare data
+		int[] indices = {0,2,0};
+		LinkedList<String[]> sigersCategories = extractDataFromRDT(rawSinger, indices);
+		LinkedList<String[]> musicalGroupsCategories = extractDataFromRDT(rawMusicalGroups, indices);
+		
+		//Filter duplicates from musicalGroupsCategories and sigersCategories
+		HashSet<String> singers = new HashSet<String>();
+		for(String[] singer : sigersCategories)
+			singers.add(singer[0]);
+		
+		Iterator<String[]> iter = musicalGroupsCategories.iterator();
+		while(iter.hasNext()){
+			String[] tupple = iter.next();
+			String group = tupple[0];
+			if(singers.contains(group))
+				iter.remove();
+		}
+				
+		for(String[] arr: sigersCategories)
+			arr[2] = "0";
+		
+		for(String[] arr: musicalGroupsCategories)
+			arr[2] = "1";
+		
+		//Create temporary tables: update_artists_temp (includes duplicates), update_artists_distinct
+		createTable(connection, "update_artists_temp", 
+			"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_artists_temp(artist_name, artist_category, artist_type)'", 
+			"artist_name varchar(100) NOT NULL, ",
+			"artist_category varchar(100) NOT NULL, ",
+			"artist_type BIT NOT NULL");
+		
+		createTable(connection, "update_artists_distinct", 
+			"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_artists_distinct(artist_name, artist_type)'", 
+			"artist_name varchar(100) NOT NULL, ",
+			"artist_type BIT NOT NULL");
+		
+		
+		//populate artists_temp table with Singers
+		tableColumns = new String[3];
+		tableColumns[0] = "artist_name";
+		tableColumns[1] = "artist_category";
+		tableColumns[2] = "artist_type";
+		types = new int[3];
+		types[0] = 2;
+		types[1] = 2;
+		types[2] = 1;
+		*/
+		//status = populateTable(connection, "update_artists_temp", tableColumns, types, sigersCategories);
+		//status = populateTable(connection, "update_artists_temp", tableColumns, types, musicalGroupsCategories);
+
+		//populate update_artists_distinct table
+		statementToExecute = "INSERT INTO update_artists_distinct(artist_name, artist_type) "
+				+ "SELECT DISTINCT artist_name, artist_type "
+				+ "FROM update_artists_temp ";
+		//status = executeStatement(connection, statementToExecute);
+		
+		//Update artists table
+		statementToExecute = "INSERT INTO artists(artist_name, artist_type) "
+				+ "SELECT DISTINCT UpdateArtist.artist_name, UpdateArtist.artist_type "
+				+ "FROM update_artists_distinct AS UpdateArtist, artists AS Artists "
+				+ "WHERE  UpdateArtist.artist_name NOT IN (SELECT DISTINCT artist_name FROM artists)";
+		//status = executeStatement(connection, statementToExecute);
+
+		
+		//Artist categories - 
+		
+		//Create temporary table: update_artists_categories_distinct
+		createTable(connection, "update_artists_categories_distinct", 
+			"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_artists_categories_distinct(category_name)'", 
+			"category_name varchar(100) NOT NULL");
+
+		//populate update_artists_categories_distinct table
+		statementToExecute = "INSERT INTO update_artists_categories_distinct(category_name) "
+				+ "SELECT DISTINCT artist_category "
+				+ "FROM update_artists_temp";
+		//status = executeStatement(connection, statementToExecute);
+			
+		//Update categories_of_artists table
+		statementToExecute = "INSERT INTO categories_of_artists(category_name) "
+				+ "SELECT DISTINCT category_name "
+				+ "FROM update_artists_categories_distinct AS UpdateCategory "
+				+ "WHERE  UpdateCategory.category_name NOT IN (SELECT DISTINCT categories_of_artists.category_name FROM categories_of_artists)";
+		//status = executeStatement(connection, statementToExecute);
+		
+		
+		//Update artist_category table
+		//Create temp table: update_artist_category_temp
+		createTable(connection, "update_artist_category_temp", 
+				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_artist_category_temp(artist, category)'", 
+				"artist varchar(100) NOT NULL, ",
+				"category varchar(100) NOT NULL, ",
+				"PRIMARY KEY (artist, category)");
+		
+		statementToExecute = "INSERT INTO update_artist_category_temp(artist, category) "
+				+ "SELECT DISTINCT artist_name, artist_category "
+				+ "FROM update_artists_temp";
+		//status = executeStatement(connection, statementToExecute);
+		
+		//populate artist_category table
+		statementToExecute = "INSERT INTO artist_category(artist_id, category_id) "
+				+ "SELECT DISTINCT Artist.artist_id, Category.category_artist_id "
+				+ "FROM artist_category_temp AS Temp, artists AS Artist, categories_of_artists AS Category "
+				+ "WHERE Temp.artist = Artist.artist_name  AND  Temp.category = Category.category_name "
+				+ "LIMIT 2000";
+		//status = executeStatement(connection, statementToExecute);
+		
+		
+		//Drop temp tables: artist_category_temp
+		//dropTable(connection, "update_artists_temp");
+		//dropTable(connection, "artist_category_temp");
+		//dropTable(connection, "update_artists_distinct");
+		//dropTable(connection, "update_artist_category_temp");
+		
+		return status;
+		
+		
+	}
+	
+	
+	
 }
