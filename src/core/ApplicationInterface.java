@@ -1,6 +1,9 @@
 package core;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import utilities.Pair;
 
 public interface ApplicationInterface {
 	
@@ -18,9 +21,6 @@ public interface ApplicationInterface {
 	public boolean updateMusicDatabase();
 	
 	
-	
-	
-	//aaa
 	/**
 	 *  for log in screen
 	 * @param username - string representing the username
@@ -52,7 +52,7 @@ public interface ApplicationInterface {
 	 * @param username
 	 * @return the status song of the user
 	 */
-	public String getStatusSong();
+	public Pair<String,String> getStatusSong();
 	
 	
 	//mira change
@@ -62,7 +62,7 @@ public interface ApplicationInterface {
 	 * @param song
 	 * @return true iff the change succeeded
 	 */
-	public boolean changeStatusSong(String song); //qaqa
+	public boolean changeStatusSong(Pair<String,String> song); //qaqa
 	
 	
 	
@@ -72,14 +72,14 @@ public interface ApplicationInterface {
 	 * @return the song list of the user
 	 */
 	
-	public List<String[]> getSongList();
+	public List<Pair<String,String>> getSongList();
 	
 	/**
 	 * for main screen
 	 * @param username
 	 * @return
 	 */
-	public List<String> getFriendList(String username);
+	public ArrayList<String> getFriendList();
 	
 	/**
 	 * for main screen
@@ -93,7 +93,7 @@ public interface ApplicationInterface {
 	 * @param friend_name - name to search in the users db
 	 * @return list of the search results 
 	 */
-	public List<String> getSearchResultsFriends(String friend_name);
+	public ArrayList<String> getSearchResultsFriends(String friend_name);
 	
 	/**
 	 * for add a friend screen
@@ -107,14 +107,14 @@ public interface ApplicationInterface {
 	 * @param artist_name - the artist name to search by
 	 * @return list of the search results
 	 */
-	public List<String> getSearchResultsByArtist(String artist_name);
+	public ArrayList<Pair<String,String>> getSearchResultsByArtist(String artist_name);
 	
 	/**
 	 * for add song screen
 	 * @param song_name -- the song name to search by
 	 * @return list of the search results
 	 */
-	public List<String> getSearchResultsBySong(String song_name);
+	public ArrayList<Pair<String,String>> getSearchResultsBySong(String song_name);
 	
 	/**
 	 * 

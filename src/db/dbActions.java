@@ -12,7 +12,7 @@ import java.util.List;
 import core.User;
 
 
-public class dbActions implements databaseActions{
+public class dbActions implements DBActionsInterface{
 
 	private boolean qaqa = false;
 	private ConnectionPool connectionPool;
@@ -31,6 +31,19 @@ public class dbActions implements databaseActions{
 				"From songs";
 		return executeQuery(sql_query,true); // true for  query is_select 
 			
+	}
+	
+	//gil- is it duplicated song name?
+	public int getSongID(String song_name)
+	{
+		String sql_query ="Select song_id " + 
+				"From songs " +
+				"Where songs.song_name =" + song_name;
+		
+		int song_id = Integer.parseInt(executeQuery(sql_query,true).get(0)[0]);
+		return song_id; // true for  query is_select 
+		
+		
 	}
 	
 	public ArrayList<String[]> getSongsArtistList(){
@@ -55,7 +68,7 @@ public class dbActions implements databaseActions{
 	
 	//Users DB// need to check
 	public boolean addSongToUser(String user_id, String song_id){
-		String sql_query ="INSERT INTO `project`.`user_songs` " +
+		String sql_query ="INSERT INTO `db_project`.`user_songs` " +
 				"(`user_id`, `song_id`) VALUES ('"+user_id+"', '"+song_id+"');";
 			
 		if (executeQuery(sql_query,false)==null)
@@ -75,6 +88,8 @@ public class dbActions implements databaseActions{
 		return true;
 		
 	}
+	
+	
 	
 
 	// need to check 
@@ -118,8 +133,42 @@ public class dbActions implements databaseActions{
 		return  executeQuery(sql_query,true);
 	}
 
+	
+	@Override
+	//need to check
+	public ArrayList<String[]> getUserFreindsList(int userID)
+	{
+		String StringUserID= ConvertIntegerToString(userID);
+		
+		String sql_query ="Select user_name " + 
+				"From users_freinds, users " +
+				"Where users_freinds.user_id=" + StringUserID + " And users.user_id = users_freinds.user_freind_id "; 
+		return executeQuery(sql_query,true);
+		
+	}
 
-
+	@Override
+	public boolean addFreindToUser(int userID, int userFreindID)
+	{
+				String sql_query ="INSERT INTO `db_project`.`users_freinds` " +
+						"(`user_id`, `user_freind_id`) VALUES ('"+userID+"', '"+userFreindID+"');";
+				if (executeQuery(sql_query,false)==null)
+					return false; // true for  query is_select
+			
+				return true;
+	}
+	
+	@Override
+	//Equivalent to usernameExists
+		public String getFindFreind(String Freindname)
+		{
+			String sql_query ="Select user_id, user_name, status_song_id " + 
+					"From users " +
+					"Where users.user_name=" + Freindname;
+			return executeQuery(sql_query,true).get(0)[0];
+		}
+		
+	
 	//gil
 	@Override
 	public boolean usernameExists(String username) {
@@ -233,9 +282,10 @@ public class dbActions implements databaseActions{
 	public String[] getUserStatusSong(int userID) {
 		String StringUserID= ConvertIntegerToString(userID);
 		
-		String sql_query ="Select song_name " + 
-				"From users, songs " +
-				"Where users.user_id=" + StringUserID + " And songs.song_id =users.status_song_id"; 
+		String sql_query ="Select song_name, artist_name " + 
+				"From users, songs , artist_song , artists " +
+				"Where users.user_id=" + StringUserID + " And artist_song.song_id = users.status_song_id And songs.song_id = users.status_song_id And artist.artist_id = artist_song.artist_id "; 
+		
 		
 		return executeQuery(sql_query,true).get(0);
 	}

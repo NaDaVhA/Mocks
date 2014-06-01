@@ -10,7 +10,7 @@ import java.util.List;
 import core.User;
 
 
-public interface databaseActions {
+public interface DBActionsInterface {
 
 	//[song_name, song_id]
 	public ArrayList<String[]> getSongsList();
@@ -23,27 +23,27 @@ public interface databaseActions {
 
 	//[artist_id, artist_name]
 	public ArrayList<String[]> getSingersList();
-
-
-
-	//aaa
 	
+	public int getSongID(String song_name);
+	
+	public String getFindFreind(String Freindname);
+
 	
 	//Users DB
+	public boolean registerNewUser(String username, String password);
 	
-	//[user_id, user_name, status_song_id]
-	public ArrayList<String[]> getUsersList();
-		
-	//[user_name]
-	public String[] getUserName(int userID);
+	public boolean authenticateUser(String username, String password);
 	
-	public int getUserId(String username);
+	public boolean connectUser(int userID);
+	
 	
 	public boolean usernameExists(String username);
 	
-	public String getUserPassword(int userID);
-	
 	public boolean disconnectUser(int userID);
+	
+	
+	
+	
 	
 	
 	//[song_name, artist_name]
@@ -52,28 +52,38 @@ public interface databaseActions {
 	//[artist_name]
 	public ArrayList<String[]> getUserArtistList(int userID);
 	
-	//[song_name]
+	//[song_name, artist_name]
 	public String[] getUserStatusSong(int userID);
 	
 	
-	
-	
-	
-	//connectiion
-
 
 	//Users DB
-	public boolean registerNewUser(String username, String password);
 	
-	public boolean authenticateUser(String username, String password);
-	
-	public boolean connectUser(int userID);
-	
-	public boolean setUserStatusSong(int userID, int songID);
+	//adds
+	public boolean addFreindToUser(int userID, int userFreindID);
 	
 	public boolean addArtistToUser(String user_id, String artist_id);
 	
 	public boolean addSongToUser(String user_id, String song_id);
+	
+	public boolean setUserStatusSong(int userID, int songID);
+	
+	//gets
+	
+	//[user_id, user_name, status_song_id]
+	public ArrayList<String[]> getUsersList();
+			
+	//[user_name]
+	public String[] getUserName(int userID);
+		
+	public int getUserId(String username);
+	
+	public String getUserPassword(int userID);
+	
+	//[user_name]
+	public ArrayList<String[]> getUserFreindsList(int userID);
+	
+	
 	
 	
 	//Database management	

@@ -1,16 +1,18 @@
 package core;
 
-import java.sql.Connection;
+
+import java.util.ArrayList;
 import java.util.List;
 
+import utilities.Pair;
 import db.ConnectionPool;
-import db.DataBaseManager;
-import db.databaseActions;
+
+import db.DBActionsInterface;
 import db.dbActions;
 
 public class AppEngine implements ApplicationInterface{
 	
-	private databaseActions dbActionRunner;
+	private DBActionsInterface dbActionRunner;
 	private User user;
 	
 	
@@ -43,7 +45,10 @@ public class AppEngine implements ApplicationInterface{
 		String yagoFilesPath =  Configurator.getYagoFolderPath("projectConfig.xml"); 
 		
 		status = this.dbActionRunner.initializeDatabase(yagoFilesPath);
-				
+		if(!status)
+			System.out.println("Database initialization failure!");
+		
+		
 		return status;
 		
 	}
@@ -76,10 +81,16 @@ public class AppEngine implements ApplicationInterface{
 	// 		User management code
 	///////////////////////////////////////
 	
-	
+	//also log in user
 	@Override
 	public boolean isUserRegisterd(String username, String password) {
-		return this.dbActionRunner.authenticateUser(username, password);
+		boolean stat = true;
+		stat = this.dbActionRunner.authenticateUser(username, password);
+		if (!stat)
+			return stat;
+		stat = initializeUserInstance(username);
+		return stat;
+		 
 	}
 
 	@Override
@@ -89,43 +100,24 @@ public class AppEngine implements ApplicationInterface{
 
 	@Override
 	public boolean signUpUser(String username, String password) {
-		// TODO Auto-generated method stub
-		return false;
+		return this.dbActionRunner.registerNewUser(username, password);
 	}
 	
-	
-	/**
-	 * Authenticates user, and creates user instance.
-	 * @param username
-	 * @param password
-	 * @return true if user is authenticated, false otherwise.
-	 */
-	public boolean signInUser(String username, String password) {
-		
-		boolean stat=true;
-		stat = this.dbActionRunner.authenticateUser(username, password);
-		
-		if(!stat){
-			return false;
-		}else {
-			stat= initializeUserInstance(this.dbActionRunner.getUserId(username));	
-		}
-		
-		return stat;
-	}
 
 	
 	@Override
-	public String getStatusSong() {
+	public Pair<String,String> getStatusSong() {
 		return this.user.getStatusSong();
 	}
 	
 	
 	@Override
-	public boolean changeStatusSong(String song) {
+	public boolean changeStatusSong(Pair<String,String> song) {
 		boolean stat=true;
-		int user_id =this.user.getUserId();
-		int song_id = this.dbActionRunner.getSongID(song);
+		String song_name = song.getLeft();
+		
+		int user_id =this.user.getUserID();
+		int song_id = this.dbActionRunner.getSongID(song_name);
 	
 		stat = this.dbActionRunner.setUserStatusSong(user_id, song_id);
 		if (!stat)
@@ -139,15 +131,14 @@ public class AppEngine implements ApplicationInterface{
 	}
 
 	@Override
-	public List<String[]> getSongList() {
+	public List<Pair<String,String>> getSongList() {
 		
-		return  this.user.getSongList();
+		return  this.user.getSongArtistList();
 	}
 
 	@Override
-	public List<String> getFriendList(String username) {
-		// TODO Auto-generated method stub
-		return null;
+	public ArrayList<String> getFriendList() {
+		return this.user.getfreindsList();
 	}
 
 	@Override
@@ -156,38 +147,56 @@ public class AppEngine implements ApplicationInterface{
 		return false;
 	}
 
+	
 	@Override
-	public List<String> getSearchResultsFriends(String friend_name) {
+	public ArrayList<String> getSearchResultsFriends(String friend_name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	
 	@Override
 	public boolean addFriend(String username) {
-		// TODO Auto-generated method stub
-		return false;
+		
+		int user_id =this.user.getUserID();
+		int freind_user_id = this.dbActionRunner.getUserId(username);
+		
+		boolean stat = this.dbActionRunner.addFreindToUser(user_id, freind_user_id);
+		
+		if (stat = false)
+		return stat;
+		
+		
+		this.user.addFreindTofreindsList(username);;
+		return stat;
+	
 	}
 
+	
+	
 	@Override
-	public List<String> getSearchResultsByArtist(String artist_name) {
+	public ArrayList<Pair<String,String>> getSearchResultsByArtist(String artist_name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	
 	@Override
-	public List<String> getSearchResultsBySong(String song_name) {
+	public ArrayList<Pair<String,String>> getSearchResultsBySong(String song_name){
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	
 	@Override
 	public boolean addSong(String song,String artist) {
 		
-		String user_name=this.user.getUsername();
+		String user_name=this.user.getUserName();
 		boolean stat = this.dbActionRunner.addSongToUser(user_name, song);
 		if (stat = false)
 			return stat;
-		this.user.addSongToMySongsList(song, artist);
+		Pair<String,String> pair = new Pair<String,String>(song,artist);
+		this.user.addSongToSongArtistlist(pair);
 		return stat;
 		
 	}
@@ -203,35 +212,79 @@ public class AppEngine implements ApplicationInterface{
 	 * 
 	 * @return
 	 */
-	private boolean initializeUserInstance(int userID){
+	private boolean initializeUserInstance(String username){
 		
-		boolean status = true;
 		
-		this.user = new User(userID);
+		int userID =this.dbActionRunner.getUserId(username);
+		if (userID==-1)
+			return false;
+		
+		this.user = new User(userID,username);
 		
 		//Initialize user's fields
-		String username = this.dbActionRunner.getUserName(userID);
-		if(username == null)
-			return false;
-		this.user.setUsername(username); 
 		
-		String statusSong = this.dbActionRunner.getUserStatusSong(userID);
-		if(statusSong == null)
+		String[] statusSongTemp = this.dbActionRunner.getUserStatusSong(userID);
+		if(statusSongTemp == null)
 			return false;
+		Pair<String,String> statusSong =ConvertArrayToPair(statusSongTemp);
 		this.user.setStatusSong(statusSong); 
 		
-		//Mira - decide what to do here
-		List<String[]> mySongsList = this.dbActionRunner.getUserSongList(userID);
-		if(mySongsList == null)
+	
+		ArrayList<String[]> mySongsListTemp = this.dbActionRunner.getUserSongList(userID);
+		if(mySongsListTemp == null)
 			return false;
-		this.user.setSongsList(mySongsList); 
+		List<Pair<String,String>> mySongsList = ConvertListArrayToListPair(mySongsListTemp);
+		this.user.setSongArtistlist(mySongsList); 
 		
-		List<String[]> myArtistList = this.dbActionRunner.getUserArtistList(userID);
-		if(myArtistList == null)
+		ArrayList<String[]> myArtistListTemp = this.dbActionRunner.getUserArtistList(userID);
+		if(myArtistListTemp == null)
 			return false;
-		this.user.setArtistList(myArtistList); 
+		List<Pair<String,String>> myArtistList = ConvertListArrayToListPair(myArtistListTemp);
+		this.user.setArtistlist(myArtistList); 
 		
-		return status;
+		ArrayList<String[]> myFreindsListTemp = this.dbActionRunner.getUserFreindsList(userID);
+		if(myFreindsListTemp == null)
+			return false;
+		ArrayList<String> myFreindsList = ConvertListArrayToList(myArtistListTemp);
+		this.user.setfreindsList(myFreindsList); 
+	
+		return true;
 	}
+	
+	private Pair<String,String> ConvertArrayToPair(String[] str)
+	{
+		Pair<String,String> pair=null;
+		if (str.length == 1)
+			pair= new Pair<String,String>(str[0],null);
+		if (str.length == 2)
+			pair= new Pair<String,String>(str[0],str[1]);
+		return pair;
+		
+		
+	}
+	
+	private List<Pair<String,String>> ConvertListArrayToListPair(ArrayList<String[]> arraylst)
+	{
+		List<Pair<String,String>> pairList = new ArrayList<Pair<String,String>>();
+		for (String[] s : arraylst)
+		{
+			pairList.add(ConvertArrayToPair(s));
+		}
+		return pairList;
+	}
+	
+	private ArrayList<String> ConvertListArrayToList(ArrayList<String[]> arraylst)
+	{
+		ArrayList<String> List = new ArrayList<String>();
+		for (String[] s : arraylst)
+		{
+			List.add(s[0]);
+		}
+		return List;
+		
+	}
+	
+	
+	
 	
 }
