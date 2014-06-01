@@ -12,7 +12,7 @@ import ui.theMusicalNetwork;
 public class Main {
 
 	public static void main(String[] args) {
-		//mira check
+		//mira2 check
 		boolean status = true;
 		
 		//Create a new ApplicationInterface instance
