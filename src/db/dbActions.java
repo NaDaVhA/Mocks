@@ -322,7 +322,8 @@ public class dbActions implements DBActionsInterface{
 
 		Connection connection = this.connectionPool.getConnectionFromPool();
 		
-		String getPasswordQuery = "SELECT userID FROM users WHERE username LIKE '" + username + "'";
+		//String getPasswordQuery = "SELECT userID FROM users WHERE username LIKE '" + username + "'";
+		String getPasswordQuery = "SELECT user_id FROM users WHERE user_name LIKE '" + username + "'"; //1.6.14
 		
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -352,7 +353,8 @@ public class dbActions implements DBActionsInterface{
 
 		Connection connection = this.connectionPool.getConnectionFromPool();
 		
-		String getPasswordQuery = "SELECT password FROM users WHERE userID = " + userID;
+		//String getPasswordQuery = "SELECT password FROM users WHERE userID = " + userID; //1.6.14
+		String getPasswordQuery = "SELECT password FROM users WHERE user_id = " + userID;
 		
 		Statement stmt = null;
 		ResultSet rs = null;
