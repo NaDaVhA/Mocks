@@ -6,7 +6,6 @@ import java.util.List;
 
 import utilities.Pair;
 import db.ConnectionPool;
-
 import db.DBActionsInterface;
 import db.dbActions;
 
@@ -110,6 +109,20 @@ public class AppEngine implements ApplicationInterface{
 		return this.user.getStatusSong();
 	}
 	
+	@Override
+	public Pair<String,String> getStatusSong(String username) {
+		int freind_user_id = this.dbActionRunner.getUserId(username);
+		
+		if (freind_user_id==-1)
+			return null;
+		String[] str = this.dbActionRunner.getUserStatusSong(freind_user_id);
+		if (str==null)
+			return null;
+		
+		return ConvertArrayToPair(str);	
+	}
+	
+	
 	
 	@Override
 	public boolean changeStatusSong(Pair<String,String> song) {
@@ -130,6 +143,24 @@ public class AppEngine implements ApplicationInterface{
 		return stat;
 	}
 
+	@Override
+	public List<Pair<String,String>> getSongList(String username)
+	{
+		int freind_user_id = this.dbActionRunner.getUserId(username);
+		
+		if (freind_user_id==-1)
+			return null;
+		
+		ArrayList<String[]> lst = this.dbActionRunner.getUserSongList(freind_user_id);
+		if (lst == null)
+		return null;
+		
+		return ConvertListArrayToListPair(lst);
+		
+		
+	}
+	
+	
 	@Override
 	public List<Pair<String,String>> getSongList() {
 		

@@ -46,7 +46,9 @@ public interface ApplicationInterface {
 	public boolean signUpUser(String username, String password);
 	
 	
-	//mira change
+	//username of a friend
+	public Pair<String,String> getStatusSong(String username); 
+	
 	/**
 	 * for main screen
 	 * @param username
@@ -55,7 +57,7 @@ public interface ApplicationInterface {
 	public Pair<String,String> getStatusSong();
 	
 	
-	//mira change
+	
 	/**
 	 * 
 	 * @param username
@@ -71,6 +73,10 @@ public interface ApplicationInterface {
 	 * @param username
 	 * @return the song list of the user
 	 */
+	
+	//username of a friend
+	public List<Pair<String,String>> getSongList(String username);
+	
 	
 	public List<Pair<String,String>> getSongList();
 	
