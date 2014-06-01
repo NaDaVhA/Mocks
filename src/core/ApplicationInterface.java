@@ -6,9 +6,18 @@ public interface ApplicationInterface {
 	
 	/**
 	 * Initializes the application.
-	 * @return true if succeeded, false otherwise
+	 * @return true if succeeded, false otherwise.
 	 */
 	public boolean initializeApplication();
+	
+	
+	/**
+	 * Updates  the application's music database.
+	 * @return true if succeeded, false otherwise.
+	 */
+	public boolean updateMusicDatabase();
+	
+	
 	
 	
 	//aaa
@@ -114,6 +123,9 @@ public interface ApplicationInterface {
 	 * @return true iff the song was added to the user song list
 	 */
 	public boolean addSong(String song,String artist);
+
+
+	
 
 	
 	

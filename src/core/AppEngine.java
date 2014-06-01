@@ -49,6 +49,28 @@ public class AppEngine implements ApplicationInterface{
 	}
 	
 	
+	///////////////////////////////////////
+	// 		Music management code
+	///////////////////////////////////////
+	
+	
+	/**
+	 * Updates the music database.
+	 * @return true if succeeded, false otherwise.
+	 */
+	public boolean updateMusicDatabase(){
+		
+		boolean status = true;
+		
+		String yagoFilesPath =  Configurator.getYagoFolderPath("projectConfig.xml"); 
+		
+		status = this.dbActionRunner.updateMusicDB(yagoFilesPath);
+				
+		return status;
+		
+	}
+	
+	
 	
 	///////////////////////////////////////
 	// 		User management code
