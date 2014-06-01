@@ -1,5 +1,7 @@
 package ui;
 
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -17,8 +19,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
+
+import core.ApplicationInterface;
+import utilities.Pair;
 
 public class addNewSongScreen extends Screen{
 	
@@ -31,13 +39,23 @@ public class addNewSongScreen extends Screen{
 	private Button radio_search2=null;
 	private Button search_songs_button=null;	
 	private Label search_results_label=null;
-	private List result_list=null;
+	private Table result_list=null;
 	private Button back_button=null;
 	private Button add_song_button=null;
+	
+	private boolean searchByArtist;
+	private String text_to_search;
+	private Pair<String,String> song_chosen;
+	
+	private Thread t8;
+	
+	
 
-	public addNewSongScreen(Display display, Shell shell) {
-		super(display, shell);
+	public addNewSongScreen(Display display, Shell shell,ApplicationInterface engine) {
+		super(display, shell, engine);
 	}
+	
+	
 	
 	@Override
 	public void createScreen(){
@@ -102,12 +120,20 @@ public class addNewSongScreen extends Screen{
 							Control child = children [j];
 							if (child instanceof Button) {
 								Button button = (Button) child;
-								if ((button.getStyle () & SWT.RADIO) != 0) button.setSelection (false);
+								if ((button.getStyle () & SWT.RADIO) != 0){ button.setSelection (false);}
 							}
+							
 						}
 						Button button = (Button) event.widget;
 						button.setSelection (true);
 						System.out.println(button.getText()); //chosen button
+						if(button.getText().contains("Song")){
+							searchByArtist=false;
+						}
+						else{
+							searchByArtist=true;
+						}
+						System.out.println(searchByArtist);
 					}
 				};
 			
@@ -115,6 +141,8 @@ public class addNewSongScreen extends Screen{
 			radio_search1.setText("Search by Artist");
 			//radio_search1.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 			radio_search1.addListener (SWT.Selection, radioGroup);
+			radio_search1.setSelection(true);
+			searchByArtist=true;
 			radio_search1.addPaintListener(new PaintListener() {
 				
 				@Override
@@ -149,6 +177,47 @@ public class addNewSongScreen extends Screen{
 				}
 			});
 			
+			/*******/
+			class searchSongs implements Runnable {
+
+				@Override
+				public void run() {
+					final ArrayList<Pair<String, String>> list;
+					if(searchByArtist){
+					// list=theMusicalNetwork.nadav.getSearchResultsByArtist(text_to_search);
+					 list=engine.getSearchResultsByArtist(text_to_search);
+					}
+					else{
+						// list=theMusicalNetwork.nadav.getSearchResultsBySong(text_to_search);
+						 list=engine.getSearchResultsBySong(text_to_search);
+					}
+					getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							//status_song=status;
+							
+							result_list.removeAll();
+							for(Pair<String, String> s:list){
+								TableItem item = new TableItem (result_list, SWT.NONE);
+								item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+								//item.setText(0, "artist "+s.getLeft());
+								//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
+								item.setText(0, s.getLeft());
+								item.setText(1, s.getRight());
+							}
+							
+							//Thread.currentThread();
+							pool.remove(t8);
+							if(pool.isEmpty()){
+								closeWaiting();
+								showScreen();
+							}
+						}
+					});
+					
+				}
+			}
+			
+			/*******/
 			search_songs_button=new Button(getShell(),SWT.NONE);
 			search_songs_button.setText("Search");
 			FormData data5 = new FormData ();
@@ -161,6 +230,13 @@ public class addNewSongScreen extends Screen{
 				@Override
 				public void widgetSelected (SelectionEvent e) {
 					System.out.println("qaqa - pressed search");
+					text_to_search=search_box.getText();
+					System.out.println("qaqa - search with :"+text_to_search);
+								
+					 openWaiting();			
+					 t8 = new Thread(new searchSongs());
+					 pool.add(t8);
+					 t8.start();
 					
 				}
 			});
@@ -187,16 +263,77 @@ public class addNewSongScreen extends Screen{
 			
 			//search list
 			
-			result_list=new List(getShell(), SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
+			result_list=new Table (getShell(), SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION);
+			result_list.setLinesVisible (true);
+			result_list.setHeaderVisible (true);
+			TableColumn column = new TableColumn (result_list, SWT.NONE);
+			column.setText ("Artist");
+			TableColumn column1 = new TableColumn (result_list, SWT.NONE);
+			column1.setText ("Song name");
+			column.setWidth(160);
+			column1.setWidth(160);
 			//for (int i=0; i<12; i++) friend_result_list.add ("Friend resault " + i); //QAQA CHANGE WITH REAL SONGS
 			
 			result_list.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 			FormData data7 = new FormData ();
-			data7.width=300;
+			data7.width=304;
 			data7.height=100;
 			data7.right = new FormAttachment (64);
-			data7.bottom = new FormAttachment (42, 0);
+			data7.bottom = new FormAttachment (45, 0);
 			result_list.setLayoutData(data7);
+			
+			result_list.addListener(SWT.Selection, new Listener () {
+				@Override
+				public void handleEvent (Event event) {
+					//System.out.println(event.data);//qaqa
+					int [] selection = result_list.getSelectionIndices ();
+					
+					for (int i=0; i<selection.length; i++) {
+						System.out.println(result_list.getItem(selection[i])); //qaqa
+							song_chosen=new Pair<String, String>(result_list.getItem(selection[i]).getText(0)
+									, result_list.getItem(selection[i]).getText(1));
+						}
+					//openWaiting();
+					
+					
+				}
+			});
+			
+			/*******/
+			class addSong implements Runnable {
+
+				@Override
+				public void run() {
+					//final boolean b=theMusicalNetwork.nadav.addSong("qaqa", song_chosen.getLeft(), song_chosen.getRight());
+					final boolean b=engine.addSong(song_chosen.getLeft(), song_chosen.getRight());
+					getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							//status_song=status;
+							
+							if(!b){
+								closeWaiting();
+								showScreen();
+								errorPop("Error", "Failed to add song.");	
+								pool.remove(t8);
+							}
+							else{
+								
+								pool.remove(t8);
+								if(pool.isEmpty()){
+									closeWaiting();
+									showScreen();
+									PopUp("added song", "qaqa-succes!!!");
+								}
+								
+							}
+						
+						}
+					});
+					
+				}
+			}
+			
+			/*******/
 			
 			
 			
@@ -205,95 +342,23 @@ public class addNewSongScreen extends Screen{
 			add_song_button=new Button(getShell(),SWT.NONE);
 			add_song_button.setText("Add the Song!");
 			FormData data8 = new FormData ();
-			data8.width=300;
+			data8.width=324;
 			data8.height=26;
-			data8.right = new FormAttachment (63, 0);
-			data8.bottom = new FormAttachment (55, 0);
+			data8.right = new FormAttachment (64, 0);
+			data8.bottom = new FormAttachment (58, 0);
 			add_song_button.setLayoutData(data8); 
 			add_song_button.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected (SelectionEvent e) {
 					System.out.println("qaqa - pressed Add song");
-					
+					t8 = new Thread(new addSong());
+					 pool.add(t8);
+					 t8.start();
 				}
 			});
 			
 			
-			/*
-			//friend status song label
-			friend_status_label=new Label(getShell(), SWT.BORDER);
-			friend_status_label.setAlignment(SWT.CENTER);
 			
-			friend_status_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-			friend_status_label.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
-			friend_status_label.setText("Friend status song:");
-			FormData data7 = new FormData ();
-			data7.width=200;
-			
-			data7.right = new FormAttachment (30, 0);
-			data7.bottom = new FormAttachment (50, 0);
-			friend_status_label.setLayoutData(data7);
-			
-			//friend_status_song
-			friend_status_song=new Label(getShell(), SWT.BORDER);
-			friend_status_song.setAlignment(SWT.LEFT);
-			
-			friend_status_song.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-			friend_status_song.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
-			friend_status_song.setText("qaqa");
-			FormData data8 = new FormData ();
-			data8.width=600;
-			
-			data8.right = new FormAttachment (95, 0);
-			data8.bottom = new FormAttachment (50, 0);
-			friend_status_song.setLayoutData(data8);
-			
-			//songs_list_label
-			
-			songs_list_label=new Label(getShell(), SWT.BORDER);
-			songs_list_label.setAlignment(SWT.CENTER);
-			
-			songs_list_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-			songs_list_label.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
-			songs_list_label.setText("Friend Song List:");
-			FormData data9 = new FormData ();
-			data9.width=200;
-			
-			data9.right = new FormAttachment (30, 0);
-			data9.bottom = new FormAttachment (63, 0);
-			songs_list_label.setLayoutData(data9);
-			
-			//friend song list 
-			friend_songs=new List(getShell(), SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
-			//for (int i=0; i<12; i++) friend_result_list.add ("Friend resault " + i); //QAQA CHANGE WITH REAL SONGS
-			
-			friend_songs.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-			FormData data10 = new FormData ();
-			data10.width=300;
-			data10.height=100;
-			data10.right = new FormAttachment (65);
-			data10.bottom = new FormAttachment (80, 0);
-			friend_songs.setLayoutData(data10);
-			
-			//add_friend_button
-			add_friend_button=new Button(getShell(),SWT.NONE);
-			add_friend_button.setText("Add Friend");
-			FormData data11 = new FormData ();
-			data11.width=115;
-			data11.height=106;
-			data11.right = new FormAttachment (85, 0);
-			data11.bottom = new FormAttachment (80, 0);
-			add_friend_button.setLayoutData(data11); 
-			add_friend_button.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected (SelectionEvent e) {
-					System.out.println("qaqa - pressed add friend");
-					
-				}
-			});
-			
-		*/
-				
 				//back button
 				back_button=new Button(getShell(),SWT.NONE);
 				back_button.setText("Go back to home screen");
@@ -308,7 +373,7 @@ public class addNewSongScreen extends Screen{
 					public void widgetSelected (SelectionEvent e) {
 						System.out.println("qaqa - pressed back home");
 						disposeScreen();
-						mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),"QAQA - USERNAME"); //QAQA ADD USERNAME
+						mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,"QAQA - USERNAME"); //QAQA ADD USERNAME
 						mainScreen.createScreen();
 					}
 				});
@@ -331,6 +396,42 @@ public class addNewSongScreen extends Screen{
 		this.search_label.dispose();
 		this.search_results_label.dispose();
 		this.search_songs_button.dispose();
+		
+	}
+
+	@Override
+	protected void hideScreen() {
+		// TODO Auto-generated method stub
+		this.add_song_button.setVisible(false);
+		this.back_button.setVisible(false);
+		this.head.setVisible(false);
+		this.radio_search.setVisible(false);
+		this.radio_search1.setVisible(false);
+		this.radio_search2.setVisible(false);
+		this.result_list.setVisible(false);
+		this.search_box.setVisible(false);
+		this.search_label.setVisible(false);
+		this.search_results_label.setVisible(false);
+		this.search_songs_button.setVisible(false);
+		this.getShell().layout();
+		
+	}
+
+	@Override
+	protected void showScreen() {
+		// TODO Auto-generated method stub
+		this.add_song_button.setVisible(true);
+		this.back_button.setVisible(true);
+		this.head.setVisible(true);
+		this.radio_search.setVisible(true);
+		this.radio_search1.setVisible(true);
+		this.radio_search2.setVisible(true);
+		this.result_list.setVisible(true);
+		this.search_box.setVisible(true);
+		this.search_label.setVisible(true);
+		this.search_results_label.setVisible(true);
+		this.search_songs_button.setVisible(true);
+		this.getShell().layout();
 		
 	}
 

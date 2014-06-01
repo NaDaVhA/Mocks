@@ -12,6 +12,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import core.ApplicationInterface;
+
 public class signUpScreen extends Screen{
 	
 	//private Display display=null;
@@ -29,9 +31,9 @@ public class signUpScreen extends Screen{
 	private  Text R_pass=null;
 	private Button signUp=null;
 	
-	public signUpScreen(Display display,Shell shell) {
+	public signUpScreen(Display display,Shell shell,ApplicationInterface engine) {
 		// TODO Auto-generated constructor stub
-		super(display, shell);
+		super(display, shell, engine);
 	}
 	
 	private void setUsername(String username){
@@ -143,10 +145,13 @@ public class signUpScreen extends Screen{
 
 			@Override
 			public void run() {
-				final boolean isUserTaken=theMusicalNetwork.nadav.isUsernameTaken(signUpScreen.this.username_s);
+				//final boolean isUserTaken=theMusicalNetwork.nadav.isUsernameTaken(signUpScreen.this.username_s);
+				final boolean isUserTaken=engine.isUsernameTaken(signUpScreen.this.username_s);
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						if(isUserTaken){ //QAQA  - PUT REAL FUNCTION HERE 
+							closeWaiting();
+							showScreen();
 							errorPop("Sign up Error", "Username already taken");
 						}
 						else{//username is not taken and pass is ok..  sign up the user
@@ -156,17 +161,22 @@ public class signUpScreen extends Screen{
 
 								@Override
 								public void run() {
-									final boolean signUpUser=theMusicalNetwork.nadav.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
+									//final boolean signUpUser=theMusicalNetwork.nadav.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
+									final boolean signUpUser=engine.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
 									getDisplay().asyncExec(new Runnable() {
 										public void run() {
 											if(!signUpUser){ //QAQA  - PUT REAL FUNCTION HERE 
+												closeWaiting();
+												showScreen();
 												errorPop("Sign up Error", "Failed to Sign up..");
 											}
 											else{//Sign up success.. go to main screen
-												
+												closeWaiting();
 												disposeScreen();
-												mainScreen main_screen=new mainScreen(getDisplay(), getShell(),signUpScreen.this.username_s);
-												main_screen.createScreen();
+												logInScreen log=new logInScreen(getDisplay(), getShell(), engine);
+												log.createScreen();
+												//mainScreen main_screen=new mainScreen(getDisplay(), getShell(),engine,signUpScreen.this.username_s);
+												//main_screen.createScreen();
 												//else{...}
 											}
 										}
@@ -210,6 +220,7 @@ public class signUpScreen extends Screen{
 					/***/
 					// create a thread to check if user registerd
 					Thread t = new Thread(new CheckUserTaken());
+					openWaiting();
 					t.start();
 					/***/
 				
@@ -224,6 +235,7 @@ public class signUpScreen extends Screen{
 	
 	@Override
 	protected void disposeScreen(){
+		this.headline.dispose();
 		this.pass.dispose();
 		this.password.dispose();
 		this.R_pass.dispose();
@@ -231,6 +243,35 @@ public class signUpScreen extends Screen{
 		this.user.dispose();
 		this.username.dispose();
 		this.signUp.dispose();
+	}
+
+	@Override
+	protected void hideScreen() {
+		// TODO Auto-generated method stub
+		this.headline.setVisible(false);
+		this.pass.setVisible(false);
+		this.password.setVisible(false);
+		this.R_pass.setVisible(false);
+		this.R_password.setVisible(false);
+		this.user.setVisible(false);
+		this.username.setVisible(false);
+		this.signUp.setVisible(false);
+		this.getShell().layout();
+	}
+
+	@Override
+	protected void showScreen() {
+		// TODO Auto-generated method stub
+		this.headline.setVisible(true);
+		this.pass.setVisible(true);
+		this.password.setVisible(true);
+		this.R_pass.setVisible(true);
+		this.R_password.setVisible(true);
+		this.user.setVisible(true);
+		this.username.setVisible(true);
+		this.signUp.setVisible(true);
+		this.getShell().layout();
+		
 	}
 
 	

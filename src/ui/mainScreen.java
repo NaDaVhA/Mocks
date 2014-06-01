@@ -8,21 +8,30 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import core.ApplicationInterface;
+import utilities.Pair;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
 
 
 public class mainScreen extends Screen{
 	//members
 	private String username;
-	private String status_song;
+	private Pair<String,String> status_song;
 	
 	private Label user_label=null;
 	private Label status_song_label=null;
@@ -39,13 +48,17 @@ public class mainScreen extends Screen{
 	private Button view_friend=null;
 	
 	
+	private Thread t1,t2,t3,t4;
+	
 	//QAQA add here the rest
+	private Pair<String, String> song_selcted_table=null;
 	
 	
-	public mainScreen(Display display,Shell shell,String username) {
+	public mainScreen(Display display,Shell shell,ApplicationInterface engine,String username) {
 		// TODO Auto-generated constructor stub
-		super(display, shell);
+		super(display, shell, engine);
 		this.username=username;
+	
 	}
 	
 	
@@ -53,7 +66,38 @@ public class mainScreen extends Screen{
 	@Override
 	public void createScreen() {
 		
-		this.status_song="qaqa -  status song";//qaqa add call to getStatusSong in interface
+		/*******/
+		class getStatusSong implements Runnable {
+
+			@Override
+			public void run() {
+				//final Pair<String,String> status=theMusicalNetwork.nadav.getStatusSong(username);
+				//final Pair<String,String> status=engine.getStatusSong(username); //1.6.14
+				final Pair<String,String> status=engine.getStatusSong();
+				getDisplay().asyncExec(new Runnable() {
+					public void run() {
+						//status_song=status;
+						status_song_label.setText("Status song:  "+status.getLeft()+" "+status.getRight());
+						updateStatusSong(status);
+						//Thread.currentThread();
+						pool.remove(t1);
+						if(pool.isEmpty()){
+							
+							closeWaiting();
+							showScreen();
+						}
+					}
+				});
+				
+			}
+		}
+		
+		/*******/
+		 t1 = new Thread(new getStatusSong());
+		pool.add(t1);
+		t1.start();
+		
+		//this.status_song="qaqa -  status song";//qaqa add call to getStatusSong in interface
 	
 		//username label
 		user_label=new Label(getShell(), SWT.NONE);
@@ -83,8 +127,9 @@ public class mainScreen extends Screen{
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed sign out");
+				//signOutUser in interface qaqa
 				disposeScreen();
-				logInScreen logIn=new logInScreen(getDisplay(),getShell());
+				logInScreen logIn=new logInScreen(getDisplay(),getShell(),engine);
 				logIn.createScreen();
 			}
 		});
@@ -97,7 +142,7 @@ public class mainScreen extends Screen{
 		status_song_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		
 		status_song_label.setFont(SWTResourceManager.getFont("MV Boli", 14, SWT.BOLD));
-		status_song_label.setText("Status song:  "+this.status_song);
+		
 		FormData data3 = new FormData ();
 		data3.width=700;
 		
@@ -106,6 +151,49 @@ public class mainScreen extends Screen{
 		status_song_label.setLayoutData(data3);
 		
 		//change status song button
+		
+		/*******/
+		class changeStatusSong implements Runnable {
+
+			@Override
+			public void run() {
+				
+				//final boolean b=theMusicalNetwork.nadav.changeStatusSong(username, song_selcted_table);
+				final boolean b=engine.changeStatusSong(song_selcted_table);
+				
+				getDisplay().asyncExec(new Runnable() {
+					public void run() {
+						//status_song=status;
+						if(b){
+						status_song_label.setText("Status song:  "+song_selcted_table.getLeft()+" "+song_selcted_table.getRight());
+						updateStatusSong(song_selcted_table);
+						//Thread.currentThread();
+							pool.remove(t4);
+							if(pool.isEmpty()){
+								
+								closeWaiting();
+								showScreen();
+							}
+						}
+						else{
+							pool.remove(t4);
+							if(pool.isEmpty()){
+								
+								closeWaiting();
+								showScreen();
+								errorPop("Error", "Failed to update status song");
+							}
+							
+							
+						}
+					}
+				});
+				}
+				
+			
+		}
+		
+		/*******/
 		
 		change_status_song=new Button(getShell(),SWT.NONE);
 		change_status_song.setText("Change Status Song");
@@ -119,6 +207,15 @@ public class mainScreen extends Screen{
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed change status song");
+				if(song_selcted_table==null){
+					errorPop("Error", "Please select a song from song list.\nIf you want to search for a new song press Add new Song.");
+				}
+				else{
+				openWaiting();
+				t4 = new Thread(new changeStatusSong());
+				pool.add(t4);
+				t4.start();
+				}
 			}
 		});
 		
@@ -151,7 +248,8 @@ public class mainScreen extends Screen{
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed add new song");
 				disposeScreen();
-				addNewSongScreen newSong=new addNewSongScreen(getDisplay(), getShell());
+				//hideScreen();
+				addNewSongScreen newSong=new addNewSongScreen(getDisplay(), getShell(),engine);
 				newSong.createScreen();
 			}
 		});
@@ -185,12 +283,19 @@ public class mainScreen extends Screen{
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed add new friend");
 				disposeScreen();
-				addNewFriendScreen newFriend=new addNewFriendScreen(getDisplay(), getShell());
+				addNewFriendScreen newFriend=new addNewFriendScreen(getDisplay(), getShell(),engine,username);
 				newFriend.createScreen();
 			}
 		});
 		
 		//song list
+		/*songList_t= new Table (getShell(), SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION);
+		songList_t.setLinesVisible (true);
+		songList_t.setHeaderVisible (true);
+		TableColumn column = new TableColumn (songList_t, SWT.NONE);
+		column.setText ("Artist");
+		TableColumn column1 = new TableColumn (songList_t, SWT.NONE);
+		column1.setText ("Song name");*/
 		songList_t= new Table (getShell(), SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION);
 		songList_t.setLinesVisible (true);
 		songList_t.setHeaderVisible (true);
@@ -198,7 +303,74 @@ public class mainScreen extends Screen{
 		column.setText ("Artist");
 		TableColumn column1 = new TableColumn (songList_t, SWT.NONE);
 		column1.setText ("Song name");
-		for (int i=0; i<128; i++) {
+		column.setWidth(125);
+		column1.setWidth(125);
+		songList_t.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		FormData data9 = new FormData ();
+		data9.width=250;
+		data9.height=200;
+		data9.right = new FormAttachment (40, 0);
+		data9.bottom = new FormAttachment (83, 0);
+		songList_t.setLayoutData(data9);
+		songList_t.addListener(SWT.Selection, new Listener () {
+			@Override
+			public void handleEvent (Event event) {
+				System.out.println(event.item);//qaqa
+				TableItem item=(TableItem)event.item;
+				System.out.println(item.getText(0));//qaqa
+				System.out.println(item.getText(1));//qaqa
+				Pair<String, String> s=new Pair<String, String>(item.getText(0), item.getText(1));
+				song_selcted_table=s;
+			}
+		});
+		
+		/*******/
+		class getSongList implements Runnable {
+
+			@Override
+			public void run() {
+				
+			//	final ArrayList<Pair<String,String>> f= engine.getSongList(username); //1.6.14
+				final ArrayList<Pair<String,String>> f= (ArrayList<Pair<String, String>>) engine.getSongList();
+						
+				getDisplay().asyncExec(new Runnable() {
+					public void run() {
+						
+					
+						for(Pair<String,String> s:f){
+							//friendList.add (s);
+							TableItem item = new TableItem (songList_t, SWT.NONE);
+							item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+							//item.setText(0, "artist "+s.getLeft());
+							//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
+							item.setText(0, s.getLeft());
+							item.setText(1, s.getRight());
+						}
+						
+						
+						//System.out.println(pool.size());
+						
+						pool.remove(t2);
+						if(pool.isEmpty()){
+							
+							closeWaiting();
+							showScreen();
+						}
+
+						
+				
+					}
+				});
+				
+			}
+		}
+		
+		/*******/
+		t2 = new Thread(new getSongList());
+		pool.add(t2);
+		t2.start();
+		
+		/*for (int i=0; i<128; i++) {
 			TableItem item = new TableItem (songList_t, SWT.NONE);
 			item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 			item.setText(0, "artist "+i);
@@ -210,21 +382,56 @@ public class mainScreen extends Screen{
 		data9.height=200;
 		data9.right = new FormAttachment (40, 0);
 		data9.bottom = new FormAttachment (83, 0);
-		songList_t.setLayoutData(data9); 
+		songList_t.setLayoutData(data9);
 		
 		column.setWidth(125);
-		column1.setWidth(125);
+		column1.setWidth(125); */
 		
 		//songList_t.getColumn (0).pack ();
 		//songList_t.getColumn (1).pack ();
 		
 		//friend list
 		friendList=new List(getShell(), SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
-		
-		LinkedList<String> l = theMusicalNetwork.nadav.getFriendList("nadav"); //QAQA CHANGE WITH REAL friend
-		for(String s:l){
-			friendList.add (s);
+		/*******/
+		class getFriendList implements Runnable {
+
+			@Override
+			public void run() {
+				
+				//final ArrayList<String> f=theMusicalNetwork.nadav.getFriendList(username);
+				//final ArrayList<String> f=engine.getFriendList(username); //1.6.14
+				final ArrayList<String> f=engine.getFriendList();
+						
+				getDisplay().asyncExec(new Runnable() {
+					public void run() {
+						for(String s:f){
+							friendList.add (s);
+						}
+						
+						pool.remove(t3);
+						
+						System.out.println(pool.size());
+						if(pool.isEmpty()){
+							
+							closeWaiting();
+							showScreen();
+						}
+					}
+				});
+				
+			}
 		}
+		
+		/*******/
+		 t3 = new Thread(new getFriendList());
+		pool.add(t3);
+		
+		t3.start();
+		
+		//LinkedList<String> l = theMusicalNetwork.nadav.getFriendList("nadav"); //QAQA CHANGE WITH REAL friend
+	/*	for(String s:l){
+			friendList.add (s);
+		}*/
 		//for (int i=0; i<l.size(); i++) friendList.add (l.);
 		
 		friendList.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -266,8 +473,21 @@ public class mainScreen extends Screen{
 				System.out.println("qaqa - pressed view friend");
 			}
 		});
-			
 		
+	/*	while(!pool.isEmpty())	{
+		Thread t=pool.peek();
+		if(t!=null){
+		t.start();
+		System.out.println("started thread");
+		while(t.isAlive()){
+			
+			}
+		pool.poll();
+		}
+		}*/
+		//status_song_label.setText("Status song:  "+this.status_song.getLeft()+" "+this.status_song.getRight());
+		//System.out.println(this.status_song.getLeft()==null);
+		openWaiting();
 		this.getShell().layout();
 		
 	}
@@ -286,6 +506,52 @@ public class mainScreen extends Screen{
 		this.user_label.dispose();
 		this.view_friend.dispose();
 		this.entertain_me.dispose();
+	}
+
+
+
+	@Override
+	protected void hideScreen() {
+		// TODO Auto-generated method stub
+		this.add_new_friend.setVisible(false);
+		this.add_new_song.setVisible(false);
+		this.change_status_song.setVisible(false);
+		this.friend_list_label.setVisible(false);
+		this.friendList.setVisible(false);
+		this.sign_out.setVisible(false);
+		this.song_list_label.setVisible(false);
+		this.songList_t.setVisible(false);
+		this.status_song_label.setVisible(false);
+		this.user_label.setVisible(false);
+		this.view_friend.setVisible(false);
+		this.entertain_me.setVisible(false);
+		this.getShell().layout();
+	}
+
+
+
+	@Override
+	protected void showScreen() {
+		// TODO Auto-generated method stub
+		this.add_new_friend.setVisible(true);
+		this.add_new_song.setVisible(true);
+		this.change_status_song.setVisible(true);
+		this.friend_list_label.setVisible(true);
+		this.friendList.setVisible(true);
+		this.sign_out.setVisible(true);
+		this.song_list_label.setVisible(true);
+		this.songList_t.setVisible(true);
+		this.status_song_label.setVisible(true);
+		this.user_label.setVisible(true);
+		this.view_friend.setVisible(true);
+		this.entertain_me.setVisible(true);
+		this.getShell().layout();
+		
+	}
+	
+	private void updateStatusSong(Pair<String, String> song){
+		this.status_song=song;
+	
 	}
 
 }

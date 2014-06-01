@@ -14,6 +14,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import core.ApplicationInterface;
+
 
 public class logInScreen extends Screen {
 	
@@ -31,8 +33,8 @@ public class logInScreen extends Screen {
 	
 
 
-	public logInScreen(Display display,Shell shell) {
-		super(display, shell);	
+	public logInScreen(Display display,Shell shell,ApplicationInterface engine) {
+		super(display, shell,engine);	
 	}
 	
 	
@@ -129,16 +131,22 @@ public class logInScreen extends Screen {
 
 			@Override
 			public void run() {
-				final boolean isUserRegisterd=theMusicalNetwork.nadav.isUserRegisterd(getUsername_s(), getPassword_s());
+				//final boolean isUserRegisterd=theMusicalNetwork.nadav.isUserRegisterd(getUsername_s(), getPassword_s());
+				final boolean isUserRegisterd=engine.isUserRegisterd(getUsername_s(), getPassword_s());
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						if(isUserRegisterd){ //QAQA  - PUT REAL FUNCTION HERE 
+							closeWaiting();
 							disposeScreen(); //he is registerd!
-							mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),getUsername_s());
+							//hideScreen();
+							mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,getUsername_s());
 							mainScreen.createScreen();
 						}
 						else{
+							closeWaiting();
+							showScreen();
 							errorPop("Log In Error", "Details given do not match a valid user.\n"+"Retype username and password.");
+							
 						}
 					}
 				});
@@ -161,6 +169,7 @@ public class logInScreen extends Screen {
 				/***/
 				// create a thread to check if user registerd
 				Thread t = new Thread(new CheckUserRegisterd());
+				openWaiting();
 				t.start();
 				/***/
 			
@@ -181,12 +190,12 @@ public class logInScreen extends Screen {
 				System.out.println("qaqa - pressed sign up"); //qaqa
 				disposeScreen();
 				//run other screen
-				signUpScreen sign_up=new signUpScreen(getDisplay(), getShell());
+				signUpScreen sign_up=new signUpScreen(getDisplay(), getShell(),engine);
 				sign_up.createScreen();
 			}
 		});
 		
-		this.getShell().layout();
+		//sthis.getShell().layout();
 
 	}
 	
@@ -200,6 +209,36 @@ public class logInScreen extends Screen {
 		this.username.dispose();
 		this.pass.dispose();
 		this.user.dispose();
+	}
+
+
+	@Override
+	protected void hideScreen() {
+		// TODO Auto-generated method stub
+		this.headline.setVisible(false);
+		this.logIn.setVisible(false);
+		this.password.setVisible(false);
+		this.signUp.setVisible(false);
+		this.username.setVisible(false);
+		this.pass.setVisible(false);
+		this.user.setVisible(false);
+		
+		this.getShell().layout();
+		
+	}
+
+
+	@Override
+	protected void showScreen() {
+		// TODO Auto-generated method stub
+		this.headline.setVisible(true);
+		this.logIn.setVisible(true);
+		this.password.setVisible(true);
+		this.signUp.setVisible(true);
+		this.username.setVisible(true);
+		this.pass.setVisible(true);
+		this.user.setVisible(true);
+		this.getShell().layout();
 	}
 	
 	
