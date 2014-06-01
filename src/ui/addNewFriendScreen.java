@@ -119,7 +119,7 @@ public class addNewFriendScreen extends Screen {
 				//final Pair<String, String> friend_song=theMusicalNetwork.nadav.getStatusSong(friend_name_to_show);
 				final Pair<String, String> friend_song=engine.getStatusSong(friend_name_to_show); //1.6.14
 				//final  ArrayList<Pair<String, String>> list=theMusicalNetwork.nadav.getSongList(friend_name_to_show);
-				final  ArrayList<Pair<String, String>> list=engine.getSongList(friend_name_to_show); //1.6.14
+				final  ArrayList<Pair<String, String>> list=(ArrayList<Pair<String, String>>) engine.getSongList(friend_name_to_show); //1.6.14
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;
