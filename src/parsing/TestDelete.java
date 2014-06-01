@@ -1,5 +1,5 @@
 package parsing;
 
 public class TestDelete {
-	private int test;
+	private int tost;
 }
