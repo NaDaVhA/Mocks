@@ -21,6 +21,10 @@ public class Main {
 		//Initialize the application
 		status = app.initializeApplication();
 		
+	//	if(status)
+			//status = app.updateMusicDatabase();
+
+		
 		//Continue with GUI loop
 		if(status){
 			//NADAV - Continue with GUI ...
