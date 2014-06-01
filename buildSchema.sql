@@ -73,3 +73,11 @@ CREATE TABLE `users` (
   PRIMARY KEY (`user_id`),
 UNIQUE INDEX `user_name_UNIQUE` (`user_name` ASC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='users(user_id, user_name , password , status_song_id)';
+
+CREATE TABLE `users_freinds` (
+  `user_id` int(11) NOT NULL,
+  `user_freind_id` int(11) NOT NULL,
+  PRIMARY KEY (`user_id`,`user_freind_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='users_freinds(user_id,user_freind_id)';
+
+
