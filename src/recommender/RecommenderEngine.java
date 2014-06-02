@@ -23,10 +23,17 @@ public class RecommenderEngine {
 	private Hashtable<String, Hashtable<String, String>> userSongs; //[userId,[songId,songId]]
 	private Hashtable<String, Hashtable<String, String>> songUsers; //[songId,[userId,userId]]
 	
+	private static RecommenderEngine instance = new RecommenderEngine();
+	private boolean isInitalized = false;
 	
 	
+	private RecommenderEngine(){
+	}
 	
-		
+	public static RecommenderEngine getInstance(){
+		return instance;
+	}
+	
 	public void initalize(List<User> allUsers, List<Song> allSongs){
 		
 		this.allSongs = allSongs;
@@ -58,15 +65,23 @@ public class RecommenderEngine {
 				if (userSongs.get(u.getId()).containsKey(s.getId()))
 					songUsers.get(s.getId()).put(u.getId(), u.getId());
 			}
-		}						
+		}	
+		
+		isInitalized = true;
 	}
 			
-	public List<String> recommendFriends(String userId, int topK)
+	public List<String> recommendFriends(String userId, int topK) throws Exception
 	{
+		if (!isInitalized)
+			throw new Exception("RecommenderEngine is not initalized");
+		
 		return getSimilarUsers(userId, topK, false);
 	}
 	
-	public List<String> recommendSongs(String userId, int topK){
+	public List<String> recommendSongs(String userId, int topK) throws Exception{
+		
+		if (!isInitalized)
+			throw new Exception("RecommenderEngine is not initalized");
 		
 		User targetUser = getUserById(userId);
 		List<String> similarUsers = getSimilarUsers(userId, (int)(allUsers.size()*0.05), true);		

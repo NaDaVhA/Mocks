@@ -68,12 +68,14 @@ public class Startup {
 		
 		
 				
-		RecommenderEngine engine = new RecommenderEngine();
+		RecommenderEngine engine = RecommenderEngine.getInstance();
 		engine.initalize(allUsers, allSongs);		
-		List<String> suggestedFriends = engine.recommendFriends(allUsers.get(0).getId(),10);
-		List<String> suggestedSongs = engine.recommendSongs(allUsers.get(0).getId(), 10);
-		
-		
+		try {
+			List<String> suggestedFriends = engine.recommendFriends(allUsers.get(0).getId(),10);
+			List<String> suggestedSongs = engine.recommendSongs(allUsers.get(0).getId(), 10);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		
 	}
