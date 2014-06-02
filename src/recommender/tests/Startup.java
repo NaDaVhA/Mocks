@@ -52,7 +52,7 @@ public class Startup {
 		List<Song> allSongs = new LinkedList<Song>();
 		for (int i=0;i<songsCount;i++)
 		{
-			Song s = new Song(""+i,""+i);
+			Song s = new Song(""+i,""+i,"Artist"+i);
 			allSongs.add(s);
 			
 			//Generate User Listens To Songs
@@ -71,8 +71,8 @@ public class Startup {
 		RecommenderEngine engine = RecommenderEngine.getInstance();
 		engine.initalize(allUsers, allSongs);		
 		try {
-			List<String> suggestedFriends = engine.recommendFriends(allUsers.get(0).getId(),10);
-			List<String> suggestedSongs = engine.recommendSongs(allUsers.get(0).getId(), 10);
+			List<User> suggestedFriends = engine.recommendFriends(allUsers.get(0),10);
+			List<Song> suggestedSongs = engine.recommendSongs(allUsers.get(0), 10);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

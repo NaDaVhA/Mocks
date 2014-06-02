@@ -5,12 +5,14 @@ package recommender.entites;
 public class Song {
 
 	private String name;
+	private String artistName;
 	private String id;
 	
 	
-	public Song(String id, String name){
+	public Song(String id, String name, String artistName){
 		this.name = name;
 		this.id = id;
+		this.artistName = artistName;
 	}
 	
 	public String getName() {
@@ -29,5 +31,10 @@ public class Song {
 		Song other = (Song)obj;
 		return other.id.toLowerCase().equals(this.id.toLowerCase());
 	}
+
+	public String getArtistName() {
+		return artistName;
+	}
+
 	
 }

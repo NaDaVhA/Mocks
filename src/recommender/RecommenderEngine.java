@@ -15,7 +15,7 @@ import java.util.Hashtable;
 
 
 
-public class RecommenderEngine {
+public class RecommenderEngine{
 
 	private List<User> allUsers;
 	private List<Song> allSongs;
@@ -29,6 +29,9 @@ public class RecommenderEngine {
 	
 	private RecommenderEngine(){
 	}
+	
+	
+	
 	
 	public static RecommenderEngine getInstance(){
 		return instance;
@@ -70,27 +73,27 @@ public class RecommenderEngine {
 		isInitalized = true;
 	}
 			
-	public List<String> recommendFriends(String userId, int topK) throws Exception
+	public List<User> recommendFriends(User user, int topK) throws Exception
 	{
 		if (!isInitalized)
 			throw new Exception("RecommenderEngine is not initalized");
 		
-		return getSimilarUsers(userId, topK, false);
+		return getSimilarUsers(user, topK, false);
 	}
 	
-	public List<String> recommendSongs(String userId, int topK) throws Exception{
+	public List<Song> recommendSongs(User user, int topK) throws Exception{
 		
 		if (!isInitalized)
 			throw new Exception("RecommenderEngine is not initalized");
 		
-		User targetUser = getUserById(userId);
-		List<String> similarUsers = getSimilarUsers(userId, (int)(allUsers.size()*0.05), true);		
+		User targetUser = user;
+		List<User> similarUsers = getSimilarUsers(targetUser, (int)(allUsers.size()*0.05), true);		
 		
 		Hashtable<String,Integer> candidates = new Hashtable<String, Integer>();
 		
-		for (String similarUserId : similarUsers)
+		for (User similarUser : similarUsers)
 		{
-			User similarUser = getUserById(similarUserId);
+			
 			for (Song s : similarUser.getListensTo())
 			{
 				if (!userSongs.get(targetUser.getId()).containsKey(s.getId()))
@@ -112,17 +115,20 @@ public class RecommenderEngine {
 		if (topK > scores.size())
 			topK = scores.size();
 		
-		List<String> resultSet = new ArrayList<String>();
+		List<Song> resultSet = new ArrayList<Song>();
 		for (int i=0;i<topK;i++)		
-			resultSet.add(scores.get(i).getSongId());		
+			resultSet.add(getSongById(scores.get(i).getSongId()));		
 		
 		return resultSet;
 			
 	}
 		
-	private List<String> getSimilarUsers(String userId, int topK, boolean includeFriends){
+	
+	
+	
+	private List<User> getSimilarUsers(User user, int topK, boolean includeFriends){
 				
-		User targetUser = getUserById(userId);
+		User targetUser = user;
 				
 		List<UsersSimilarityScore> scores = new ArrayList<UsersSimilarityScore>();				
 		for (User u : allUsers)
@@ -151,9 +157,9 @@ public class RecommenderEngine {
 		if (topK > scores.size())
 			topK = scores.size();
 		
-		List<String> resultSet = new ArrayList<String>();
+		List<User> resultSet = new ArrayList<User>();
 		for (int i=0;i<topK;i++)		
-			resultSet.add(scores.get(i).getUser().getId());		
+			resultSet.add(scores.get(i).getUser());		
 		
 		return resultSet;
 	}
@@ -170,7 +176,7 @@ public class RecommenderEngine {
 		return new UsersSimilarityScore(user,targetUser,intersectionSize);
 	}
 
-	private User getUserById(String userId){
+	public User getUserById(String userId){
 		for (User u : allUsers)
 		{
 			if (u.getId().toLowerCase().equals(userId.toLowerCase()))
@@ -179,6 +185,14 @@ public class RecommenderEngine {
 		return null;
 	}
 	
+	public Song getSongById(String songId){
+		for (Song s : allSongs)
+		{
+			if (s.getId().toLowerCase().equals(songId.toLowerCase()))
+				return s;
+		}
+		return null;
+	}
 	
 	
 	
