@@ -30,18 +30,31 @@ public class RecommenderEngineAdapter{
 	}
 	
 	public List<String> recommendFriends(String username, int topK) throws Exception{
+		
 		RecommenderEngine engine = RecommenderEngine.getInstance();
-		List<User> tResult = engine.recommendFriends(engine.getUserById(username), topK);
+		
+		User u = engine.getUserByUsername(username);
+		if (u==null)
+			return new ArrayList<String>();
+			
+		List<User> tResult = engine.recommendFriends(u, topK);
+		
 		List<String> result = new ArrayList<String>();
-		for (User u : tResult)
-			result.add(u.getId());
+		for (User user : tResult)
+			result.add(user.getUsername());
+		
 		return result;
 	}
 	
 	public List<Pair<String,String>> recommendSongs(String username, int topK) throws Exception{
 		
 		RecommenderEngine engine = RecommenderEngine.getInstance();
-		List<Song> tResult = engine.recommendSongs(engine.getUserById(username), topK);
+		
+		User u = engine.getUserByUsername(username);
+		if (u==null)
+			return new ArrayList<Pair<String,String>>();
+		
+		List<Song> tResult = engine.recommendSongs(u, topK);
 		
 		List<Pair<String,String>> result = new ArrayList<Pair<String,String>>();
 		for (Song s : tResult)
@@ -76,18 +89,36 @@ public class RecommenderEngineAdapter{
 		
 		List<User> resultList = new ArrayList<User>();
 		
+		//Create Users
 		ArrayList<String[]> allUsersSet = db.getUsersList();
 		for (int i=0;i<allUsersSet.size();i++)
 		{
 			String[] currentUserArr = allUsersSet.get(i);
 			String userName = currentUserArr[1];
+			String userIdStr = currentUserArr[0];
 			
-			recommender.entites.User u = new User(userName);
+			recommender.entites.User u = new User(userIdStr,userName);
 			resultList.add(u);
+		}
+		
+		//Add User Friends & Songs
+		for (User u : resultList)
+		{
+			ArrayList<String[]> userFriends = db.getUserFreindsList(Integer.parseInt(u.getId()));
+			for (String[] friendArr : userFriends)
+			{
+				String friendUsername = friendArr[0];
+				u.addFriend(getUserByUsername(resultList,friendUsername));
+			}
 			
-			//Add User Friends!
-			
-			//Add User Songs
+			ArrayList<String[]> userSongs = db.getUserSongList(Integer.parseInt(u.getId()));
+			for (String[] userSongArr : userSongs)
+			{
+				String artistName = userSongArr[1];
+				String songName = userSongArr[0];
+				recommender.entites.Song s = new Song(artistName+"@"+songName, songName, artistName);
+				u.addSong(s);
+			}
 		}
 		
 		return resultList;
@@ -95,7 +126,14 @@ public class RecommenderEngineAdapter{
 		
 	}
 
-	
+	public User getUserByUsername(List<User> users, String username){
+		for (User u : users)
+		{
+			if (u.getUsername().toLowerCase().equals(username.toLowerCase()))
+				return u;
+		}
+		return null;
+	}
 	
 	
 

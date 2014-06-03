@@ -185,6 +185,15 @@ public class RecommenderEngine{
 		return null;
 	}
 	
+	public User getUserByUsername(String username){
+		for (User u : allUsers)
+		{
+			if (u.getUsername().toLowerCase().equals(username.toLowerCase()))
+				return u;
+		}
+		return null;
+	}
+	
 	public Song getSongById(String songId){
 		for (Song s : allSongs)
 		{

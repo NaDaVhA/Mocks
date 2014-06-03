@@ -34,7 +34,7 @@ public class Startup {
 		//Generate Users
 		List<User> allUsers = new LinkedList<User>();
 		for (int i=0;i<usersCount;i++)
-			allUsers.add(new User(""+i));
+			allUsers.add(new User(""+i,""+i));
 		
 		//Generate Friends
 		for (User u : allUsers)

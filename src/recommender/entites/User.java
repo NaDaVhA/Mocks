@@ -5,18 +5,24 @@ import java.util.LinkedList;
 public class User {
 
 	private String id;
+	private String username;
 	private LinkedList<Song> listensTo;
 	private LinkedList<User> friends;
 	
 	
-	public User(String id){
+	public User(String id, String username){
 		this.id = id;
+		this.username = username;
 		this.listensTo = new LinkedList<Song>();
 		this.friends = new LinkedList<User>();
 	}
 	
 	public String getId() {
 		return id;
+	}
+	
+	public String getUsername() {
+		return username;
 	}
 	
 	public LinkedList<Song> getListensTo() {
