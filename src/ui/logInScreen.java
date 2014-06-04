@@ -131,8 +131,15 @@ public class logInScreen extends Screen {
 
 			@Override
 			public void run() {
+				final boolean isUserRegisterd;
+				if(theMusicalNetwork.qaqa){
+					isUserRegisterd=theMusicalNetwork.nadav.isUserRegisterd(getUsername_s(), getPassword_s());
+				}
+				else{//real code
+					isUserRegisterd=engine.isUserRegisterd(getUsername_s(), getPassword_s());
+				}
 				//final boolean isUserRegisterd=theMusicalNetwork.nadav.isUserRegisterd(getUsername_s(), getPassword_s());
-				final boolean isUserRegisterd=engine.isUserRegisterd(getUsername_s(), getPassword_s());
+				//final boolean isUserRegisterd=engine.isUserRegisterd(getUsername_s(), getPassword_s());
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						if(isUserRegisterd){ //QAQA  - PUT REAL FUNCTION HERE 
@@ -195,7 +202,7 @@ public class logInScreen extends Screen {
 			}
 		});
 		
-		//sthis.getShell().layout();
+		this.getShell().layout();
 
 	}
 	

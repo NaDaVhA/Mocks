@@ -116,10 +116,21 @@ public class addNewFriendScreen extends Screen {
 
 			@Override
 			public void run() {
-				//final Pair<String, String> friend_song=theMusicalNetwork.nadav.getStatusSong(friend_name_to_show);
-				final Pair<String, String> friend_song=engine.getStatusSong(friend_name_to_show); //1.6.14
-				//final  ArrayList<Pair<String, String>> list=theMusicalNetwork.nadav.getSongList(friend_name_to_show);
-				final  ArrayList<Pair<String, String>> list=(ArrayList<Pair<String, String>>) engine.getSongList(friend_name_to_show); //1.6.14
+				final Pair<String, String> friend_song;
+				final  ArrayList<Pair<String, String>> list;
+				
+				if(theMusicalNetwork.qaqa){
+					 friend_song=theMusicalNetwork.nadav.getStatusSong(friend_name_to_show);
+					 list=(ArrayList<Pair<String, String>>) theMusicalNetwork.nadav.getSongList(friend_name_to_show);
+				}
+				else{ //true code
+				 friend_song=engine.getStatusSong(friend_name_to_show); //1.6.14
+					
+					 list=(ArrayList<Pair<String, String>>) engine.getSongList(friend_name_to_show); //1.6.14
+					
+				}
+				
+				
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;
@@ -192,8 +203,15 @@ public class addNewFriendScreen extends Screen {
 
 			@Override
 			public void run() {
-				//final  ArrayList<String> list=theMusicalNetwork.nadav.getSearchResultsFriends(name_to_search);
-				final  ArrayList<String> list=engine.getSearchResultsFriends(name_to_search);
+				final  ArrayList<String> list;
+				if(theMusicalNetwork.qaqa){
+					 list=theMusicalNetwork.nadav.getSearchResultsFriends(name_to_search);
+				}
+				else{//true code
+					 list=engine.getSearchResultsFriends(name_to_search);
+				}
+				
+				//final  ArrayList<String> list=engine.getSearchResultsFriends(name_to_search);
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;
@@ -314,8 +332,15 @@ public class addNewFriendScreen extends Screen {
 
 			@Override
 			public void run() {
+				final boolean add;
+				if(theMusicalNetwork.qaqa){
+					add=theMusicalNetwork.nadav.addFriend(friend_name_to_show);
+				}
+				else{
+					add=engine.addFriend(friend_name_to_show);
+				}
 				//final boolean add=theMusicalNetwork.nadav.addFriend(friend_name_to_show);
-				final boolean add=engine.addFriend(friend_name_to_show);
+				//final boolean add=engine.addFriend(friend_name_to_show);
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;

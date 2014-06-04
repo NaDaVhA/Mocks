@@ -73,7 +73,14 @@ public class mainScreen extends Screen{
 			public void run() {
 				//final Pair<String,String> status=theMusicalNetwork.nadav.getStatusSong(username);
 				//final Pair<String,String> status=engine.getStatusSong(username); //1.6.14
-				final Pair<String,String> status=engine.getStatusSong();
+				final Pair<String,String> status;
+				if(theMusicalNetwork.qaqa){
+					status=theMusicalNetwork.nadav.getStatusSong();
+				}
+				else{ //real code
+					 status=engine.getStatusSong();
+				}
+				//final Pair<String,String> status=engine.getStatusSong();
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;
@@ -159,7 +166,14 @@ public class mainScreen extends Screen{
 			public void run() {
 				
 				//final boolean b=theMusicalNetwork.nadav.changeStatusSong(username, song_selcted_table);
-				final boolean b=engine.changeStatusSong(song_selcted_table);
+				final boolean b;
+				if(theMusicalNetwork.qaqa){
+					b=theMusicalNetwork.nadav.changeStatusSong(song_selcted_table);
+				}
+				else{
+					b=engine.changeStatusSong(song_selcted_table);
+				}
+				//final boolean b=engine.changeStatusSong(song_selcted_table);
 				
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
@@ -303,8 +317,8 @@ public class mainScreen extends Screen{
 		column.setText ("Artist");
 		TableColumn column1 = new TableColumn (songList_t, SWT.NONE);
 		column1.setText ("Song name");
-		column.setWidth(125);
-		column1.setWidth(125);
+		column.setWidth(135);
+		column1.setWidth(135);
 		songList_t.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		FormData data9 = new FormData ();
 		data9.width=250;
@@ -331,7 +345,14 @@ public class mainScreen extends Screen{
 			public void run() {
 				
 			//	final ArrayList<Pair<String,String>> f= engine.getSongList(username); //1.6.14
-				final ArrayList<Pair<String,String>> f= (ArrayList<Pair<String, String>>) engine.getSongList();
+				final ArrayList<Pair<String,String>> f;
+				if(theMusicalNetwork.qaqa){
+					f= (ArrayList<Pair<String, String>>) theMusicalNetwork.nadav.getSongList();
+				}
+				else{
+					f= (ArrayList<Pair<String, String>>) engine.getSongList();
+				}
+				//final ArrayList<Pair<String,String>> f= (ArrayList<Pair<String, String>>) engine.getSongList();
 						
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
@@ -397,10 +418,15 @@ public class mainScreen extends Screen{
 
 			@Override
 			public void run() {
+				final ArrayList<String> f;
+				if(theMusicalNetwork.qaqa){
+					 f=theMusicalNetwork.nadav.getFriendList();
+				}
+				else{
+					f=engine.getFriendList();
+				}
 				
-				//final ArrayList<String> f=theMusicalNetwork.nadav.getFriendList(username);
-				//final ArrayList<String> f=engine.getFriendList(username); //1.6.14
-				final ArrayList<String> f=engine.getFriendList();
+				//final ArrayList<String> f=engine.getFriendList();
 						
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {

@@ -146,7 +146,14 @@ public class signUpScreen extends Screen{
 			@Override
 			public void run() {
 				//final boolean isUserTaken=theMusicalNetwork.nadav.isUsernameTaken(signUpScreen.this.username_s);
-				final boolean isUserTaken=engine.isUsernameTaken(signUpScreen.this.username_s);
+				final boolean isUserTaken;
+				if(theMusicalNetwork.qaqa){
+					isUserTaken=theMusicalNetwork.nadav.isUsernameTaken(signUpScreen.this.username_s);
+				}
+				else{
+					isUserTaken=engine.isUsernameTaken(signUpScreen.this.username_s);
+				}
+				//final boolean isUserTaken=engine.isUsernameTaken(signUpScreen.this.username_s);
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						if(isUserTaken){ //QAQA  - PUT REAL FUNCTION HERE 
@@ -161,8 +168,15 @@ public class signUpScreen extends Screen{
 
 								@Override
 								public void run() {
+									final boolean signUpUser;
 									//final boolean signUpUser=theMusicalNetwork.nadav.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
-									final boolean signUpUser=engine.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
+									if(theMusicalNetwork.qaqa){
+										signUpUser=theMusicalNetwork.nadav.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
+									}
+									else{
+										signUpUser=engine.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
+									}
+									//final boolean signUpUser=engine.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
 									getDisplay().asyncExec(new Runnable() {
 										public void run() {
 											if(!signUpUser){ //QAQA  - PUT REAL FUNCTION HERE 

@@ -182,14 +182,24 @@ public class addNewSongScreen extends Screen{
 
 				@Override
 				public void run() {
-					final ArrayList<Pair<String, String>> list;
+					final ArrayList<Pair<String, String>> list ;
 					if(searchByArtist){
-					// list=theMusicalNetwork.nadav.getSearchResultsByArtist(text_to_search);
-					 list=engine.getSearchResultsByArtist(text_to_search);
+						if(theMusicalNetwork.qaqa){
+							list=theMusicalNetwork.nadav.getSearchResultsByArtist(text_to_search);
+						}
+						else{ //true code
+							 list=engine.getSearchResultsByArtist(text_to_search);
+						}
+					
 					}
 					else{
-						// list=theMusicalNetwork.nadav.getSearchResultsBySong(text_to_search);
-						 list=engine.getSearchResultsBySong(text_to_search);
+						if(theMusicalNetwork.qaqa){
+							 list=theMusicalNetwork.nadav.getSearchResultsBySong(text_to_search);
+						}
+						else{//real code
+							list=engine.getSearchResultsBySong(text_to_search);
+						}
+							 
 					}
 					getDisplay().asyncExec(new Runnable() {
 						public void run() {
@@ -304,8 +314,15 @@ public class addNewSongScreen extends Screen{
 
 				@Override
 				public void run() {
+					final boolean b;
+					if(theMusicalNetwork.qaqa){
+						b=theMusicalNetwork.nadav.addSong( song_chosen.getLeft(), song_chosen.getRight());
+					}
+					else{//true code
+						b=engine.addSong(song_chosen.getLeft(), song_chosen.getRight());
+					}
 					//final boolean b=theMusicalNetwork.nadav.addSong("qaqa", song_chosen.getLeft(), song_chosen.getRight());
-					final boolean b=engine.addSong(song_chosen.getLeft(), song_chosen.getRight());
+					//final boolean b=engine.addSong(song_chosen.getLeft(), song_chosen.getRight());
 					getDisplay().asyncExec(new Runnable() {
 						public void run() {
 							//status_song=status;
