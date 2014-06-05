@@ -104,7 +104,7 @@ public class dbActions implements DBActionsInterface{
 		if ((user_id == -1) || (song_id == -1) || (user_id == 0) || (song_id == 0))
 			return false;
 		
-		String sql_query ="INSERT INTO `db_project`.`user_songs` " +
+		String sql_query ="INSERT INTO `user_songs` " +
 				"(`user_id`, `song_id`) VALUES ('"+user_id+"', '"+song_id+"');";
 			
 		if (executeQuery(sql_query,false)==null)
@@ -189,7 +189,7 @@ public class dbActions implements DBActionsInterface{
 	@Override
 	public boolean addFreindToUser(int userID, int userFreindID)
 	{
-				String sql_query ="INSERT INTO `db_project`.`users_freinds` " +
+				String sql_query ="INSERT INTO `users_freinds` " +
 						"(`user_id`, `user_freind_id`) VALUES ('"+userID+"', '"+userFreindID+"');";
 				if (executeQuery(sql_query,false)==null)
 					return false; // true for  query is_select
@@ -239,7 +239,7 @@ public class dbActions implements DBActionsInterface{
 	@Override
 	public boolean registerNewUser(String userName, String password) {
 		
-		String sql_query ="INSERT INTO `db_project`.`users` " +
+		String sql_query ="INSERT INTO `users` " +
 		"(`user_name`, `password`) VALUES ('"+userName+"', '"+password+"');";
 			
 		if (executeQuery(sql_query,false)==null)
@@ -326,7 +326,7 @@ public class dbActions implements DBActionsInterface{
 	@Override
 	public boolean setUserStatusSong(int userID, int songID) {
 		
-		String sql_query ="UPDATE `db_project`.`users` " +
+		String sql_query ="UPDATE `users` " +
 				" set status_song_id = " + songID 
 				+ " where users.user_id =" + userID;
 		if (executeQuery(sql_query,false)==null)
