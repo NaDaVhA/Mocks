@@ -37,7 +37,7 @@ public class welcomeScreen {
 				
 		welcome=new Label(shell, SWT.NONE);
 		welcome.setAlignment(SWT.CENTER);
-		welcome.setText("Welcome! -QAQA add app logo here!");
+		welcome.setText("Welcome!                ");
 		welcome.setForeground(display.getSystemColor(SWT.COLOR_WHITE)); //change color to white
 		welcome.setFont(SWTResourceManager.getFont("MV Boli", 16, SWT.BOLD));
 

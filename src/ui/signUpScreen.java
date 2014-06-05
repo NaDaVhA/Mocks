@@ -231,16 +231,20 @@ public class signUpScreen extends Screen{
 					errorPop("Sign up Error", "Passwords doesnt match.\nPlease try again.");
 				}
 				else{
+					if(signUpScreen.this.password_s.isEmpty() || signUpScreen.this.password_repeat_s.isEmpty()){
+						errorPop("Sign up Error", "One or more of the passwords fields are empty.\nPlease try again.");
+					}
+					else{
+						
+						/***/
+						// create a thread to check if user registerd
+						Thread t = new Thread(new CheckUserTaken());
+						openWaiting();
+						t.start();
+						/***/
 					
-					/***/
-					// create a thread to check if user registerd
-					Thread t = new Thread(new CheckUserTaken());
-					openWaiting();
-					t.start();
-					/***/
-				
+					}
 				}
-				
 			}
 		});
 		

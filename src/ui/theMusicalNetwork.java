@@ -31,7 +31,7 @@ public class theMusicalNetwork {
 	private viewFriendScreen viewFriendScreen;*/
 	//QAQA-DELETE AFTER QA
 	public static NadavDevelopmentClass nadav;  //qaqa this  design is not good
-	public static boolean qaqa=false;
+	public static boolean qaqa=true;
 
 
 
