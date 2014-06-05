@@ -604,7 +604,12 @@ public class dbActions implements DBActionsInterface{
 	}
 
 
-	
+	public void terminateConnectionToDB(){
+		
+		boolean status = this.connectionPool.closeConnectionPool();
+		if(!status)
+			System.out.println("Connection to database is lost. terminating application anyway.");
+	}
 	
 	
 }

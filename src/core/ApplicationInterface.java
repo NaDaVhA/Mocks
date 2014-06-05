@@ -15,6 +15,13 @@ public interface ApplicationInterface {
 	
 	
 	/**
+	 * Terminates connection to database.
+	 * Closes all open (and valid) connections from the connection pool.
+	 */
+	public void terminateDBConnection();
+	
+	
+	/**
 	 * Updates  the application's music database.
 	 * @return true if succeeded, false otherwise.
 	 */

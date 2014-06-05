@@ -197,7 +197,7 @@ public class ConnectionPool {
 	 * @return true if all connections are closed, false otherwise.
 	 * @throws SQLException 
 	 */
-	public boolean closeConnectionPool() throws SQLException{
+	public boolean closeConnectionPool(){
 		
 		boolean status = true;
 		
@@ -209,7 +209,6 @@ public class ConnectionPool {
 			} catch (SQLException e) {
 				System.out.println("closeConnectionPool: Lost connection to DB.");
 				e.printStackTrace();
-				throw e;
 			}
 			
 			//Try to close connection at most 5 times

@@ -96,4 +96,6 @@ public interface DBActionsInterface {
 	
 	public boolean updateMusicDB(String yagoFilesPath) throws SQLException;
 	
+	public void terminateConnectionToDB();
+	
 }

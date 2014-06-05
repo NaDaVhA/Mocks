@@ -31,7 +31,7 @@ public class AppEngine implements ApplicationInterface{
 	
 	
 	/////////////////////////////////////////////////
-	// 		Application's initialization code 
+	// 		Application's management code 
 	/////////////////////////////////////////////////
 	
 	/**
@@ -58,6 +58,18 @@ public class AppEngine implements ApplicationInterface{
 		return new Pair<Integer, Boolean>(0, status);
 		
 	}
+	
+	
+	/**
+	 * Terminates connection to database.
+	 * Closes all open (and valid) connections from the connection pool.
+	 */
+	public void terminateDBConnection(){
+		
+		this.dbActionRunner.terminateConnectionToDB();
+		
+	}
+	
 	
 	
 	///////////////////////////////////////

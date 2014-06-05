@@ -49,7 +49,8 @@ public class Main {
 		}
 
 		System.out.println("End! ...");
-
+		
+		app.terminateDBConnection();
 	}
 
 }
