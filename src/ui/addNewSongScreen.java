@@ -282,16 +282,19 @@ public class addNewSongScreen extends Screen{
 			column1.setText ("Song name");
 			column.setWidth(160);
 			column1.setWidth(160);
+			
+			
 			//for (int i=0; i<12; i++) friend_result_list.add ("Friend resault " + i); //QAQA CHANGE WITH REAL SONGS
 			
-			result_list.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+			//result_list.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 			FormData data7 = new FormData ();
 			data7.width=304;
 			data7.height=100;
 			data7.right = new FormAttachment (64);
 			data7.bottom = new FormAttachment (45, 0);
 			result_list.setLayoutData(data7);
-			
+			result_list.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+			System.out.println("$$$$"+result_list.getBackgroundMode());
 			result_list.addListener(SWT.Selection, new Listener () {
 				@Override
 				public void handleEvent (Event event) {
@@ -316,10 +319,10 @@ public class addNewSongScreen extends Screen{
 				public void run() {
 					final boolean b;
 					if(theMusicalNetwork.qaqa){
-						b=theMusicalNetwork.nadav.addSong( song_chosen.getLeft(), song_chosen.getRight());
+						b=theMusicalNetwork.nadav.addSong(song_chosen.getRight(),song_chosen.getLeft());
 					}
 					else{//true code
-						b=engine.addSong(song_chosen.getLeft(), song_chosen.getRight());
+						b=engine.addSong(song_chosen.getRight(),song_chosen.getLeft());
 					}
 					//final boolean b=theMusicalNetwork.nadav.addSong("qaqa", song_chosen.getLeft(), song_chosen.getRight());
 					//final boolean b=engine.addSong(song_chosen.getLeft(), song_chosen.getRight());
@@ -339,7 +342,7 @@ public class addNewSongScreen extends Screen{
 								if(pool.isEmpty()){
 									closeWaiting();
 									showScreen();
-									PopUp("added song", "qaqa-succes!!!");
+									PopUpinfo("added song", "qaqa-succes!!!");
 								}
 								
 							}

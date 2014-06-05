@@ -59,9 +59,23 @@ public abstract class Screen {
 	 * opens a pop up window 
 	 * @param head - the title of the pop up message
 	 * @param body - the body of the pop up message
+	 * n
+	 */
+	protected boolean PopUpinfo(String head,String body){
+		MessageBox messageBox =   new MessageBox(shell, SWT.OK| SWT.ICON_INFORMATION);
+		messageBox.setText(head);
+		messageBox.setMessage(body);
+		if(messageBox.open()==SWT.OK)
+			return true;
+		else return false;
+	}
+	/**
+	 * opens a pop up window 
+	 * @param head - the title of the pop up message
+	 * @param body - the body of the pop up message
 	 * @return true iff OK button was chosen
 	 */
-	protected boolean PopUp(String head,String body){
+	protected boolean PopUpWarning(String head,String body){
 		MessageBox messageBox =   new MessageBox(shell, SWT.OK| SWT.CANCEL| SWT.ICON_WARNING);
 		messageBox.setText(head);
 		messageBox.setMessage(body);
@@ -85,7 +99,7 @@ public abstract class Screen {
 	
 	protected void openWaiting(){
 		//this.hideScreen();   //qaqa 1.6.14
-		waiting= new Label(getShell(), SWT.NONE);
+		waiting= new Label(getShell(), SWT.INHERIT_DEFAULT);
 		waiting.setAlignment(SWT.CENTER);
 		waiting.setText("Please wait while we are processing your request");
 		waiting.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE)); //change color to white

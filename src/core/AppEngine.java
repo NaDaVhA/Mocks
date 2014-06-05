@@ -99,7 +99,13 @@ public class AppEngine implements ApplicationInterface{
 
 	@Override
 	public boolean signUpUser(String username, String password) {
-		return this.dbActionRunner.registerNewUser(username, password);
+		
+		boolean stat =  this.dbActionRunner.registerNewUser(username, password);
+		
+		if (!stat)
+			return stat;
+		stat = initializeUserInstance(username);
+		return stat;
 	}
 	
 
@@ -178,12 +184,15 @@ public class AppEngine implements ApplicationInterface{
 		return false;
 	}
 
+	//mira
 	
 	@Override
 	public ArrayList<String> getSearchResultsFriends(String friend_name) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return ConvertListArrayToList(this.dbActionRunner.getFindFreind(friend_name));
+		
 	}
+	//mira-
 
 	
 	@Override
@@ -194,11 +203,11 @@ public class AppEngine implements ApplicationInterface{
 		
 		boolean stat = this.dbActionRunner.addFreindToUser(user_id, freind_user_id);
 		
-		if (stat = false)
+		if (stat == false)
 		return stat;
 		
+		this.user.addFreindTofreindsList(username);
 		
-		this.user.addFreindTofreindsList(username);;
 		return stat;
 	
 	}
@@ -207,15 +216,21 @@ public class AppEngine implements ApplicationInterface{
 	
 	@Override
 	public ArrayList<Pair<String,String>> getSearchResultsByArtist(String artist_name) {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<String[]> result = this.dbActionRunner.getArtistList(artist_name);
+		if (result == null)
+			return null;
+		
+		return ConvertListArrayToListPair(result);
 	}
 
 	
 	@Override
 	public ArrayList<Pair<String,String>> getSearchResultsBySong(String song_name){
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<String[]> result = this.dbActionRunner.getSongsArtistList(song_name);
+		if (result == null)
+			return null;
+		
+		return ConvertListArrayToListPair(result);
 	}
 
 	
@@ -224,7 +239,7 @@ public class AppEngine implements ApplicationInterface{
 		
 		String user_name=this.user.getUserName();
 		boolean stat = this.dbActionRunner.addSongToUser(user_name, song);
-		if (stat = false)
+		if (stat == false)
 			return stat;
 		Pair<String,String> pair = new Pair<String,String>(song,artist);
 		this.user.addSongToSongArtistlist(pair);
@@ -245,6 +260,7 @@ public class AppEngine implements ApplicationInterface{
 	 */
 	private boolean initializeUserInstance(String username){
 		
+		System.out.println("mira1");
 		
 		int userID =this.dbActionRunner.getUserId(username);
 		if (userID==-1)
@@ -254,6 +270,7 @@ public class AppEngine implements ApplicationInterface{
 		
 		//Initialize user's fields
 		
+	
 		String[] statusSongTemp = this.dbActionRunner.getUserStatusSong(userID);
 		if(statusSongTemp == null)
 			return false;
@@ -267,18 +284,24 @@ public class AppEngine implements ApplicationInterface{
 		List<Pair<String,String>> mySongsList = ConvertListArrayToListPair(mySongsListTemp);
 		this.user.setSongArtistlist(mySongsList); 
 		
+		
+		
 		ArrayList<String[]> myArtistListTemp = this.dbActionRunner.getUserArtistList(userID);
 		if(myArtistListTemp == null)
 			return false;
 		List<Pair<String,String>> myArtistList = ConvertListArrayToListPair(myArtistListTemp);
 		this.user.setArtistlist(myArtistList); 
 		
+
+		
 		ArrayList<String[]> myFreindsListTemp = this.dbActionRunner.getUserFreindsList(userID);
 		if(myFreindsListTemp == null)
 			return false;
-		ArrayList<String> myFreindsList = ConvertListArrayToList(myArtistListTemp);
+		ArrayList<String> myFreindsList = ConvertListArrayToList(myFreindsListTemp);	
 		this.user.setfreindsList(myFreindsList); 
 	
+	
+		
 		return true;
 	}
 	
@@ -294,9 +317,9 @@ public class AppEngine implements ApplicationInterface{
 		
 	}
 	
-	private List<Pair<String,String>> ConvertListArrayToListPair(ArrayList<String[]> arraylst)
+	private ArrayList<Pair<String,String>> ConvertListArrayToListPair(ArrayList<String[]> arraylst)
 	{
-		List<Pair<String,String>> pairList = new ArrayList<Pair<String,String>>();
+		ArrayList<Pair<String,String>> pairList = new ArrayList<Pair<String,String>>();
 		for (String[] s : arraylst)
 		{
 			pairList.add(ConvertArrayToPair(s));
@@ -307,6 +330,9 @@ public class AppEngine implements ApplicationInterface{
 	private ArrayList<String> ConvertListArrayToList(ArrayList<String[]> arraylst)
 	{
 		ArrayList<String> List = new ArrayList<String>();
+
+		
+		
 		for (String[] s : arraylst)
 		{
 			List.add(s[0]);

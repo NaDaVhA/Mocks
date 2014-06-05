@@ -26,8 +26,17 @@ public interface DBActionsInterface {
 	
 	public int getSongID(String song_name);
 	
-	public String getFindFreind(String Freindname);
-
+	
+	//mira
+	//[user_name]
+	public ArrayList<String[]> getFindFreind(String Freindname);
+	
+	//[song, artist]
+	public ArrayList<String[]> getArtistList(String artist_name);
+	
+	//[song, artist]
+	public ArrayList<String[]> getSongsArtistList(String songname);
+//mira-
 	
 	//Users DB
 	public boolean registerNewUser(String username, String password);
@@ -64,11 +73,15 @@ public interface DBActionsInterface {
 	
 	public boolean addArtistToUser(String user_id, String artist_id);
 	
-	public boolean addSongToUser(String user_id, String song_id);
+	//mira
+	public boolean addSongToUser(String user_name, String song_name);
+	//mira-
 	
 	public boolean setUserStatusSong(int userID, int songID);
 	
 	//gets
+	
+	
 	
 	//[user_id, user_name, status_song_id]
 	public ArrayList<String[]> getUsersList();
@@ -82,7 +95,6 @@ public interface DBActionsInterface {
 	
 	//[user_name]
 	public ArrayList<String[]> getUserFreindsList(int userID);
-	
 	
 	
 	

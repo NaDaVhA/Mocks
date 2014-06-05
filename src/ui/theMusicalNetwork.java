@@ -31,7 +31,7 @@ public class theMusicalNetwork {
 	private viewFriendScreen viewFriendScreen;*/
 	//QAQA-DELETE AFTER QA
 	public static NadavDevelopmentClass nadav;  //qaqa this  design is not good
-	public static boolean qaqa=true;
+	public static boolean qaqa=false;
 
 
 
@@ -60,7 +60,9 @@ public class theMusicalNetwork {
 		
 		bg_image=new Image(display,npath);	
 		shell.setBackgroundImage(bg_image);
-		shell.setBackgroundMode(SWT.INHERIT_FORCE);
+		
+		//shell.setBackgroundMode(SWT.INHERIT_FORCE);
+		shell.setBackgroundMode(SWT.INHERIT_DEFAULT);
 		
 		/*this.addFriendScreen=new addNewFriendScreen(display, shell, "bug!!"); //qaqa
 		this.addSongScreen =new addNewSongScreen(display, shell);
@@ -91,6 +93,7 @@ public void openShell(){
             
         }
         display.dispose();
+       
   }
 	
 	

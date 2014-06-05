@@ -46,6 +46,7 @@ public class mainScreen extends Screen{
 	
 	private Button entertain_me=null;
 	private Button view_friend=null;
+	private String friend_name;
 	
 	
 	private Thread t1,t2,t3,t4;
@@ -319,13 +320,15 @@ public class mainScreen extends Screen{
 		column1.setText ("Song name");
 		column.setWidth(135);
 		column1.setWidth(135);
-		songList_t.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		
+		
 		FormData data9 = new FormData ();
 		data9.width=250;
 		data9.height=200;
 		data9.right = new FormAttachment (40, 0);
 		data9.bottom = new FormAttachment (83, 0);
 		songList_t.setLayoutData(data9);
+		songList_t.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		songList_t.addListener(SWT.Selection, new Listener () {
 			@Override
 			public void handleEvent (Event event) {
@@ -468,6 +471,17 @@ public class mainScreen extends Screen{
 		data10.bottom = new FormAttachment (80, 0);
 		friendList.setLayoutData(data10);
 		
+		friendList.addListener(SWT.Selection, new Listener () {
+			@Override
+			public void handleEvent (Event event) {
+				int [] selection = friendList.getSelectionIndices ();
+				for (int i=0; i<selection.length; i++) {
+					System.out.println(friendList.getItem(selection[i])); //qaqa
+					friend_name=friendList.getItem(selection[i]);
+					}
+			}
+		});
+		
 		//entertain me button
 		entertain_me=new Button(getShell(),SWT.NONE);
 		entertain_me.setText("Entertain Me!");
@@ -497,6 +511,14 @@ public class mainScreen extends Screen{
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed view friend");
+				if(friend_name==null){
+					errorPop("Error", "Please select a friend first.");
+				}
+				else{
+				hideScreen();
+				viewFriendScreen view=new viewFriendScreen(getDisplay(),getShell(),engine,friend_name);
+				view.createScreen();
+				}
 			}
 		});
 		

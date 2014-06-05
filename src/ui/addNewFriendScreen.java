@@ -356,7 +356,7 @@ public class addNewFriendScreen extends Screen {
 							if(pool.isEmpty()){
 								closeWaiting();
 								showScreen();
-								PopUp("added Friend", "qaqa-succes!!!");
+								PopUpinfo("added Friend", "qaqa-succes!!!");
 							}
 							
 						}

@@ -185,6 +185,7 @@ public class signUpScreen extends Screen{
 												errorPop("Sign up Error", "Failed to Sign up..");
 											}
 											else{//Sign up success.. go to main screen
+												PopUpinfo("Sign up", "sign up succes!");
 												closeWaiting();
 												disposeScreen();
 												logInScreen log=new logInScreen(getDisplay(), getShell(), engine);
