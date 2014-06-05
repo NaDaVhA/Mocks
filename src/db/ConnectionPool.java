@@ -111,13 +111,13 @@ public class ConnectionPool {
 	}
 	
 	
-	
-	/**
+/*	
+	*//**
 	 * Retrieves connection from connection pool. 
 	 * Connection is removed from pool.
 	 * if no connections are available, creates and Retrieves a new connection.
 	 * @return a DataBaseConnection object.
-	 */
+	 *//*
 	public Connection getConnectionFromPool(){
 		
 		if(this.availableConnectionsNumber == 0)
@@ -128,10 +128,16 @@ public class ConnectionPool {
 		return this.pool.pop();
 		
 	};
+	*/
 	
-	
-	
-	public Connection SAFEgetConnectionFromPool() throws SQLException{
+	/**
+	 * Retrieves connection from connection pool. 
+	 * Connection is removed from pool.
+	 * if no connections are available, creates and Retrieves a new connection.
+	 * @return a DataBaseConnection object.
+	 * @throws SQLException
+	 */
+	public Connection getConnectionFromPool() throws SQLException{
 		
 		if(this.availableConnectionsNumber == 0)
 			this.createNewConnectionInPool(this.host, this.port, this.dataBase, this.dbUser, this.dbPassword);
@@ -173,7 +179,6 @@ public class ConnectionPool {
 	};
 	
 	
-	
 	/**
 	 * Returns connection to the connection pool
 	 * @param dbConn
@@ -190,14 +195,22 @@ public class ConnectionPool {
 	/**
 	 * Closes all connections in connection pool.
 	 * @return true if all connections are closed, false otherwise.
+	 * @throws SQLException 
 	 */
-	public boolean closeConnectionPool(){
+	public boolean closeConnectionPool() throws SQLException{
 		
 		boolean status = true;
 		
 		while(this.availableConnectionsNumber > 0){
 			
-			Connection con = this.getConnectionFromPool();
+			Connection con = null;
+			try {
+				con = this.getConnectionFromPool();
+			} catch (SQLException e) {
+				System.out.println("closeConnectionPool: Lost connection to DB.");
+				e.printStackTrace();
+				throw e;
+			}
 			
 			//Try to close connection at most 5 times
 			for(int i=0; i< 5; i++){

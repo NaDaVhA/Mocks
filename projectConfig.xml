@@ -1,1 +1,2 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><Configuration><ConnectionArguments><hostname>localhost</hostname><port>3306</port><databaseName>db_project</databaseName><username>root</username><password>YOURPASSWORD</password></ConnectionArguments><YagoFolderPath>D:\\YAGO\\</YagoFolderPath></Configuration>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Configuration><ConnectionArguments><hostname>localhost</hostname><port>3306</port><databaseName>test_2</databaseName><username>root</username><password>EnterYourPassword</password></ConnectionArguments><YagoFolderPath>D:\\YAGO\\</YagoFolderPath>
+	<UpdateYagoFolderPath>D:\\YAGO_update\\</UpdateYagoFolderPath></Configuration>

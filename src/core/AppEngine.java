@@ -1,6 +1,7 @@
 package core;
 
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,20 +36,26 @@ public class AppEngine implements ApplicationInterface{
 	
 	/**
 	 * First, checks whether database is initialized. If needed - initializes application's database.
-	 * @return true if succeeded, false otherwise.
+	 * @return Pair<0,true> if succeeded, Pair<0,false> if not and Pair<-1,something>.
 	 */
-	public boolean initializeApplication(){
+	public Pair<Integer, Boolean> initializeApplication(){
 		
 		boolean status = true;
 		
 		String yagoFilesPath =  Configurator.getYagoFolderPath("projectConfig.xml", false); 
 		
-		status = this.dbActionRunner.initializeDatabase(yagoFilesPath);
+		try {
+			status = this.dbActionRunner.initializeDatabase(yagoFilesPath);
+		} catch (SQLException e) {
+			// Connection is lost.
+			e.printStackTrace();
+			return new Pair<Integer, Boolean>(-1, status);
+		}
 		if(!status)
 			System.out.println("Database initialization failure!");
 		
 		
-		return status;
+		return new Pair<Integer, Boolean>(0, status);
 		
 	}
 	
@@ -62,16 +69,21 @@ public class AppEngine implements ApplicationInterface{
 	 * Updates the music database.
 	 * @return true if succeeded, false otherwise.
 	 */
-	public boolean updateMusicDatabase(){
+	public Pair<Integer, Boolean> updateMusicDatabase(){
 		
 		boolean status = true;
 		
 		String yagoFilesPath =  Configurator.getYagoFolderPath("projectConfig.xml", true); 
 		
-		status = this.dbActionRunner.updateMusicDB(yagoFilesPath);
+		try {
+			status = this.dbActionRunner.updateMusicDB(yagoFilesPath);
+		} catch (SQLException e) {
+			// Connection is lost.
+			e.printStackTrace();
+			return new Pair<Integer, Boolean>(-1, status);
+		}
 				
-		return status;
-		
+		return new Pair<Integer, Boolean>(0, status);		
 	}
 	
 	
@@ -82,30 +94,65 @@ public class AppEngine implements ApplicationInterface{
 	
 	//also log in user
 	@Override
-	public boolean isUserRegisterd(String username, String password) {
-		boolean stat = true;
-		stat = this.dbActionRunner.authenticateUser(username, password);
-		if (!stat)
-			return stat;
-		stat = initializeUserInstance(username);
-		return stat;
-		 
+	public Pair<Integer, Boolean> isUserRegisterd(String username, String password) {
+		
+		boolean status = true;
+		
+		try {
+			status = this.dbActionRunner.authenticateUser(username, password);
+			if (!status)
+				return new Pair<Integer, Boolean>(0, status);
+			
+			status = initializeUserInstance(username);
+		} catch (SQLException e) {
+			// Connection is lost.
+			e.printStackTrace();
+			return new Pair<Integer, Boolean>(-1, status);
+		}
+		
+		
+		return new Pair<Integer, Boolean>(0, status);		 
 	}
 
+	
 	@Override
-	public boolean isUsernameTaken(String username) {
-		return this.dbActionRunner.usernameExists(username);
+	public Pair<Integer, Boolean> isUsernameTaken(String username) {
+		
+		boolean status = false;
+		
+		try {
+			status = this.dbActionRunner.usernameExists(username);
+			return new Pair<Integer, Boolean>(0, status);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Pair<Integer, Boolean>(-1, status);
+		}
+		
 	}
 
+	
 	@Override
-	public boolean signUpUser(String username, String password) {
+	public Pair<Integer, Boolean> signUpUser(String username, String password) {
 		
-		boolean stat =  this.dbActionRunner.registerNewUser(username, password);
+		boolean stat = false;
+		try {
+			
+			stat = this.dbActionRunner.registerNewUser(username, password);
+			if (!stat)
+				return new Pair<Integer, Boolean>(0, stat);
+			
+			stat = initializeUserInstance(username);
 		
-		if (!stat)
-			return stat;
-		stat = initializeUserInstance(username);
-		return stat;
+		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Pair<Integer, Boolean>(-1, stat);
+
+		}
+		
+		return new Pair<Integer, Boolean>(0, stat);
 	}
 	
 
@@ -115,55 +162,91 @@ public class AppEngine implements ApplicationInterface{
 		return this.user.getStatusSong();
 	}
 	
+	
 	@Override
-	public Pair<String,String> getStatusSong(String username) {
-		int freind_user_id = this.dbActionRunner.getUserId(username);
+	public Pair<Integer, Pair<String, String>> getStatusSong(String username) {
 		
-		if (freind_user_id==-1)
-			return null;
-		String[] str = this.dbActionRunner.getUserStatusSong(freind_user_id);
-		if (str==null)
-			return null;
+		int freind_user_id;
+		String[] str = null;
 		
-		return ConvertArrayToPair(str);	
+		try {
+			freind_user_id = this.dbActionRunner.getUserId(username);
+			if (freind_user_id==-1)
+				return new Pair<Integer, Pair<String,String>>(0, null);
+			
+			str = this.dbActionRunner.getUserStatusSong(freind_user_id);
+			if (str==null)
+				return new Pair<Integer, Pair<String,String>>(0, null);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Pair<Integer, Pair<String,String>>(-1, null);
+
+		}
+		
+		Pair<String, String> result = ConvertArrayToPair(str);
+		return new Pair<Integer, Pair<String,String>>(0, result);
 	}
 	
 	
 	
 	@Override
-	public boolean changeStatusSong(Pair<String,String> song) {
+	public Pair<Integer, Boolean> changeStatusSong(Pair<String,String> song) {
+		
 		boolean stat=true;
 		String song_name = song.getLeft();
 		
 		int user_id =this.user.getUserID();
-		int song_id = this.dbActionRunner.getSongID(song_name);
-	
-		stat = this.dbActionRunner.setUserStatusSong(user_id, song_id);
-		if (!stat)
-		{
-			return stat;
+		int song_id;
+		try {
+			
+			song_id = this.dbActionRunner.getSongID(song_name);
+		
+			stat = this.dbActionRunner.setUserStatusSong(user_id, song_id);
+			if (!stat)
+			{
+				return new Pair<Integer, Boolean>(0, stat);
+
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Pair<Integer, Boolean>(-1, stat);
+
 		}
 		
 		this.user.setStatusSong(song);
 	
-		return stat;
+		return new Pair<Integer, Boolean>(0, stat);
 	}
 
 	@Override
-	public List<Pair<String,String>> getSongList(String username)
+	public Pair<Integer, List<Pair<String, String>>> getSongList(String username)
 	{
-		int freind_user_id = this.dbActionRunner.getUserId(username);
+		int freind_user_id;
+		ArrayList<String[]> lst = null;
 		
-		if (freind_user_id==-1)
-			return null;
+		try {
+			freind_user_id = this.dbActionRunner.getUserId(username);
+			
+			if (freind_user_id==-1)
+				return new Pair<Integer, List<Pair<String,String>>>(0, null);
+			
+			lst = this.dbActionRunner.getUserSongList(freind_user_id);
+			if (lst == null)
+				return new Pair<Integer, List<Pair<String,String>>>(0, null);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Pair<Integer, List<Pair<String,String>>>(-1, null);
+
+		}
 		
-		ArrayList<String[]> lst = this.dbActionRunner.getUserSongList(freind_user_id);
-		if (lst == null)
-		return null;
-		
-		return ConvertListArrayToListPair(lst);
-		
-		
+		ArrayList<Pair<String, String>> result = ConvertListArrayToListPair(lst);
+		return new Pair<Integer, List<Pair<String,String>>>(0, result);
+
 	}
 	
 	
@@ -173,40 +256,58 @@ public class AppEngine implements ApplicationInterface{
 		return  this.user.getSongArtistList();
 	}
 
+	
 	@Override
 	public ArrayList<String> getFriendList() {
 		return this.user.getfreindsList();
 	}
 
+	
 	@Override
 	public boolean signOutUser(String username) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	
 	//mira
 	
 	@Override
-	public ArrayList<String> getSearchResultsFriends(String friend_name) {
+	public  Pair<Integer, ArrayList<String>> getSearchResultsFriends(String friend_name) {
 		
-		return ConvertListArrayToList(this.dbActionRunner.getFindFreind(friend_name));
+		try {
+			ArrayList<String> result = ConvertListArrayToList(this.dbActionRunner.getFindFreind(friend_name));
+			return new Pair<Integer, ArrayList<String>>(0, result);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Pair<Integer, ArrayList<String>>(-1, null);
+		}
 		
 	}
-	//mira-
-
 	
+
+	//mira-
 	@Override
 	public boolean addFriend(String username) {
 		
 		int user_id =this.user.getUserID();
-		int freind_user_id = this.dbActionRunner.getUserId(username);
+		int freind_user_id;
+		boolean stat = false;
 		
-		boolean stat = this.dbActionRunner.addFreindToUser(user_id, freind_user_id);
+		try {
+			freind_user_id = this.dbActionRunner.getUserId(username);
+			stat = this.dbActionRunner.addFreindToUser(user_id, freind_user_id);
+			
+			if (stat == false)
+			return stat;
+			
+			this.user.addFreindTofreindsList(username);
 		
-		if (stat == false)
-		return stat;
-		
-		this.user.addFreindTofreindsList(username);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		return stat;
 	
@@ -215,35 +316,70 @@ public class AppEngine implements ApplicationInterface{
 	
 	
 	@Override
-	public ArrayList<Pair<String,String>> getSearchResultsByArtist(String artist_name) {
-		ArrayList<String[]> result = this.dbActionRunner.getArtistList(artist_name);
+	public Pair<Integer, ArrayList<Pair<String, String>>> getSearchResultsByArtist(String artist_name) {
+		
+		ArrayList<String[]> result;
+		try {
+			result = this.dbActionRunner.getArtistList(artist_name);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Pair<Integer, ArrayList<Pair<String,String>>>(-1, null);
+		}
+		
+		if (result == null)
+			return new Pair<Integer, ArrayList<Pair<String,String>>>(0, null);
+		
+		ArrayList<Pair<String,String>> KeithRichards =  ConvertListArrayToListPair(result);
+		return new Pair<Integer, ArrayList<Pair<String,String>>>(0, KeithRichards);
+
+	}
+
+	
+	@Override
+	public Pair<Integer, ArrayList<Pair<String, String>>> getSearchResultsBySong(String song_name){
+		
+		ArrayList<String[]> result;
+		
+		try {
+			result = this.dbActionRunner.getSongsArtistList(song_name);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Pair<Integer, ArrayList<Pair<String,String>>>(-1, null);
+		}
 		if (result == null)
 			return null;
 		
-		return ConvertListArrayToListPair(result);
+		ArrayList<Pair<String, String>> MickJagger = ConvertListArrayToListPair(result);
+		return new Pair<Integer, ArrayList<Pair<String,String>>>(0, MickJagger);
 	}
 
 	
 	@Override
-	public ArrayList<Pair<String,String>> getSearchResultsBySong(String song_name){
-		ArrayList<String[]> result = this.dbActionRunner.getSongsArtistList(song_name);
-		if (result == null)
-			return null;
+	public Pair<Integer, Boolean> addSong(String song,String artist) {
 		
-		return ConvertListArrayToListPair(result);
-	}
-
-	
-	@Override
-	public boolean addSong(String song,String artist) {
+		System.out.println("Song = " + song);
 		
 		String user_name=this.user.getUserName();
-		boolean stat = this.dbActionRunner.addSongToUser(user_name, song);
+		boolean stat = false;
+		
+		try {
+			stat = this.dbActionRunner.addSongToUser(user_name, song);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Pair<Integer, Boolean>(-1, stat);
+
+		}
+		
 		if (stat == false)
-			return stat;
+			return new Pair<Integer, Boolean>(0, stat);
+		
 		Pair<String,String> pair = new Pair<String,String>(song,artist);
 		this.user.addSongToSongArtistlist(pair);
-		return stat;
+		
+		return new Pair<Integer, Boolean>(0, stat);
 		
 	}
 
@@ -257,8 +393,9 @@ public class AppEngine implements ApplicationInterface{
 	/**
 	 * 
 	 * @return
+	 * @throws SQLException 
 	 */
-	private boolean initializeUserInstance(String username){
+	private boolean initializeUserInstance(String username) throws SQLException{
 		
 		System.out.println("mira1");
 		
@@ -305,13 +442,19 @@ public class AppEngine implements ApplicationInterface{
 		return true;
 	}
 	
+	
+	/**
+	 * Converts array to pair...
+	 * @param str
+	 * @return Pair<artist_name,song_name> or Pair<null,artist_name>
+	 */
 	private Pair<String,String> ConvertArrayToPair(String[] str)
 	{
 		Pair<String,String> pair=null;
 		if (str.length == 1)
-			pair= new Pair<String,String>(str[0],null);
+			pair= new Pair<String,String>(null,str[0]);
 		if (str.length == 2)
-			pair= new Pair<String,String>(str[0],str[1]);
+			pair= new Pair<String,String>(str[1],str[0]);
 		return pair;
 		
 		
@@ -331,7 +474,8 @@ public class AppEngine implements ApplicationInterface{
 	{
 		ArrayList<String> List = new ArrayList<String>();
 
-		
+		if(arraylst==null)
+			return null;
 		
 		for (String[] s : arraylst)
 		{

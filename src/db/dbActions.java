@@ -21,7 +21,7 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 	
-	public ArrayList<String[]> getSongsList(){
+	public ArrayList<String[]> getSongsList() throws SQLException{
 		
 		String sql_query ="Select song_name, song_id " + 
 				"From songs";
@@ -30,7 +30,7 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 	
-	public int getSongID(String song_name)
+	public int getSongID(String song_name) throws SQLException
 	{
 		String sql_query ="Select song_id " + 
 				"From songs " +
@@ -53,7 +53,7 @@ public class dbActions implements DBActionsInterface{
 		
 	}
 	
-	public ArrayList<String[]> getSongsArtistList(){
+	public ArrayList<String[]> getSongsArtistList() throws SQLException{
 	
 		String sql_query ="Select song_name, artist_name " + 
 				"From songs,artist_song,artists " +
@@ -64,7 +64,7 @@ public class dbActions implements DBActionsInterface{
 			
 	}
 	
-	public ArrayList<String[]> getSongsArtistList(String songname){
+	public ArrayList<String[]> getSongsArtistList(String songname) throws SQLException{
 		
 		String sql_query ="Select song_name, artist_name " + 
 				"From songs,artist_song,artists " +
@@ -74,7 +74,7 @@ public class dbActions implements DBActionsInterface{
 			
 	}
 	
-	public ArrayList<String[]> getArtistList(String artist_name)
+	public ArrayList<String[]> getArtistList(String artist_name) throws SQLException
 	{
 		String sql_query ="Select song_name, artist_name " + 
 				"From artists, artist_song, songs " +
@@ -85,7 +85,7 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 
-	public ArrayList<String[]> getUsersList(){
+	public ArrayList<String[]> getUsersList() throws SQLException{
 		
 		String sql_query ="Select user_id, user_name, status_song_id " + 
 				"From users ";	
@@ -95,7 +95,7 @@ public class dbActions implements DBActionsInterface{
 	
 	
 	//Users DB// need to check
-	public boolean addSongToUser(String user_name, String song_name){
+	public boolean addSongToUser(String user_name, String song_name) throws SQLException{
 		
 		int user_id = getUserId(user_name);
 		
@@ -114,7 +114,7 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 	// need to check 
-	public boolean addArtistToUser(String user_id, String artist_id){
+	public boolean addArtistToUser(String user_id, String artist_id) throws SQLException{
 		String sql_query ="INSERT INTO `project`.`user_artist` " +
 				"(`user_id`, `artist_id`) VALUES ('"+user_id+"', '"+artist_id+"');";
 		
@@ -127,7 +127,7 @@ public class dbActions implements DBActionsInterface{
 	
 	//{null} if there is not match
 	// need to check 
-	public String[] getUserName(int userID) {
+	public String[] getUserName(int userID) throws SQLException {
 
 		
 		String userId_as_String = ConvertIntegerToString(userID);
@@ -153,7 +153,7 @@ public class dbActions implements DBActionsInterface{
 	
 	
 	@Override
-	public ArrayList<String[]> getSingersList() {
+	public ArrayList<String[]> getSingersList() throws SQLException {
 		
 		String sql_query ="Select artist_id, artist_name " + 
 				"From artists " +
@@ -164,7 +164,7 @@ public class dbActions implements DBActionsInterface{
 
 
 	@Override
-	public ArrayList<String[]> getBandsList() {
+	public ArrayList<String[]> getBandsList() throws SQLException {
 		String sql_query ="Select artist_id, artist_name " + 
 				"From artists " +
 				"Where artists.artist_type=0 ";
@@ -174,7 +174,7 @@ public class dbActions implements DBActionsInterface{
 	
 	@Override
 	//need to check
-	public ArrayList<String[]> getUserFreindsList(int userID)
+	public ArrayList<String[]> getUserFreindsList(int userID) throws SQLException
 	{
 		String StringUserID= ConvertIntegerToString(userID);
 		
@@ -187,7 +187,7 @@ public class dbActions implements DBActionsInterface{
 	}
 
 	@Override
-	public boolean addFreindToUser(int userID, int userFreindID)
+	public boolean addFreindToUser(int userID, int userFreindID) throws SQLException
 	{
 				String sql_query ="INSERT INTO `users_freinds` " +
 						"(`user_id`, `user_freind_id`) VALUES ('"+userID+"', '"+userFreindID+"');";
@@ -200,7 +200,7 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 	@Override
-	public ArrayList<String[]> getFindFreind(String Freindname)
+	public ArrayList<String[]> getFindFreind(String Freindname) throws SQLException
 	{
 		
 		String sql_query ="Select user_name " + 
@@ -214,7 +214,7 @@ public class dbActions implements DBActionsInterface{
 	//needcheck
 	//PORBLEM:  false on not - matching and also failurQuery..
 	@Override
-	public boolean usernameExists(String username) {
+	public boolean usernameExists(String username) throws SQLException {
 		 
 		String sql_query ="Select user_name " + 
 				"From users " +
@@ -237,7 +237,7 @@ public class dbActions implements DBActionsInterface{
 
 
 	@Override
-	public boolean registerNewUser(String userName, String password) {
+	public boolean registerNewUser(String userName, String password) throws SQLException {
 		
 		String sql_query ="INSERT INTO `users` " +
 		"(`user_name`, `password`) VALUES ('"+userName+"', '"+password+"');";
@@ -251,7 +251,7 @@ public class dbActions implements DBActionsInterface{
 	//needcheck
 	//PORBLEM:  false on not - matching and also failurQuery..
 	@Override
-	public boolean authenticateUser(String username, String password) {
+	public boolean authenticateUser(String username, String password) throws SQLException {
 		
 		String sql_query ="Select user_name " + 
 				"From users " +
@@ -275,7 +275,7 @@ public class dbActions implements DBActionsInterface{
 	
 
 	@Override
-	public ArrayList<String[]> getUserSongList(int userID) {
+	public ArrayList<String[]> getUserSongList(int userID) throws SQLException {
 		String StringUserID= ConvertIntegerToString(userID);
 		
 		String sql_query ="Select song_name, artist_name " + 
@@ -286,7 +286,7 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 	@Override
-	public ArrayList<String[]> getUserArtistList(int userID) {
+	public ArrayList<String[]> getUserArtistList(int userID) throws SQLException {
 		String StringUserID= ConvertIntegerToString(userID);
 		String sql_query ="Select artist_name " + 
 				"From user_artist, artists " +
@@ -300,7 +300,7 @@ public class dbActions implements DBActionsInterface{
 
 	//if user isnt exist return also null
 	@Override
-	public String[] getUserStatusSong(int userID) {
+	public String[] getUserStatusSong(int userID) throws SQLException {
 		String StringUserID= ConvertIntegerToString(userID);
 		
 		
@@ -324,7 +324,7 @@ public class dbActions implements DBActionsInterface{
 	}
 
 	@Override
-	public boolean setUserStatusSong(int userID, int songID) {
+	public boolean setUserStatusSong(int userID, int songID) throws SQLException {
 		
 		String sql_query ="UPDATE `users` " +
 				" set status_song_id = " + songID 
@@ -349,9 +349,10 @@ public class dbActions implements DBActionsInterface{
 	 * This method gets the userID corresponding to the given userName.
 	 * @param userName
 	 * @return userID if exists, -1 if no such user exists.
+	 * @throws SQLException 
 	 */
 	@Override
-	public int getUserId(String username) {
+	public int getUserId(String username) throws SQLException {
 		
 		String sql_query ="Select user_id " + 
 				"From users " +
@@ -376,7 +377,7 @@ public class dbActions implements DBActionsInterface{
 	
 	//userID not exists  =  return null and also error
 	@Override
-	public String getUserPassword(int userID) {
+	public String getUserPassword(int userID) throws SQLException {
 		
 		String StringUserID= ConvertIntegerToString(userID);
 		String sql_query ="Select password " + 
@@ -403,138 +404,8 @@ public class dbActions implements DBActionsInterface{
 	//////////////////////////////////////////////
 	// 		General queries generic methods
 	//////////////////////////////////////////////
-	
-	public boolean tableInsertion(String table, String[] columns, String[] values, String whereSentence) {
-		
-		Connection connection = this.connectionPool.getConnectionFromPool();
-		boolean status = true;
-		
-		
-		return true;
-		
-	}
-	
-	
-	/**
-	 * Updates table.
-	 * @param table
-	 * @param columns
-	 * @param values
-	 * @return
-	 */
-	public boolean tableUpdate(String table, String[] columns, String[] values, String whereSentence) {
-
-		Connection connection = this.connectionPool.getConnectionFromPool();
-		boolean status = true;
-		
-		if(columns.length != values.length){
-			if(qaqa) System.out.println("tableUpdate: columns.length != values.length");
-			return false;
-		}
-		
-		String updateTableQuery = "UPDATE " + table + " SET ";
-		for(int i=0; i<columns.length; i++){
-			updateTableQuery = updateTableQuery.concat(columns[i]).concat(" = ").concat(values[i]);
-			if(i!=columns.length-1)
-				updateTableQuery = updateTableQuery.concat(",");
-		}
-		
-		updateTableQuery = updateTableQuery.concat(" " + whereSentence);
-		
-		Statement stmt = null;
-
-		try {
-			stmt = connection.createStatement();
-			status = stmt.execute(updateTableQuery);
-		} catch (SQLException e) {
-			System.out.println("ERROR tableUpdate - " + e.getMessage());
-		} finally {
-			DataBaseManager.safelyClose(stmt);
-			this.connectionPool.returnConnectionToPool(connection);
-		}
-				
-		return status;
-	}
 
 
-	/**
-	 * Executes generic action on a given table.
-	 * @param action - 1 for INSERT INTO, 2 for UPDATE
-	 * @param table
-	 * @param columns
-	 * @param values
-	 * @param whereSentence - SQL syntax for "where" addition. Can be null.
-	 * @return true if action succeeded, false otherwise.
-	 */
-	public boolean tableAction(int action, String table, String[] columns, String[] values, String whereSentence) {
-
-		Connection connection = this.connectionPool.getConnectionFromPool();
-		boolean status = true;
-		
-		
-		String actionStr = null;
-		switch(action){
-			case 1: 
-				actionStr = "INSERT INTO " ;
-				break;
-			case 2: 
-				actionStr = "UPDATE ";
-				break;
-			default:
-				System.out.println("Ilegal action!");
-				return false;
-		}
-		
-		
-		if(columns.length != values.length){
-			if(qaqa) System.out.println("tableUpdate: columns.length != values.length");
-			return false;
-		}
-		
-		String actionTableQuery = actionStr + table + " ";
-		if(action == 1)
-			
-		if(action == 2)
-			actionTableQuery = actionTableQuery.concat("SET ");
-
-		for(int i=0; i<columns.length; i++){
-			actionTableQuery = actionTableQuery.concat(columns[i]).concat(" = ").concat(values[i]);
-			if(i!=columns.length-1)
-				actionTableQuery = actionTableQuery.concat(",");
-		}
-		
-		if(whereSentence != null)
-			actionTableQuery = actionTableQuery.concat(" " + whereSentence);
-		
-		Statement stmt = null;
-
-		try {
-			stmt = connection.createStatement();
-			status = stmt.execute(actionTableQuery);
-		} catch (SQLException e) {
-			System.out.println("ERROR tableUpdate - " + e.getMessage());
-		} finally {
-			DataBaseManager.safelyClose(stmt);
-			this.connectionPool.returnConnectionToPool(connection);
-		}
-				
-		return status;
-	}
-
-	
-	
-	
-
-	@Override
-	public boolean connectUser(int userID) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-
-
-	
     /*
      *general for sql query 
      * 
@@ -588,42 +459,63 @@ public class dbActions implements DBActionsInterface{
 	/*( without select "*") 
 	 *   null is error, else true
 	 * */ 
-	private  ArrayList<String[]> executeQuery(String sql_query,boolean is_Select)
+	private  ArrayList<String[]> executeQuery(String sql_query,boolean is_Select) throws SQLException
 	{
 		System.out.println(sql_query);
-		Connection connection = this.connectionPool.getConnectionFromPool();
+		
 		ArrayList<String[]> List = new ArrayList<String[]>();
 		Statement stmt = null;
 		ResultSet rs = null;
-
-		try {
-			
-			
-			stmt = connection.createStatement();
-			
-			if (is_Select)
-			{
-				rs = stmt.executeQuery(sql_query);
-				String[] SelectCol = parseSelectQuery(sql_query);
-				int  SelectColLength = SelectCol.length;
-				List = ReturnSelectQuery(rs,SelectColLength,SelectCol);
-			}
-			else
-			{
-				stmt.executeUpdate(sql_query);
-				
-			}
-			
-			
-			
-		} catch (SQLException e) {
-			List=null;
-			System.out.println("ERROR execute_query_Failed - " + e.getMessage());
+		boolean loopAround = true;
+		Connection connection = null;
 		
-		} finally {
-			this.connectionPool.returnConnectionToPool(connection);
-			DataBaseManager.safelyClose(stmt, rs);
+		while(loopAround){
+			
+			try {
+				
+				//Try to get connection from pool
+				try {
+					connection = this.connectionPool.getConnectionFromPool();
+				} catch (SQLException e1) {
+					// Connection is lost! Unable to get connection. Throw exception.
+					e1.printStackTrace();
+					throw e1;
+				}
+				
+				
+				stmt = connection.createStatement();
+				
+				if (is_Select)
+				{
+					rs = stmt.executeQuery(sql_query);
+					String[] SelectCol = parseSelectQuery(sql_query);
+					int  SelectColLength = SelectCol.length;
+					List = ReturnSelectQuery(rs,SelectColLength,SelectCol);
+				}
+				else
+				{
+					stmt.executeUpdate(sql_query);
+					
+				}
+				
+				loopAround = false;
+				
+			} catch (SQLException e) {
+				
+				List=null;
+				System.out.println("ERROR execute_query_Failed - " + e.getMessage());
+				
+				if(connection.isValid(0)){
+					loopAround = false;
+				}
+			
+			} finally {
+				this.connectionPool.returnConnectionToPool(connection);
+				DataBaseManager.safelyClose(stmt, rs);
+			}
+				
 		}
+		
 	
 		return List;
 		
@@ -636,11 +528,18 @@ public class dbActions implements DBActionsInterface{
 	///////////////////////////////////////
 	
 	
-	public boolean initializeDatabase(String yagoFilesPath){
+	public boolean initializeDatabase(String yagoFilesPath) throws SQLException{
 		
 		boolean status = true;
 		
-		Connection connection = this.connectionPool.getConnectionFromPool();
+		Connection connection;
+		try {
+			connection = this.connectionPool.getConnectionFromPool();
+		} catch (SQLException e) {
+			// Connection is lost! Unable to get connection. Throw exception.
+			e.printStackTrace();
+			throw e;
+		}
 		
 		status = this.buildMusicDB(yagoFilesPath);
 			
@@ -656,10 +555,18 @@ public class dbActions implements DBActionsInterface{
 	 * @param connection
 	 * @param yagoFilesPath - path to the Yago files.
 	 * @return true if succeeded, false otherwise.
+	 * @throws SQLException 
 	 */
-	public boolean buildMusicDB(String yagoFilesPath){
+	public boolean buildMusicDB(String yagoFilesPath) throws SQLException{
 		
-		Connection connection = this.connectionPool.getConnectionFromPool();
+		Connection connection = null;
+		try {
+			connection = this.connectionPool.getConnectionFromPool();
+		} catch (SQLException e) {
+			// Connection is lost! Unable to get connection. Throw exception.
+			e.printStackTrace();
+			throw e;
+		}
 		
 		boolean status = DataBaseManager.buildMusicDatabase(connection, yagoFilesPath);
 		
@@ -675,10 +582,18 @@ public class dbActions implements DBActionsInterface{
 	 * @param connection
 	 * @param yagoFilesPath - path to the Yago files.
 	 * @return true if succeeded, false otherwise.
+	 * @throws SQLException 
 	 */
-	public boolean updateMusicDB(String yagoFilesPath){
+	public boolean updateMusicDB(String yagoFilesPath) throws SQLException{
 		
-		Connection connection = this.connectionPool.getConnectionFromPool();
+		Connection connection;
+		try {
+			connection = this.connectionPool.getConnectionFromPool();
+		} catch (SQLException e) {
+			// Connection is lost! Unable to get connection. Throw exception.
+			e.printStackTrace();
+			throw e;
+		}
 		
 		boolean status = DataBaseManager.updateMusicDatabase(connection, yagoFilesPath);
 		
@@ -687,5 +602,9 @@ public class dbActions implements DBActionsInterface{
 		return status;
 		
 	}
+
+
+	
+	
 	
 }

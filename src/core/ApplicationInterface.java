@@ -11,14 +11,14 @@ public interface ApplicationInterface {
 	 * Initializes the application.
 	 * @return true if succeeded, false otherwise.
 	 */
-	public boolean initializeApplication();
+	public Pair<Integer, Boolean> initializeApplication();
 	
 	
 	/**
 	 * Updates  the application's music database.
 	 * @return true if succeeded, false otherwise.
 	 */
-	public boolean updateMusicDatabase();
+	public Pair<Integer, Boolean> updateMusicDatabase();
 	
 	
 	/**
@@ -27,14 +27,14 @@ public interface ApplicationInterface {
 	 * @param password - string representing the password
 	 * @return true iff its an authentic user
 	 */
-	public boolean isUserRegisterd(String username,String password);
+	public Pair<Integer, Boolean> isUserRegisterd(String username,String password);
 	
 	/**
 	 * for sign up screnn
 	 * @param username
 	 * @return true iff username is already in use
 	 */
-	public boolean isUsernameTaken(String username);
+	public Pair<Integer, Boolean> isUsernameTaken(String username);
 	
 	
 	/**
@@ -43,11 +43,11 @@ public interface ApplicationInterface {
 	 * @param password
 	 * @return true iff signing up the user succeeded
 	 */
-	public boolean signUpUser(String username, String password);
+	public Pair<Integer, Boolean> signUpUser(String username, String password);
 	
 	
 	//username of a friend
-	public Pair<String,String> getStatusSong(String username); 
+	public Pair<Integer, Pair<String, String>> getStatusSong(String username); 
 	
 	/**
 	 * for main screen
@@ -64,7 +64,7 @@ public interface ApplicationInterface {
 	 * @param song
 	 * @return true iff the change succeeded
 	 */
-	public boolean changeStatusSong(Pair<String,String> song); //qaqa
+	public Pair<Integer, Boolean> changeStatusSong(Pair<String,String> song); //qaqa
 	
 	
 	
@@ -75,7 +75,7 @@ public interface ApplicationInterface {
 	 */
 	
 	//username of a friend
-	public List<Pair<String,String>> getSongList(String username);
+	public Pair<Integer, List<Pair<String, String>>> getSongList(String username);
 	
 	
 	public List<Pair<String,String>> getSongList();
@@ -99,7 +99,7 @@ public interface ApplicationInterface {
 	 * @param friend_name - name to search in the users db
 	 * @return list of the search results 
 	 */
-	public ArrayList<String> getSearchResultsFriends(String friend_name);
+	public Pair<Integer, ArrayList<String>> getSearchResultsFriends(String friend_name);
 	
 	/**
 	 * for add a friend screen
@@ -113,14 +113,14 @@ public interface ApplicationInterface {
 	 * @param artist_name - the artist name to search by
 	 * @return list of the search results
 	 */
-	public ArrayList<Pair<String,String>> getSearchResultsByArtist(String artist_name);
+	public Pair<Integer, ArrayList<Pair<String, String>>> getSearchResultsByArtist(String artist_name);
 	
 	/**
 	 * for add song screen
 	 * @param song_name -- the song name to search by
 	 * @return list of the search results
 	 */
-	public ArrayList<Pair<String,String>> getSearchResultsBySong(String song_name);
+	public Pair<Integer, ArrayList<Pair<String, String>>> getSearchResultsBySong(String song_name);
 	
 	/**
 	 * 
@@ -128,7 +128,7 @@ public interface ApplicationInterface {
 	 * @param song
 	 * @return true iff the song was added to the user song list
 	 */
-	public boolean addSong(String song,String artist);
+	public Pair<Integer, Boolean> addSong(String song,String artist);
 
 
 	/**
