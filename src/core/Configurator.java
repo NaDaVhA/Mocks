@@ -65,9 +65,10 @@ public class Configurator {
 	/**
 	 * Extracts a path to the Yago files' folder from the configuration file.
 	 * @param filename
-	 * @return A string holding the path to the Yago files' folder.
+	 * @param updateFolder - true if the update folder is requested, false if db creation is needed
+	 * @return A string holding the path to the Yago files' folder (regular or update).
 	 */
-	public static String getYagoFolderPath(String filename){
+	public static String getYagoFolderPath(String filename, boolean updateFolder){
 		
 		String yagoFolderPath = null;
 		
@@ -84,7 +85,11 @@ public class Configurator {
 			Node node = nodes.item(0);
 			Element element = (Element) node;
 			
-			yagoFolderPath = new String(getValue("YagoFolderPath", element));
+			if(updateFolder){
+				yagoFolderPath = new String(getValue("UpdateYagoFolderPath", element));
+			}else{
+				yagoFolderPath = new String(getValue("YagoFolderPath", element));
+			}
 						
 			}catch(Exception ex) {
 				

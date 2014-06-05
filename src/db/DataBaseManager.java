@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import parsing.RawDataUnit;
 import parsing.yagoMiner;
@@ -138,7 +137,67 @@ public class DataBaseManager {
 		}
 	}
 	
+	
+	/**
+	 * Execute the given statements as a complete transaction.
+	 * @param conn
+	 * @param statements
+	 * @return false if failed, true if succeded.
+	 */
+	public static boolean executeTransaction(Connection conn, String[] statements) {
+		
+		Statement stmt = null;
+		boolean status = false;
+		
+		try {
+			conn.setAutoCommit(false);
 
+			stmt = conn.createStatement();
+			
+			int numberOfStatements = statements.length;
+			status = false;
+			
+			for(int i=0; i<numberOfStatements; i++){
+				status = stmt.execute(statements[i]);
+			}
+			
+			//Commit transaction
+			if(qaqa) System.out.println("executeTransaction: Commiting transaction..");
+			conn.commit();
+
+		} catch (SQLException e) {
+			System.out
+					.println("We have an exception, transaction is not complete: Exception: "
+							+ e.getMessage());
+			try {
+				conn.rollback();
+				System.out.println("Rollback Successfully :)");
+			} catch (SQLException e2) {
+				System.out
+						.println("ERROR demoTransactions (when rollbacking) - "
+								+ e.getMessage());
+			}
+		} finally {
+			safelyClose(stmt);
+			safelySetAutoCommit(conn);
+		}
+		
+		return status;
+	}
+
+	
+	/**
+	 * Attempts to set the connection back to auto-commit, ignoring errors.
+	 * @param conn
+	 */
+	private static void safelySetAutoCommit(Connection conn) {
+		try {
+			conn.setAutoCommit(true);
+		} catch (Exception e) {
+		}
+	}
+	
+	
 	
 	//////////////////////////////////////////////////////////
 	// 		Database modifiers - DB Creation & Maintenance
@@ -484,7 +543,7 @@ public class DataBaseManager {
 			if(status)
 				status = updateConfiguration(connection, atribute, "1", "operation", tuple);
 		}
-		
+		//why
 		return status;
 	}
 	
@@ -905,6 +964,10 @@ public class DataBaseManager {
 	 */
 	public static boolean updateMusicDatabase(Connection connection, String pathToYagoFiles){
 		
+		int dbStatus = checkConfiguration(connection, "status", "updateOp");
+		if(dbStatus == 1)	
+			return true;
+		
 		boolean status = true;	
 		
 		System.out.println("Updating music database. This might take more than a few minutes...");
@@ -951,6 +1014,7 @@ public class DataBaseManager {
 		if(!status) return false;
 	
 		//Initialize configuration table - update values !!!  QAQA 
+		initializeConfigurationTuple(connection, "updateOp");
 		
 		System.out.println("Finished updating the database.");
 		
@@ -967,7 +1031,7 @@ public class DataBaseManager {
 	private static boolean updateCreatorCreationsTable(Connection connection, RawDataUnit rawCreatorCreationsData) {
 		
 		//Check configuration
-		int dbStatus = checkConfiguration(connection, "creatorCreationTables", "update");
+		int dbStatus = checkConfiguration(connection, "creatorCreationTables", "updateOp");
 		if(dbStatus == 1)	
 			return true;
 		
@@ -978,26 +1042,35 @@ public class DataBaseManager {
 		int[] types;
 		String statementToExecute;
 		
-		//Prepare data
-		int[] indices = {1,3};
-		LinkedList<String[]> creatorCreation = extractDataFromRDT(rawCreatorCreationsData, indices);
+		if(checkConfiguration(connection, "artist_song_temp", "updateOp") == 0){
+			
+			//Prepare data
+			int[] indices = {1,3};
+			LinkedList<String[]> updateCreatorCreation = extractDataFromRDT(rawCreatorCreationsData, indices);
+			
+			//Create temporary table: update_artist_song_temp
+			createTable(connection, "update_artist_song_temp", 
+				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_artist_song_temp(artist, song)'", 
+				"artist varchar(100) NOT NULL, ",
+				"song varchar(100) NOT NULL");
 		
-		//Create temporary table: update_artist_song_temp
-		createTable(connection, "update_artist_song_temp", 
-			"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_artist_song_temp(artist, song)'", 
-			"artist varchar(100) NOT NULL, ",
-			"song varchar(100) NOT NULL");
-	
-		//populate artist_song_temp with artist-songs
-		tableColumns = new String[2];
-		tableColumns[0] = "artist";
-		tableColumns[1] = "song";
-		types = new int[2];
-		types[0] = 2;
-		types[1] = 2;
-		status = populateTable(connection, "update_artist_song_temp", tableColumns, types, creatorCreation);
-		if(!status) return false;
-		System.out.println("Update creations database: Completed step 1/5.");
+			//populate artist_song_temp with artist-songs
+			tableColumns = new String[2];
+			tableColumns[0] = "artist";
+			tableColumns[1] = "song";
+			types = new int[2];
+			types[0] = 2;
+			types[1] = 2;
+			
+			status = populateTable(connection, "update_artist_song_temp", tableColumns, types, updateCreatorCreation);
+			if(status){
+				status = updateConfiguration(connection, "artist_song_temp", "1", "operation", "updateOp");
+			}else{
+				return false;
+			}
+			
+		}
+		System.out.println("Update creations database: Completed step 1/4.");
 		
 		//Populate DISTINCT values
 		createTable(connection, "update_artist_song_distinct", 
@@ -1008,19 +1081,18 @@ public class DataBaseManager {
 		
 		statementToExecute = "INSERT INTO update_artist_song_distinct(artist, song) "
 				+ "SELECT DISTINCT artist, song "
-				+ "FROM artist_song_temp";
-		status = executeStatement(connection, statementToExecute);
+				+ "FROM update_artist_song_temp";
+		//status = executeStatement(connection, statementToExecute);
 		if(!status) return false;
-		System.out.println("Update creations database: Completed step 2/5.");
+		System.out.println("Update creations database: Completed step 2/4.");
 
 		//Create temp table: update_artist_song_id
 		createTable(connection, "update_artist_song_id", 
 				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_artist_song_id(song_id, artist_id)'", 
 				"song_id int NOT NULL, ",
-				"artist_id int NOT NULL, ",
-				"PRIMARY KEY (artist, song) ");
+				"artist_id int NOT NULL");
 		
-		//Populate update_artist_song_id table
+		//Add new entries to update_artist_song_id table (including duplications).
 		statementToExecute = "INSERT INTO update_artist_song_id(song_id, artist_id) "
 				+ "SELECT DISTINCT Song.song_id, Artist.artist_id "
 				+ "FROM artists as Artist, songs AS Song, update_artist_song_distinct AS Temp "
@@ -1028,55 +1100,45 @@ public class DataBaseManager {
 		status = executeStatement(connection, statementToExecute);
 		if(!status) return false;
 		
+		//Add new entries to update_artist_song_id table from artist_song
+		statementToExecute = "INSERT INTO update_artist_song_id(song_id, artist_id) "
+				+ "SELECT DISTINCT song_id, artist_id "
+				+ "FROM artist_song";
+		status = executeStatement(connection, statementToExecute);
+		if(!status) return false;
+		
+		statementToExecute = "DELETE from artist_song WHERE artist_id > 0";
+		status = executeStatement(connection, statementToExecute);
+		if(!status) return false;
+		
 		//Update artist_song table
 		statementToExecute = "INSERT INTO artist_song(song_id, artist_id) "
-				+ "SELECT DISTINCT Song.song_id, Artist.artist_id "
-				+ "FROM update_artist_song_id AS Temp "
-				+ "WHERE NOT EXISTS (SELECT * "
-				+ "FROM artist_song AS Old "
-				+ "WHERE Temp.song_id = Old.song_id AND Temp.artist_id = Old.artist_id) ";
-		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song", "general");
+				+ "SELECT DISTINCT song_id, artist_id "
+				+ "FROM update_artist_song_id";
+		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song", "updateOp");
 		//status = executeStatement(connection, statementToExecute);
 		if(!status) return false;
-		System.out.println("Update creations database: Completed step 3/5.");
+		System.out.println("Update creations database: Completed step 3/4.");
 
 		
 		//Update unknown connections
-		//Create temp table: unknown_song_id
-		createTable(connection, "update_unknown_song_id", 
-				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_unknown_song_id(song_id)'", 
-				"song_id int NOT NULL, ",
-				"PRIMARY KEY (song_id) ");
-		
-		//Populate unknown_song_id table
-		statementToExecute = "INSERT INTO update_unknown_song_id(song_id) "
-				+ "SELECT DISTINCT song_id "
-				+ "FROM songs "
-				+ "WHERE song_id NOT IN (SELECT DISTINCT song_id FROM artist_song)";
-		status = executeStatement(connection, statementToExecute);
-		if(!status) return false;
-		System.out.println("Update creations database: Completed step 4/5.");
-
 		//Add songs with no artists to artist_song table
 		statementToExecute = "INSERT INTO artist_song(song_id, artist_id) "
 				+ "SELECT DISTINCT Song.song_id, UnknownArtist.artist_id "
 				+ "FROM songs AS Song, artists AS UnknownArtist "
 				+ "WHERE Song.song_id NOT IN (SELECT DISTINCT song_id FROM artist_song) "
 				+ "AND UnknownArtist.artist_name = '<unknownartist>'";
-		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song_additions", "general");
+		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song_additions", "updateOp");
 		if(!status) return false;
-		System.out.println("Update creations database: Completed step 5/5.");
-		
-		
-		
-		
-		
+		System.out.println("Update creations database: Completed step 4/4.");
 		
 		//Drop temp tables: update_artist_song_temp, update_artist_song_temp_distinct
 		dropTable(connection, "update_artist_song_temp");
 		dropTable(connection, "update_artist_song_distinct");
-		
-		status = updateConfiguration(connection, "creatorCreationTables", "1", "operation", "update");
+		dropTable(connection, "update_artist_song_id");
+		dropTable(connection, "update_unknown_song_id");
+
+		status = updateConfiguration(connection, "creatorCreationTables", "1", "operation", "updateOp");
 		
 		return status;
 	}
@@ -1091,7 +1153,7 @@ public class DataBaseManager {
 	private static boolean updateSongsTables(Connection connection, RawDataUnit rawSongs) {
 
 		//Check configuration
-		int dbStatus = checkConfiguration(connection, "songsTables", "update");
+		int dbStatus = checkConfiguration(connection, "songsTables", "updateOp");
 		if(dbStatus == 1)	
 			return true;
 		
@@ -1133,18 +1195,17 @@ public class DataBaseManager {
 		//populate update_song_category_distinct with songs-categories distinct values
 		statementToExecute = "INSERT INTO update_song_category_distinct(song, category) "
 				+ "SELECT DISTINCT song, category "
-				+ "FROM song_category_temp";
+				+ "FROM update_song_category_temp";
 		status = executeStatement(connection, statementToExecute);		
 		if(!status) return false;
 		System.out.println("Update songs database: Completed step 2/6.");
 
 		//Update songs table
 		statementToExecute = "INSERT INTO songs(song_name) "
-				+ "SELECT DISTINCT Update.song "
-				+ "FROM update_song_category_distinct AS Update "
-				+ "WHERE  Update.song NOT IN (SELECT DISTINCT song_name FROM songs)";
-		status = insertPrimaryDataCycle(connection, statementToExecute, "songs", "update");
-		//status = executeStatement(connection, statementToExecute);
+				+ "SELECT DISTINCT Temp.song "
+				+ "FROM update_song_category_distinct AS Temp "
+				+ "WHERE Temp.song NOT IN (SELECT DISTINCT song_name FROM songs)";
+		status = insertPrimaryDataCycle(connection, statementToExecute, "songs", "updateOp");
 		if(!status) return false;
 		System.out.println("Update songs database: Completed step 3/6.");
 
@@ -1165,11 +1226,10 @@ public class DataBaseManager {
 		
 		//Update categories_of_songs table
 		statementToExecute = "INSERT INTO categories_of_songs(category_name) "
-				+ "SELECT DISTINCT category "
+				+ "SELECT DISTINCT Temp.category_name "
 				+ "FROM update_categories_of_songs_distinct AS Temp "
-				+ "WHERE Temp.category NOT IN (SELECT category_name FROM categories_of_songs)";
-		status = insertPrimaryDataCycle(connection, statementToExecute, "categories_of_songs", "update");
-		//status = executeStatement(connection, statementToExecute);
+				+ "WHERE Temp.category_name NOT IN (SELECT category_name FROM categories_of_songs)";
+		status = insertPrimaryDataCycle(connection, statementToExecute, "categories_of_songs", "updateOp");
 		if(!status) return false;
 		System.out.println("Update songs database: Completed step 4/6.");
 		
@@ -1177,24 +1237,11 @@ public class DataBaseManager {
 		// Song-Category update - 
 		
 		//Create temp tables: update_song_category_distinct, update_artist_category_id
-		createTable(connection, "update_song_category_distinct", 
-				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_song_category_distinct(song, category)'", 
-				"song varchar(100) NOT NULL, ",
-				"category varchar(100) NOT NULL, ",
-				"PRIMARY KEY (song, category)");
-		
 		createTable(connection, "update_song_category_id", 
 				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_artist_category_id(song_id, category_id)'", 
 				"song_id int NOT NULL, ",
 				"category_id int NOT NULL, ",
 				"PRIMARY KEY (song_id, category_id)");
-		
-		//populate update_song_category_distinct
-		statementToExecute = "INSERT INTO update_song_category_distinct(song, category) "
-				+ "SELECT DISTINCT song, category "
-				+ "FROM update_song_category_distinct";
-		status = executeStatement(connection, statementToExecute);
-		if(!status) return false;
 		
 		//populate update_song_category_id
 		statementToExecute = "INSERT INTO update_song_category_id(song_id, category_id) "
@@ -1209,14 +1256,13 @@ public class DataBaseManager {
 
 		//Update song_category table
 		statementToExecute = "INSERT INTO song_category(song_id, category_id) "
-				+ "SELECT DISTINCT Song.song_id, Category.category_id "
+				+ "SELECT DISTINCT Temp.song_id, Temp.category_id "
 				+ "FROM update_song_category_id AS Temp "
 				+ "WHERE NOT EXISTS (SELECT * "
 				+ "FROM song_category AS Old "
 				+ "WHERE Temp.song_id = Old.song_id AND Temp.category_id = Old.category_id) "
 				+ "LIMIT 2000";
-		status = insertPrimaryDataCycle(connection, statementToExecute, "song_category", "update");
-		//status = executeStatement(connection, statementToExecute);
+		status = insertPrimaryDataCycle(connection, statementToExecute, "song_category", "updateOp");
 		if(!status) return false;
 		System.out.println("Update songs database: Completed step 6/6.");
 
@@ -1228,7 +1274,7 @@ public class DataBaseManager {
 		dropTable(connection, "update_song_category_distinct");
 		dropTable(connection, "update_song_category_id");
 
-		status = updateConfiguration(connection, "songsTables", "1", "operation", "update");
+		status = updateConfiguration(connection, "songsTables", "1", "operation", "updateOp");
 		
 		return status;
 		
@@ -1245,7 +1291,7 @@ public class DataBaseManager {
 	private static boolean updateArtistsTable(Connection connection, RawDataUnit rawSinger, RawDataUnit rawMusicalGroups) {
 
 		//Check configuration
-		int dbStatus = checkConfiguration(connection, "artistsTables", "update");
+		int dbStatus = checkConfiguration(connection, "artistsTables", "updateOp");
 		if(dbStatus == 1)	
 			return true;
 		
@@ -1318,7 +1364,7 @@ public class DataBaseManager {
 				+ "SELECT DISTINCT UpdateArtist.artist_name, UpdateArtist.artist_type "
 				+ "FROM update_artists_distinct AS UpdateArtist, artists AS Artists "
 				+ "WHERE  UpdateArtist.artist_name NOT IN (SELECT DISTINCT artist_name FROM artists)";
-		status = insertPrimaryDataCycle(connection, statementToExecute, "artists", "update");
+		status = insertPrimaryDataCycle(connection, statementToExecute, "artists", "updateOp");
 		//status = executeStatement(connection, statementToExecute);
 		if(!status) return false;
 		System.out.println("Update artists database: Completed step 2/5.");
@@ -1343,7 +1389,7 @@ public class DataBaseManager {
 				+ "SELECT DISTINCT category_name "
 				+ "FROM update_artists_categories_distinct AS UpdateCategory "
 				+ "WHERE  UpdateCategory.category_name NOT IN (SELECT DISTINCT categories_of_artists.category_name FROM categories_of_artists)";
-		status = insertPrimaryDataCycle(connection, statementToExecute, "categories_of_artists", "update");
+		status = insertPrimaryDataCycle(connection, statementToExecute, "categories_of_artists", "updateOp");
 		//status = executeStatement(connection, statementToExecute);
 		if(!status) return false;
 		System.out.println("Update artists database: Completed step 3/5.");
@@ -1387,7 +1433,7 @@ public class DataBaseManager {
 				+ "FROM artist_category AS Old "
 				+ "WHERE Temp.artist_id = Old.artist_id AND Temp.category_id = Old.category_id) "
 				+ "LIMIT 2000";
-		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_category", "update");
+		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_category", "updateOp");
 		//status = executeStatement(connection, statementToExecute);
 		if(!status) return false;
 		System.out.println("Update artists database: Completed step 5/5.");
@@ -1400,12 +1446,36 @@ public class DataBaseManager {
 		dropTable(connection, "update_artist_category_temp");
 		dropTable(connection, "update_artist_category_id_temp");
 		
-		status = updateConfiguration(connection, "artistsTables", "1", "operation", "update");
+		status = updateConfiguration(connection, "artistsTables", "1", "operation", "updateOp");
 		
 		return status;
 		
 		
 	}
+	
+	
+	/**
+	 * 
+	 * @param tuple
+	 * @return
+	 */
+	private static boolean initializeConfigurationTuple(Connection connection, String tuple){
+		
+		String[] statement = new String[2]; 
+
+		statement[0] = "DELETE FROM configuration WHERE operation LIKE 'updateOp'";
+		//statement[0] = "Select * from configuration";
+		statement[1] = "INSERT INTO `configuration` (`operation`) VALUES ('" + tuple + "')";
+		
+		boolean status = true;
+
+		status = executeTransaction(connection, statement);
+		
+		return status;
+	}
+	
+	
+
 	
 	
 	

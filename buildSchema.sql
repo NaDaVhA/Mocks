@@ -7,6 +7,7 @@ CREATE TABLE `configuration` (
   `songs` bit(1) NOT NULL DEFAULT b'0',
   `categories_of_songs` bit(1) NOT NULL DEFAULT b'0',
   `song_category` bit(1) NOT NULL DEFAULT b'0',
+  `artist_song_temp` bit(1) NOT NULL DEFAULT b'0',
   `artist_song` bit(1) NOT NULL DEFAULT b'0',
   `artist_song_additions` bit(1) NOT NULL DEFAULT b'0',
   `artistsTables` bit(1) NOT NULL  DEFAULT b'0',
@@ -18,7 +19,7 @@ CREATE TABLE `configuration` (
 
 
 INSERT INTO `configuration` (`operation`) VALUES ('general');
-INSERT INTO `configuration` (`operation`) VALUES ('update');
+INSERT INTO `configuration` (`operation`) VALUES ('updateOp');
 
 
 CREATE TABLE `artist_category` (

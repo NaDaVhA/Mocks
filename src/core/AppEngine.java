@@ -41,7 +41,7 @@ public class AppEngine implements ApplicationInterface{
 		
 		boolean status = true;
 		
-		String yagoFilesPath =  Configurator.getYagoFolderPath("projectConfig.xml"); 
+		String yagoFilesPath =  Configurator.getYagoFolderPath("projectConfig.xml", false); 
 		
 		status = this.dbActionRunner.initializeDatabase(yagoFilesPath);
 		if(!status)
@@ -66,7 +66,7 @@ public class AppEngine implements ApplicationInterface{
 		
 		boolean status = true;
 		
-		String yagoFilesPath =  Configurator.getYagoFolderPath("projectConfig.xml"); 
+		String yagoFilesPath =  Configurator.getYagoFolderPath("projectConfig.xml", true); 
 		
 		status = this.dbActionRunner.updateMusicDB(yagoFilesPath);
 				
