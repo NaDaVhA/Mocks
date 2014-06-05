@@ -131,8 +131,12 @@ public interface ApplicationInterface {
 	public boolean addSong(String song,String artist);
 
 
+	/**
+	 * 
+	 * @return the user username
+	 */
 	
-
+	public String getUsername();
 	
 	
 	//till here!!!!!

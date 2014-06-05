@@ -340,6 +340,14 @@ public class AppEngine implements ApplicationInterface{
 		return List;
 		
 	}
+
+
+
+	@Override
+	public String getUsername() {
+		// TODO Auto-generated method stub
+		return this.user.getUserName();
+	}
 	
 	
 	

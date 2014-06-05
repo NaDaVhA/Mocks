@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 
+
 import utilities.Pair;
 
 /**
@@ -82,9 +83,9 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 		ArrayList<String> l=new ArrayList<String>();
 		//if(username.compareTo("nadav")==0){
 			
-			for(int i=0;i<100;i++){
-				l.add("friend "+i);
-			}
+	//		for(int i=0;i<100;i++){
+	//			l.add("friend "+i);
+	//		}
 		//}
 		return l;
 	}
@@ -161,9 +162,9 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 	public List<Pair<String, String>> getSongList() {
 		// TODO Auto-generated method stub
 		ArrayList<Pair<String, String>> l=new ArrayList<Pair<String,String>>();
-		for(int i=0;i<10;i++){
-			l.add(new Pair<String, String>("artist "+i, "song "+i));
-		}
+	//	for(int i=0;i<10;i++){
+	//		l.add(new Pair<String, String>("artist "+i, "song "+i));
+	//	}
 		return l;
 	}
 
@@ -184,6 +185,12 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 		}
 		return l;
 	
+	}
+
+	@Override
+	public String getUsername() {
+		// TODO Auto-generated method stub
+		return "nadav qa";
 	}
 
 	
