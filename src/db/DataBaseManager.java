@@ -1284,7 +1284,7 @@ public class DataBaseManager {
 		
 		// Song-Category update - 
 		
-		//Create temp tables: update_song_category_distinct, update_artist_category_id
+		//Create temp table: update_artist_category_id
 		createTable(connection, "update_song_category_id", 
 				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_artist_category_id(song_id, category_id)'", 
 				"song_id int NOT NULL, ",
@@ -1324,8 +1324,6 @@ public class DataBaseManager {
 		updateConfiguration(connection, "update_song_category_temp", "0", "operation", "updateOp");
 		dropTable(connection, "update_categories_of_songs_distinct");
 		updateConfiguration(connection, "update_categories_of_songs_distinct", "0", "operation", "updateOp");
-		dropTable(connection, "update_song_category_distinct");
-		updateConfiguration(connection, "update_song_category_distinct", "0", "operation", "updateOp");
 		dropTable(connection, "update_song_category_id");
 		updateConfiguration(connection, "update_song_category_id", "0", "operation", "updateOp");
 

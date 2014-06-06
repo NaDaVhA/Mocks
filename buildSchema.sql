@@ -29,7 +29,6 @@ CREATE TABLE `configuration` (
   `update_song_category_distinct` bit(1) NOT NULL DEFAULT b'0',
   `update_song_category_temp` bit(1) NOT NULL DEFAULT b'0',
   `update_categories_of_songs_distinct` bit(1) NOT NULL DEFAULT b'0',
-  `update_song_category_distinct` bit(1) NOT NULL DEFAULT b'0',
   `update_song_category_id` bit(1) NOT NULL DEFAULT b'0',
   `update_artist_song_temp` bit(1) NOT NULL DEFAULT b'0',
   `update_artist_song_distinct` bit(1) NOT NULL DEFAULT b'0',
