@@ -30,9 +30,7 @@ public class Main {
 			//NADAV, we need to alert the user about the connection problem, and re-initialize the database. 
 		}
 		
-		
-	//	if(status)
-			//status = app.updateMusicDatabase();
+		status = zookini.getRight();
 
 
 		//Continue with GUI loop

@@ -198,6 +198,30 @@ public class DataBaseManager {
 	}
 	
 	
+	/**
+	 * If connection is valid returns status, else throws SQLException informing that connection to database is lost (given connection is not valid).
+	 * @param connection
+	 * @param status
+	 * @return status unless connection is not valid. 
+	 * @throws SQLException
+	 */
+	private static boolean checkConnectionValidity(Connection connection, boolean status) throws SQLException {
+		
+		try {
+			if(connection.isValid(3))
+				return status;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return status;
+		}
+		
+		//If connection is not valid, throw exception
+		throw new SQLException("connectionLost");
+	
+	}
+	
+	
 	
 	//////////////////////////////////////////////////////////
 	// 		Database modifiers - DB Creation & Maintenance
@@ -360,54 +384,7 @@ public class DataBaseManager {
 	// 		initialize app's database
 	////////////////////////////////////
 	
-	
-	public static boolean initializeDatabaseConfiguration(Connection connection){
-		
-		boolean status = true;
-		
-		//If table already exists, it will just skip creating table again
-		createTable(connection, "configuration", null, "parameter VARCHAR(45) NOT NULL, ", "dbStatus INT NOT NULL DEFAULT 0, ", "PRIMARY KEY (`dbStatus`)");
-		
-		PreparedStatement stmt = null;
-		
-		try {
-			
-			Statement tstmt = connection.createStatement();
-			ResultSet rs = tstmt.executeQuery("SELECT * FROM configuration WHERE parameter = 'initialized'");
-			int dbStatusValue = 99; //QAQA
-			if(rs.next() == true)
-				dbStatusValue = rs.getInt("dbStatus");
-			
-			if(dbStatusValue == 1)
-				return true;
 
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}finally{
-			safelyClose(stmt);
-		}
-		
-		
-		String insertaionAction = "INSERT INTO configuration(parameter, dbStatus) VALUES('initialized',1)";
-
-		stmt = null;
-		
-		try {
-			stmt = connection.prepareStatement(insertaionAction);
-			stmt.executeUpdate();
-
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}finally{
-			safelyClose(stmt);
-		}
-		
-		return status;
-		
-	}
-	
 	
 	/**
 	 * Checks whether database is already initialized.
@@ -536,14 +513,16 @@ public class DataBaseManager {
 	 */
 	private static boolean insertPrimaryDataCycle(Connection connection, String statementToExecute, String atribute, String tuple) {
 		
-		boolean status = true;
+		boolean status = false;
 		
 		if(checkConfiguration(connection, atribute, tuple) == 0){
 			status = executeStatement(connection, statementToExecute);
 			if(status)
 				status = updateConfiguration(connection, atribute, "1", "operation", tuple);
+		}else{
+			status = true;
 		}
-		//why
+
 		return status;
 	}
 	
@@ -560,18 +539,19 @@ public class DataBaseManager {
 	 * @param connection
 	 * @param pathToYagoFiles - path to the folder that contains the yago files.
 	 * @return
+	 * @throws SQLException 
 	 */
-	public static boolean buildMusicDatabase(Connection connection, String pathToYagoFiles){
+	public static boolean buildMusicDatabase(Connection connection, String pathToYagoFiles) throws SQLException{
 		
 		//Check database status
 		int dbStatus = checkConfiguration(connection, "status", "general");
 		if(dbStatus == 1)
 			return true;
 		
-		System.out.println("Building music database. This might take more than a few minutes...");
-		
 		boolean status = true;		
-		
+				
+		System.out.println("Building music database. This might take more than a few minutes...");
+
 		//Yago files' paths
 		String yagoFactsFile = pathToYagoFiles + "yagoFacts.tsv";
 		String YagoTransitiveTypeFile = pathToYagoFiles + "YagoTransitiveType.tsv";
@@ -602,25 +582,31 @@ public class DataBaseManager {
 		
 		//Artists data base creation
 		status = buildArtistsTables(connection, rawSinger, rawMusicalGroups);
-		if(!status) return false;
+		if(!status)
+			return checkConnectionValidity(connection, status);
 		
 		//Songs data base creation
 		status = buildSongsTables(connection, rawSongs);
-		if(!status) return false;
+		if(!status)
+			return checkConnectionValidity(connection, status);
+		
 		
 		//Creator-Creations links data creation
 		status = buildCreatorCreationsTables(connection, rawCreatorCreationsData);
-		if(!status) return false;
+		if(!status)
+			return checkConnectionValidity(connection, status);
 		
 		status = updateConfiguration(connection, "status", "1", "operation", "general");
+		if(!status)
+			return checkConnectionValidity(connection, status);
 		
 		System.out.println("Database creation succeeded. Hooray!");
 		
 		return status;
 		
 	}
-	
-	
+
+
 	/**
 	 * Builds the artists tables: artists, categories_of_artists, artist_category. 
 	 * @param connection
@@ -642,56 +628,74 @@ public class DataBaseManager {
 		int[] types;
 		String statementToExecute;
 		
+		//Add generic artist name
 		String[] unknownArtist = {"<unknownartist>", "garbage", "<unknowncategory>"};
 		rawSinger.addLine(unknownArtist);
 		
-		//Prepare data
-		int[] indices = {0,2,0};
-		LinkedList<String[]> sigersCategories = extractDataFromRDT(rawSinger, indices);
-		LinkedList<String[]> musicalGroupsCategories = extractDataFromRDT(rawMusicalGroups, indices);
 		
-		//Filter duplicates from musicalGroupsCategories and sigersCategories
-		HashSet<String> singers = new HashSet<String>();
-		for(String[] singer : sigersCategories)
-			singers.add(singer[0]);
+		//Temporary data extraction and construction
+		dbStatus = checkConfiguration(connection, "artists_temp", "general");
+		if(dbStatus == 0){
+			
+			//Prepare data
+			int[] indices = {0,2,0};
+			LinkedList<String[]> sigersCategories = extractDataFromRDT(rawSinger, indices);
+			LinkedList<String[]> musicalGroupsCategories = extractDataFromRDT(rawMusicalGroups, indices);
+			
+			//Filter duplicates from musicalGroupsCategories and sigersCategories
+			HashSet<String> singers = new HashSet<String>();
+			for(String[] singer : sigersCategories)
+				singers.add(singer[0]);
+			
+			Iterator<String[]> iter = musicalGroupsCategories.iterator();
+			while(iter.hasNext()){
+				String[] tupple = iter.next();
+				String group = tupple[0];
+				if(singers.contains(group))
+					iter.remove();
+			}
+					
+			for(String[] arr: sigersCategories)
+				arr[2] = "0";
+			
+			for(String[] arr: musicalGroupsCategories)
+				arr[2] = "1";
+			
+			//Create temporary table: artists_temp (includes duplicates)
+			createTable(connection, "artists_temp", 
+				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='artists_temp(artist_name, artist_category, artist_type)'", 
+				"artist_name varchar(100) NOT NULL, ",
+				"artist_category varchar(100) NOT NULL, ",
+				"artist_type BIT NOT NULL");
+			
 		
-		Iterator<String[]> iter = musicalGroupsCategories.iterator();
-		while(iter.hasNext()){
-			String[] tupple = iter.next();
-			String group = tupple[0];
-			if(singers.contains(group))
-				iter.remove();
-		}
+			//populate artists_temp table with Singers
+			tableColumns = new String[3];
+			tableColumns[0] = "artist_name";
+			tableColumns[1] = "artist_category";
+			tableColumns[2] = "artist_type";
+			types = new int[3];
+			types[0] = 2;
+			types[1] = 2;
+			types[2] = 1;
+			
+			dbStatus = checkConfiguration(connection, "artists_temp_after_singers", "general");
+			if(dbStatus == 0){
 				
-		for(String[] arr: sigersCategories)
-			arr[2] = "0";
-		
-		for(String[] arr: musicalGroupsCategories)
-			arr[2] = "1";
-		
-		//Create temporary table: artists_temp (includes duplicates)
-		createTable(connection, "artists_temp", 
-			"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='artists_temp(artist_name, artist_category, artist_type)'", 
-			"artist_name varchar(100) NOT NULL, ",
-			"artist_category varchar(100) NOT NULL, ",
-			"artist_type BIT NOT NULL");
-		
-	
-		//populate artists_temp table with Singers
-		tableColumns = new String[3];
-		tableColumns[0] = "artist_name";
-		tableColumns[1] = "artist_category";
-		tableColumns[2] = "artist_type";
-		types = new int[3];
-		types[0] = 2;
-		types[1] = 2;
-		types[2] = 1;
-		
-		
-		status = populateTable(connection, "artists_temp", tableColumns, types, sigersCategories);
-		if(!status) return false;
-		status = populateTable(connection, "artists_temp", tableColumns, types, musicalGroupsCategories);
-		if(!status) return false;
+				status = populateTable(connection, "artists_temp", tableColumns, types, sigersCategories);
+				if(!status) return false;
+				status = updateConfiguration(connection, "artists_temp_after_singers", "1", "operation", "general");
+				if(!status) return false;
+			}
+				
+			dbStatus = checkConfiguration(connection, "artists_temp", "general");
+			if(dbStatus == 0){
+				status = populateTable(connection, "artists_temp", tableColumns, types, musicalGroupsCategories);
+				if(!status) return false;
+				status = updateConfiguration(connection, "artists_temp", "1", "operation", "general");
+				if(!status) return false;
+			}
+		}
 		System.out.println("Artist database: Completed step 1/5.");
 		
 		//populate artists table
@@ -723,7 +727,7 @@ public class DataBaseManager {
 		statementToExecute = "INSERT INTO artist_category_temp(artist, category) "
 				+ "SELECT DISTINCT artist_name, artist_category "
 				+ "FROM artists_temp";
-		status = executeStatement(connection, statementToExecute);
+		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_category_temp", "general");
 		if(!status) return false;
 		System.out.println("Artist database: Completed step 4/5.");
 
@@ -737,120 +741,19 @@ public class DataBaseManager {
 		if(!status) return false;
 		System.out.println("Artist database: Completed step 5/5.");
 
-		//Drop artist_category_temp table
-		dropTable(connection, "artists_temp");
-		dropTable(connection, "artist_category_temp");
-		
+		//Update configuration - finished artistsTables
 		status = updateConfiguration(connection, "artistsTables", "1", "operation", "general");
 		
+		//Drop artist_category_temp table
+		dropTable(connection, "artists_temp");
+		updateConfiguration(connection, "artists_temp", "0", "operation", "general");
+		dropTable(connection, "artist_category_temp");
+		updateConfiguration(connection, "artist_category_temp", "0", "operation", "general");
+		
 		return status;
 	
 	}
-
-
-	/**
-	 * Builds the CreatorCreations table which holds all the links between our DB's songs and artists.
-	 * @param connection
-	 * @param rawCreatorCreationsData
-	 * @return true if succeeded, false otherwise.
-	 */
-	private static boolean buildCreatorCreationsTables(Connection connection, RawDataUnit rawCreatorCreationsData) {
-		
-		//Check configuration
-		int dbStatus = checkConfiguration(connection, "creatorCreationTables", "general");
-		if(dbStatus == 1)	
-			return true;
-		
-		System.out.println("Finishing the database creation. Hang on a while longer!");
-		
-		boolean status = true;
-		String[] tableColumns;
-		int[] types;
-		String statementToExecute;
-		
-		//Prepare data
-		int[] indices = {1,3};
-		LinkedList<String[]> creatorCreation = extractDataFromRDT(rawCreatorCreationsData, indices);
-		
-		//Create temporary table: artist_song_temp
-		createTable(connection, "artist_song_temp", 
-			"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='artist_song_temp(artist, song)'", 
-			"artist varchar(100) NOT NULL, ",
-			"song varchar(100) NOT NULL");
 	
-		//populate artist_song_temp with artist-songs
-		tableColumns = new String[2];
-		tableColumns[0] = "artist";
-		tableColumns[1] = "song";
-		types = new int[2];
-		types[0] = 2;
-		types[1] = 2;
-		status = populateTable(connection, "artist_song_temp", tableColumns, types, creatorCreation);
-		if(!status) return false;
-		System.out.println("Creations database: Completed step 1/5.");
-
-		//Populate DISTINCT values
-		createTable(connection, "artist_song_temp_DISTINCT", 
-				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='artist_song_temp(artist, song)'", 
-				"artist varchar(100) NOT NULL, ",
-				"song varchar(100) NOT NULL, ", 
-				"PRIMARY KEY (artist, song) ");
-		
-		statementToExecute = "INSERT INTO artist_song_temp_distinct(artist, song) "
-				+ "SELECT DISTINCT artist, song "
-				+ "FROM artist_song_temp";
-		status = executeStatement(connection, statementToExecute);
-		if(!status) return false;
-		System.out.println("Creations database: Completed step 2/5.");
-
-		//Populate artist_song table
-		statementToExecute = "INSERT INTO artist_song(song_id, artist_id) "
-				+ "SELECT DISTINCT Song.song_id, Artist.artist_id "
-				+ "FROM artists as Artist, songs AS Song, artist_song_temp_distinct AS Temp "
-				+ "WHERE Temp.song = Song.song_name AND Temp.artist = Artist.artist_name";
-		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song", "general");
-		if(!status) return false;
-		System.out.println("Creations database: Completed step 3/5.");
-
-		
-		//Add unknown connections
-		
-		//Create temp table: unknown_song_id
-		createTable(connection, "unknown_song_id", 
-				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='unknown_song_id(song_id)'", 
-				"song_id int NOT NULL, ",
-				"PRIMARY KEY (song_id) ");
-		
-		//Populate unknown_song_id table
-		statementToExecute = "INSERT INTO unknown_song_id(song_id) "
-				+ "SELECT DISTINCT song_id "
-				+ "FROM songs "
-				+ "WHERE song_id NOT IN (SELECT DISTINCT song_id FROM artist_song)";
-		status = executeStatement(connection, statementToExecute);
-		if(!status) return false;
-		System.out.println("Creations database: Completed step 4/5.");
-
-		//Add songs with no artists to artist_song table
-		statementToExecute = "INSERT INTO artist_song(song_id, artist_id) "
-				+ "SELECT DISTINCT Song.song_id, UnknownArtist.artist_id "
-				+ "FROM songs AS Song, artists AS UnknownArtist "
-				+ "WHERE Song.song_id NOT IN (SELECT DISTINCT song_id FROM artist_song) "
-				+ "AND UnknownArtist.artist_name = '<unknownartist>'";
-		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song_additions", "general");
-		if(!status) return false;
-		System.out.println("Creations database: Completed step 5/5.");
-		
-		
-		//Drop temp tables: artist_song_temp, artist_song_temp_DISTINCT
-		dropTable(connection, "artist_song_temp");
-		dropTable(connection, "artist_song_temp_DISTINCT");
-		dropTable(connection, "unknown_song_id");
-
-		status = updateConfiguration(connection, "creatorCreationTables", "1", "operation", "general");
-
-		return status;
-	}
-
 	
 	/**
 	 * Builds the following tables:
@@ -872,40 +775,51 @@ public class DataBaseManager {
 		int[] types;
 		String statementToExecute;
 		boolean status;
-			
-		//Extract song-category data from RDU
-		int[] indices = {0,2};
 
-		LinkedList<String[]> songsAndCategories = extractDataFromRDT(rawSongs, indices);
 		
-		//Create temporary tables: song_category_distinct, song_category_temp
+		//Temporary data extraction and construction
+		dbStatus = checkConfiguration(connection, "song_category_temp", "general");
+		if(dbStatus == 0){
+			
+			//Extract song-category data from RDU
+			int[] indices = {0,2};
+
+			LinkedList<String[]> songsAndCategories = extractDataFromRDT(rawSongs, indices);
+			
+			//Create temporary table: song_category_temp
+			createTable(connection, "song_category_temp", 
+					"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='song_category_temp(song, category)'", 
+					"song varchar(100) NOT NULL, ",
+					"category varchar(100) NOT NULL");
+			
+			//populate songs_categories_temp with songs-categories
+			tableColumns = new String[2];
+			tableColumns[0] = "song";
+			tableColumns[1] = "category";
+			types = new int[2];
+			types[0] = 2;
+			types[1] = 2;
+			
+			status = populateTable(connection, "song_category_temp", tableColumns, types, songsAndCategories);
+			if(!status) return false;
+			status = updateConfiguration(connection, "song_category_temp", "1", "operation", "general");
+			if(!status) return false;
+		}		
+		System.out.println("Songs database: Completed step 1/5.");
+
+		//Create temporary table: song_category_distinct
 		createTable(connection, "song_category_distinct", 
 				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='song_category_distinct(song, category)'", 
 				"song varchar(100) NOT NULL, ",
 				"category varchar(100) NOT NULL, ",
 				"PRIMARY KEY (song, category)");
 		
-		createTable(connection, "song_category_temp", 
-				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='song_category_temp(song, category)'", 
-				"song varchar(100) NOT NULL, ",
-				"category varchar(100) NOT NULL");
-		
-		//populate songs_categories_temp with songs-categories
-		tableColumns = new String[2];
-		tableColumns[0] = "song";
-		tableColumns[1] = "category";
-		types = new int[2];
-		types[0] = 2;
-		types[1] = 2;
-		status = populateTable(connection, "song_category_temp", tableColumns, types, songsAndCategories);
-		if(!status) return false;
-		System.out.println("Songs database: Completed step 1/5.");
-
 		//populate song_category_distinct with songs-categories distinct values
 		statementToExecute = "INSERT INTO song_category_distinct(song, category) "
 				+ "SELECT DISTINCT song, category "
 				+ "FROM song_category_temp";
-		status = executeStatement(connection, statementToExecute);		
+		status = insertPrimaryDataCycle(connection, statementToExecute, "song_category_distinct", "general");
+		//status = executeStatement(connection, statementToExecute);		
 		if(!status) return false;
 		System.out.println("Songs database: Completed step 2/5.");
 
@@ -937,15 +851,134 @@ public class DataBaseManager {
 		if(!status) return false;
 		System.out.println("Songs database: Completed step 5/5.");
 
+		//Update configuration - finished songsTables
+		status = updateConfiguration(connection, "songsTables", "1", "operation", "general");
+		
 		//Drop temp tables: song_category_temp, song_category_distinct
 		dropTable(connection, "song_category_temp");
+		updateConfiguration(connection, "song_category_temp", "0", "operation", "general");
 		dropTable(connection, "song_category_distinct");
-		
-		status = updateConfiguration(connection, "songsTables", "1", "operation", "general");
+		updateConfiguration(connection, "song_category_distinct", "0", "operation", "general");
 		
 		return status;
 	}
 	
+	
+
+	/**
+	 * Builds the CreatorCreations table which holds all the links between our DB's songs and artists.
+	 * @param connection
+	 * @param rawCreatorCreationsData
+	 * @return true if succeeded, false otherwise.
+	 */
+	private static boolean buildCreatorCreationsTables(Connection connection, RawDataUnit rawCreatorCreationsData) {
+		
+		//Check configuration
+		int dbStatus = checkConfiguration(connection, "creatorCreationTables", "general");
+		if(dbStatus == 1)	
+			return true;
+		
+		System.out.println("Finishing the database creation. Hang on a while longer!");
+		
+		boolean status = true;
+		String[] tableColumns;
+		int[] types;
+		String statementToExecute;
+		
+		
+		//Temporary data extraction and construction
+		dbStatus = checkConfiguration(connection, "artists_temp", "general");
+		if(dbStatus == 0){
+			
+			//Prepare data
+			int[] indices = {1,3};
+			LinkedList<String[]> creatorCreation = extractDataFromRDT(rawCreatorCreationsData, indices);
+			
+			//Create temporary table: artist_song_temp
+			createTable(connection, "artist_song_temp", 
+				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='artist_song_temp(artist, song)'", 
+				"artist varchar(100) NOT NULL, ",
+				"song varchar(100) NOT NULL");
+		
+			//populate artist_song_temp with artist-songs
+			tableColumns = new String[2];
+			tableColumns[0] = "artist";
+			tableColumns[1] = "song";
+			types = new int[2];
+			types[0] = 2;
+			types[1] = 2;
+			status = populateTable(connection, "artist_song_temp", tableColumns, types, creatorCreation);
+			if(!status) return false;
+			
+		}
+		System.out.println("Creations database: Completed step 1/5.");
+
+		//Populate DISTINCT values
+		createTable(connection, "artist_song_temp_distinct", 
+				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='artist_song_temp(artist, song)'", 
+				"artist varchar(100) NOT NULL, ",
+				"song varchar(100) NOT NULL, ", 
+				"PRIMARY KEY (artist, song) ");
+		
+		statementToExecute = "INSERT INTO artist_song_temp_distinct(artist, song) "
+				+ "SELECT DISTINCT artist, song "
+				+ "FROM artist_song_temp";
+		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song_temp_distinct", "general");
+		if(!status) return false;
+		System.out.println("Creations database: Completed step 2/5.");
+
+		//Populate artist_song table
+		statementToExecute = "INSERT INTO artist_song(song_id, artist_id) "
+				+ "SELECT DISTINCT Song.song_id, Artist.artist_id "
+				+ "FROM artists as Artist, songs AS Song, artist_song_temp_distinct AS Temp "
+				+ "WHERE Temp.song = Song.song_name AND Temp.artist = Artist.artist_name";
+		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song", "general");
+		if(!status) return false;
+		System.out.println("Creations database: Completed step 3/5.");
+
+		
+		//Add unknown connections
+		
+		//Create temp table: unknown_song_id
+		createTable(connection, "unknown_song_id", 
+				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='unknown_song_id(song_id)'", 
+				"song_id int NOT NULL, ",
+				"PRIMARY KEY (song_id) ");
+		
+		//Populate unknown_song_id table
+		statementToExecute = "INSERT INTO unknown_song_id(song_id) "
+				+ "SELECT DISTINCT song_id "
+				+ "FROM songs "
+				+ "WHERE song_id NOT IN (SELECT DISTINCT song_id FROM artist_song)";
+		status = insertPrimaryDataCycle(connection, statementToExecute, "unknown_song_id", "general");
+		if(!status) return false;
+		System.out.println("Creations database: Completed step 4/5.");
+
+		//Add songs with no artists to artist_song table
+		statementToExecute = "INSERT INTO artist_song(song_id, artist_id) "
+				+ "SELECT DISTINCT Song.song_id, UnknownArtist.artist_id "
+				+ "FROM songs AS Song, artists AS UnknownArtist "
+				+ "WHERE Song.song_id NOT IN (SELECT DISTINCT song_id FROM artist_song) "
+				+ "AND UnknownArtist.artist_name = '<unknownartist>'";
+		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song_additions", "general");
+		if(!status) return false;
+		System.out.println("Creations database: Completed step 5/5.");
+		
+		//Update configuration - finished CreatorCreationsTables
+		status = updateConfiguration(connection, "creatorCreationTables", "1", "operation", "general");
+		if(!status) return false;
+		
+		//Drop temp tables: artist_song_temp, artist_song_temp_distinct, unknown_song_id and update configuration
+		dropTable(connection, "artist_song_temp");
+		updateConfiguration(connection, "artist_song_temp", "0", "operation", "general");
+		dropTable(connection, "artist_song_temp_distinct");
+		updateConfiguration(connection, "artist_song_temp_distinct", "0", "operation", "general");
+		dropTable(connection, "unknown_song_id");
+		updateConfiguration(connection, "unknown_song_id", "0", "operation", "general");
+
+		return status;
+	}
+
 	
 	
 	////////////////////////////////////
@@ -961,8 +994,9 @@ public class DataBaseManager {
 	 * @param connection
 	 * @param pathToYagoFiles
 	 * @return true if succeeded, false otherwise.
+	 * @throws SQLException 
 	 */
-	public static boolean updateMusicDatabase(Connection connection, String pathToYagoFiles){
+	public static boolean updateMusicDatabase(Connection connection, String pathToYagoFiles) throws SQLException{
 		
 		int dbStatus = checkConfiguration(connection, "status", "updateOp");
 		if(dbStatus == 1)	
@@ -1003,7 +1037,8 @@ public class DataBaseManager {
 
 		//Update artists data base 
 		status = updateArtistsTable(connection, rawSinger, rawMusicalGroups);
-		if(!status) return false;
+		if(!status)
+			return checkConnectionValidity(connection, status);
 		
 		//Update songs data base 
 		status = updateSongsTables(connection, rawSongs);
@@ -1014,7 +1049,9 @@ public class DataBaseManager {
 		if(!status) return false;
 	
 		//Initialize configuration table - update values !!!  QAQA 
-		initializeConfigurationTuple(connection, "updateOp");
+		status = initializeConfigurationTuple(connection, "updateOp");
+		if(!status)
+			return checkConnectionValidity(connection, status);
 		
 		System.out.println("Finished updating the database.");
 		
@@ -1022,6 +1059,7 @@ public class DataBaseManager {
 		
 	}
 
+	
 	/**
 	 * Updates the links between artists and songs.
 	 * @param connection
@@ -1136,7 +1174,6 @@ public class DataBaseManager {
 		dropTable(connection, "update_artist_song_temp");
 		dropTable(connection, "update_artist_song_distinct");
 		dropTable(connection, "update_artist_song_id");
-		dropTable(connection, "update_unknown_song_id");
 
 		status = updateConfiguration(connection, "creatorCreationTables", "1", "operation", "updateOp");
 		
@@ -1455,7 +1492,7 @@ public class DataBaseManager {
 	
 	
 	/**
-	 * 
+	 * Initializes update tuple in configuration table to 0's, in order to enable other updates.
 	 * @param tuple
 	 * @return
 	 */
@@ -1464,7 +1501,6 @@ public class DataBaseManager {
 		String[] statement = new String[2]; 
 
 		statement[0] = "DELETE FROM configuration WHERE operation LIKE 'updateOp'";
-		//statement[0] = "Select * from configuration";
 		statement[1] = "INSERT INTO `configuration` (`operation`) VALUES ('" + tuple + "')";
 		
 		boolean status = true;
@@ -1474,8 +1510,6 @@ public class DataBaseManager {
 		return status;
 	}
 	
-	
-
 	
 	
 	
