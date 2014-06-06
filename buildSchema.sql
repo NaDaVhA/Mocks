@@ -22,28 +22,6 @@ INSERT INTO `configuration` (`operation`) VALUES ('general');
 INSERT INTO `configuration` (`operation`) VALUES ('updateOp');
 
 
-CREATE TABLE `artist_category` (
-  `artist_id` int(11) NOT NULL,
-  `category_id` int(11) NOT NULL,
-  PRIMARY KEY (`artist_id`,`category_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='arsist_category(artist_id, category_id)';
-
-
-CREATE TABLE `artist_song` (
-  `song_id` int(11) NOT NULL,
-  `artist_id` int(11) NOT NULL,
-  PRIMARY KEY (`song_id`,`artist_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='artist_song(song_id,artist_id )';
-
-
-CREATE TABLE `artists` (
-  `artist_id` int(11) NOT NULL AUTO_INCREMENT,
-  `artist_name` varchar(100) DEFAULT NULL,
-  `artist_type` BIT NULL,
-  PRIMARY KEY (`artist_id`),
-UNIQUE INDEX `artist_name_UNIQUE` (`artist_name` ASC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='artists(artist_id, artist_name, artist_type)';
-
 
 CREATE TABLE `categories_of_artists` (
   `category_artist_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -60,33 +38,13 @@ UNIQUE INDEX `category_name_UNIQUE` (`category_name` ASC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='categories_of_songs(category_id, category_name )';
 
 
-CREATE TABLE `song_category` (
-  `song_id` int(11) NOT NULL,
-  `category_id` int(11) NOT NULL,
-  PRIMARY KEY (`song_id`,`category_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='songCategory(song_id, category_id)';
-
-
-CREATE TABLE `songs` (
-  `song_id` int(11) NOT NULL AUTO_INCREMENT,
-  `song_name` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`song_id`),
-UNIQUE INDEX `song_name_UNIQUE` (`song_name` ASC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='songs(song_id, song_name)';
-
-
-CREATE TABLE `user_artist` (
-  `user_id` int(11) NOT NULL,
-  `artist_id` int(11) NOT NULL,
-  PRIMARY KEY (`user_id`,`artist_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='userArtist(user_id,artist_id)';
-
-
-CREATE TABLE `user_songs` (
-  `user_id` int(11) NOT NULL,
-  `song_id` int(11) NOT NULL,
-  PRIMARY KEY (`user_id`,`song_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='userSongs(user_id , song_id)';
+CREATE TABLE `artists` (
+  `artist_id` int(11) NOT NULL AUTO_INCREMENT,
+  `artist_name` varchar(100) DEFAULT NULL,
+  `artist_type` BIT NULL,
+  PRIMARY KEY (`artist_id`),
+UNIQUE INDEX `artist_name_UNIQUE` (`artist_name` ASC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='artists(artist_id, artist_name, artist_type)';
 
 
 CREATE TABLE `users` (
@@ -98,10 +56,119 @@ CREATE TABLE `users` (
 UNIQUE INDEX `user_name_UNIQUE` (`user_name` ASC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='users(user_id, user_name , password , status_song_id)';
 
+CREATE TABLE `songs` (
+  `song_id` int(11) NOT NULL AUTO_INCREMENT,
+  `song_name` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`song_id`),
+UNIQUE INDEX `song_name_UNIQUE` (`song_name` ASC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='songs(song_id, song_name)';
+
+
+
+CREATE TABLE `artist_category` (
+  `artist_id` int(11) NOT NULL,
+  `category_id` int(11) NOT NULL,
+  PRIMARY KEY (`artist_id`,`category_id`),
+CONSTRAINT `artist_id_artist_category`
+    FOREIGN KEY (`artist_id`)
+    REFERENCES `artists` (`artist_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `category_id_artist_category`
+    FOREIGN KEY (`category_id`)
+    REFERENCES `categories_of_artists` (`category_artist_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='arsist_category(artist_id, category_id)';
+
+
+CREATE TABLE `artist_song` (
+  `song_id` int(11) NOT NULL,
+  `artist_id` int(11) NOT NULL,
+  PRIMARY KEY (`song_id`,`artist_id`),
+CONSTRAINT `song_id_artist_song`
+    FOREIGN KEY (`song_id`)
+    REFERENCES `songs` (`song_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `artist_id_artist_song`
+    FOREIGN KEY (`artist_id`)
+    REFERENCES `artists` (`artist_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='artist_song(song_id,artist_id )';
+
+
+
+
+
+CREATE TABLE `song_category` (
+  `song_id` int(11) NOT NULL,
+  `category_id` int(11) NOT NULL,
+  PRIMARY KEY (`song_id`,`category_id`),
+CONSTRAINT `song_id_song_category`
+    FOREIGN KEY (`song_id`)
+    REFERENCES `songs` (`song_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `category_id_song_category`
+    FOREIGN KEY (`category_id`)
+    REFERENCES `categories_of_songs` (`category_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='songCategory(song_id, category_id)';
+
+
+
+
+CREATE TABLE `user_artist` (
+  `user_id` int(11) NOT NULL,
+  `artist_id` int(11) NOT NULL,
+  PRIMARY KEY (`user_id`,`artist_id`),
+
+CONSTRAINT `user_id_user_artist`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `users` (`user_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `artist_id_user_artist`
+    FOREIGN KEY (`artist_id`)
+    REFERENCES `artists` (`artist_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='userArtist(user_id,artist_id)';
+
+
+CREATE TABLE `user_songs` (
+  `user_id` int(11) NOT NULL,
+  `song_id` int(11) NOT NULL,
+  PRIMARY KEY (`user_id`,`song_id`),
+CONSTRAINT `user_id_user_songs`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `users` (`user_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `song_id_user_songs`
+    FOREIGN KEY (`song_id`)
+    REFERENCES `songs` (`song_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='userSongs(user_id , song_id)';
+
 CREATE TABLE `users_freinds` (
   `user_id` int(11) NOT NULL,
   `user_freind_id` int(11) NOT NULL,
-  PRIMARY KEY (`user_id`,`user_freind_id`)
+  PRIMARY KEY (`user_id`,`user_freind_id`),
+CONSTRAINT `user_id_users_freinds`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `users` (`user_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `user_freind_id_users_freinds`
+    FOREIGN KEY (`user_freind_id`)
+    REFERENCES `users` (`user_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='users_freinds(user_id,user_freind_id)';
-
-
