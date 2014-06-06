@@ -25,6 +25,7 @@ CREATE TABLE `configuration` (
   UNIQUE KEY `operation_UNIQUE` (`operation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+#mira
 
 INSERT INTO `configuration` (`operation`) VALUES ('general');
 INSERT INTO `configuration` (`operation`) VALUES ('updateOp');
