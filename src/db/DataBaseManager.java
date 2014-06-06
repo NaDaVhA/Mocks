@@ -566,7 +566,7 @@ public class DataBaseManager {
 		RawDataUnit rawCreatorCreationsData = yagoMiner.mineDataUnit(yagoFactsFile, factsAttributes, 2);
 		
 		if((rawMusicData == null)||(rawCreatorCreationsData == null)){
-			System.out.println("Data extraction failed.");
+			System.out.println("Data extraction failed. Check Yago files, or <YagoFolderPath> value correctness.");
 			return false;
 		}
 		
@@ -864,7 +864,6 @@ public class DataBaseManager {
 	}
 	
 	
-
 	/**
 	 * Builds the CreatorCreations table which holds all the links between our DB's songs and artists.
 	 * @param connection
@@ -887,7 +886,7 @@ public class DataBaseManager {
 		
 		
 		//Temporary data extraction and construction
-		dbStatus = checkConfiguration(connection, "artists_temp", "general");
+		dbStatus = checkConfiguration(connection, "artist_song_temp", "general");
 		if(dbStatus == 0){
 			
 			//Prepare data
@@ -1019,7 +1018,7 @@ public class DataBaseManager {
 		RawDataUnit rawCreatorCreationsData = yagoMiner.mineDataUnit(yagoFactsFile, factsAttributes, 2);
 		
 		if((rawMusicData == null)||(rawCreatorCreationsData == null)){
-			System.out.println("Data extraction failed.");
+			System.out.println("Data extraction failed. Check Yago files, or <UpdateYagoFolderPath> value correctness.");
 			return false;
 		}
 		
@@ -1120,7 +1119,7 @@ public class DataBaseManager {
 		statementToExecute = "INSERT INTO update_artist_song_distinct(artist, song) "
 				+ "SELECT DISTINCT artist, song "
 				+ "FROM update_artist_song_temp";
-		//status = executeStatement(connection, statementToExecute);
+		status = insertPrimaryDataCycle(connection, statementToExecute, "update_artist_song_distinct", "updateOp");
 		if(!status) return false;
 		System.out.println("Update creations database: Completed step 2/4.");
 
@@ -1135,7 +1134,7 @@ public class DataBaseManager {
 				+ "SELECT DISTINCT Song.song_id, Artist.artist_id "
 				+ "FROM artists as Artist, songs AS Song, update_artist_song_distinct AS Temp "
 				+ "WHERE Temp.song = Song.song_name AND Temp.artist = Artist.artist_name";
-		status = executeStatement(connection, statementToExecute);
+		status = insertPrimaryDataCycle(connection, statementToExecute, "update_artist_song_id_update", "updateOp");
 		if(!status) return false;
 		
 		//Add new entries to update_artist_song_id table from artist_song
@@ -1144,7 +1143,8 @@ public class DataBaseManager {
 				+ "FROM artist_song";
 		status = executeStatement(connection, statementToExecute);
 		if(!status) return false;
-		
+				
+		//"Clean" artist_song table
 		statementToExecute = "DELETE from artist_song WHERE artist_id > 0";
 		status = executeStatement(connection, statementToExecute);
 		if(!status) return false;
@@ -1154,7 +1154,6 @@ public class DataBaseManager {
 				+ "SELECT DISTINCT song_id, artist_id "
 				+ "FROM update_artist_song_id";
 		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song", "updateOp");
-		//status = executeStatement(connection, statementToExecute);
 		if(!status) return false;
 		System.out.println("Update creations database: Completed step 3/4.");
 
@@ -1170,12 +1169,17 @@ public class DataBaseManager {
 		if(!status) return false;
 		System.out.println("Update creations database: Completed step 4/4.");
 		
+		//Update configuration - finished updating creatorCreationTables
+		status = updateConfiguration(connection, "creatorCreationTables", "1", "operation", "updateOp");
+		
 		//Drop temp tables: update_artist_song_temp, update_artist_song_temp_distinct
 		dropTable(connection, "update_artist_song_temp");
+		updateConfiguration(connection, "update_artist_song_temp", "0", "operation", "updateOp");
 		dropTable(connection, "update_artist_song_distinct");
+		updateConfiguration(connection, "update_artist_song_distinct", "0", "operation", "updateOp");
 		dropTable(connection, "update_artist_song_id");
+		updateConfiguration(connection, "update_artist_song_id_update", "0", "operation", "updateOp");
 
-		status = updateConfiguration(connection, "creatorCreationTables", "1", "operation", "updateOp");
 		
 		return status;
 	}
@@ -1200,40 +1204,47 @@ public class DataBaseManager {
 		int[] types;
 		String statementToExecute;
 		boolean status;
+		
+		//Temporary data extraction and construction
+		dbStatus = checkConfiguration(connection, "song_category_temp", "updateOp");
+		if(dbStatus == 0){
 			
-		//Extract song-category data from RDU
-		int[] indices = {0,2};
-
-		LinkedList<String[]> songsAndCategories = extractDataFromRDT(rawSongs, indices);
-		
-		//Create temporary tables: update_song_category_distinct, update_song_category_temp
-		createTable(connection, "update_song_category_distinct", 
-				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_song_category_distinct(song, category)'", 
-				"song varchar(100) NOT NULL, ",
-				"category varchar(100) NOT NULL, ",
-				"PRIMARY KEY (song, category)");
-		
-		createTable(connection, "update_song_category_temp", 
-				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_song_category_temp(song, category)'", 
-				"song varchar(100) NOT NULL, ",
-				"category varchar(100) NOT NULL");
-		
-		//populate update_song_category_temp with songs-categories (might have some duplicate tupples)
-		tableColumns = new String[2];
-		tableColumns[0] = "song";
-		tableColumns[1] = "category";
-		types = new int[2];
-		types[0] = 2;
-		types[1] = 2;
-		status = populateTable(connection, "update_song_category_temp", tableColumns, types, songsAndCategories);
-		if(!status) return false;
+			//Extract song-category data from RDU
+			int[] indices = {0,2};
+	
+			LinkedList<String[]> songsAndCategories = extractDataFromRDT(rawSongs, indices);
+			
+			//Create temporary tables: update_song_category_distinct, update_song_category_temp
+			createTable(connection, "update_song_category_distinct", 
+					"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_song_category_distinct(song, category)'", 
+					"song varchar(100) NOT NULL, ",
+					"category varchar(100) NOT NULL, ",
+					"PRIMARY KEY (song, category)");
+			
+			createTable(connection, "update_song_category_temp", 
+					"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_song_category_temp(song, category)'", 
+					"song varchar(100) NOT NULL, ",
+					"category varchar(100) NOT NULL");
+			
+			//populate update_song_category_temp with songs-categories (might have some duplicate tupples)
+			tableColumns = new String[2];
+			tableColumns[0] = "song";
+			tableColumns[1] = "category";
+			types = new int[2];
+			types[0] = 2;
+			types[1] = 2;
+			status = populateTable(connection, "update_song_category_temp", tableColumns, types, songsAndCategories);
+			if(!status) return false;
+			status = updateConfiguration(connection, "update_song_category_temp", "1", "operation", "updateOp");
+			if(!status) return false;	
+		}
 		System.out.println("Update songs database: Completed step 1/6.");
 
 		//populate update_song_category_distinct with songs-categories distinct values
 		statementToExecute = "INSERT INTO update_song_category_distinct(song, category) "
 				+ "SELECT DISTINCT song, category "
 				+ "FROM update_song_category_temp";
-		status = executeStatement(connection, statementToExecute);		
+		status = insertPrimaryDataCycle(connection, statementToExecute, "update_song_category_distinct", "updateOp");
 		if(!status) return false;
 		System.out.println("Update songs database: Completed step 2/6.");
 
@@ -1258,7 +1269,7 @@ public class DataBaseManager {
 		statementToExecute = "INSERT INTO update_categories_of_songs_distinct(category_name) "
 				+ "SELECT DISTINCT category "
 				+ "FROM update_song_category_distinct";
-		status = executeStatement(connection, statementToExecute);
+		status = insertPrimaryDataCycle(connection, statementToExecute, "update_categories_of_songs_distinct", "updateOp");
 		if(!status) return false;
 		
 		//Update categories_of_songs table
@@ -1286,7 +1297,7 @@ public class DataBaseManager {
 				+ "FROM update_song_category_distinct AS Temp, songs AS Song, categories_of_songs AS Category "
 				+ "WHERE Temp.song = Song.song_name AND Temp.category = Category.category_name "
 				+ "LIMIT 2000";
-		status = executeStatement(connection, statementToExecute);
+		status = insertPrimaryDataCycle(connection, statementToExecute, "update_song_category_id", "updateOp");
 		if(!status) return false;
 		System.out.println("Update songs database: Completed step 5/6.");
 
@@ -1303,16 +1314,21 @@ public class DataBaseManager {
 		if(!status) return false;
 		System.out.println("Update songs database: Completed step 6/6.");
 
-
-		//Drop temp tables: song_category_temp, song_category_distinct
-		dropTable(connection, "update_song_category_distinct");
-		dropTable(connection, "update_song_category_temp");
-		dropTable(connection, "update_categories_of_songs_distinct");
-		dropTable(connection, "update_song_category_distinct");
-		dropTable(connection, "update_song_category_id");
-
+		//Update configuration - finished updating songsTables
 		status = updateConfiguration(connection, "songsTables", "1", "operation", "updateOp");
 		
+		//Drop temp tables and update configuration
+		dropTable(connection, "update_song_category_distinct");
+		updateConfiguration(connection, "update_song_category_distinct", "0", "operation", "updateOp");
+		dropTable(connection, "update_song_category_temp");
+		updateConfiguration(connection, "update_song_category_temp", "0", "operation", "updateOp");
+		dropTable(connection, "update_categories_of_songs_distinct");
+		updateConfiguration(connection, "update_categories_of_songs_distinct", "0", "operation", "updateOp");
+		dropTable(connection, "update_song_category_distinct");
+		updateConfiguration(connection, "update_song_category_distinct", "0", "operation", "updateOp");
+		dropTable(connection, "update_song_category_id");
+		updateConfiguration(connection, "update_song_category_id", "0", "operation", "updateOp");
+
 		return status;
 		
 	}
@@ -1339,62 +1355,83 @@ public class DataBaseManager {
 		int[] types;
 		String statementToExecute;
 	
-		//Prepare data
-		int[] indices = {0,2,0};
-		LinkedList<String[]> sigersCategories = extractDataFromRDT(rawSinger, indices);
-		LinkedList<String[]> musicalGroupsCategories = extractDataFromRDT(rawMusicalGroups, indices);
-		
-		//Filter duplicates from musicalGroupsCategories and sigersCategories
-		HashSet<String> singers = new HashSet<String>();
-		for(String[] singer : sigersCategories)
-			singers.add(singer[0]);
-		
-		Iterator<String[]> iter = musicalGroupsCategories.iterator();
-		while(iter.hasNext()){
-			String[] tupple = iter.next();
-			String group = tupple[0];
-			if(singers.contains(group))
-				iter.remove();
-		}
+		//Temporary data extraction and construction
+		dbStatus = checkConfiguration(connection, "artist_song_temp", "updateOp");
+		if(dbStatus == 0){
+			
+			//Create temporary tables: update_artists_temp (includes duplicates), update_artists_distinct
+			createTable(connection, "update_artists_temp", 
+				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_artists_temp(artist_name, artist_category, artist_type)'", 
+				"artist_name varchar(100) NOT NULL, ",
+				"artist_category varchar(100) NOT NULL, ",
+				"artist_type BIT NOT NULL");
+			
+			createTable(connection, "update_artists_distinct", 
+				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_artists_distinct(artist_name, artist_type)'", 
+				"artist_name varchar(100) NOT NULL, ",
+				"artist_type BIT NOT NULL");
+			
+			//Prepare data
+			int[] indices = {0,2,0};
+			LinkedList<String[]> sigersCategories = extractDataFromRDT(rawSinger, indices);
+			LinkedList<String[]> musicalGroupsCategories = extractDataFromRDT(rawMusicalGroups, indices);
+			
+			//Filter duplicates from musicalGroupsCategories and sigersCategories
+			HashSet<String> singers = new HashSet<String>();
+			for(String[] singer : sigersCategories)
+				singers.add(singer[0]);
+			
+			Iterator<String[]> iter = musicalGroupsCategories.iterator();
+			while(iter.hasNext()){
+				String[] tupple = iter.next();
+				String group = tupple[0];
+				if(singers.contains(group))
+					iter.remove();
+			}
+					
+			for(String[] arr: sigersCategories)
+				arr[2] = "0";
+			
+			for(String[] arr: musicalGroupsCategories)
+				arr[2] = "1";
+			
+			
+			//populate update_artists_temp table with Singers and musicak groups
+			tableColumns = new String[3];
+			tableColumns[0] = "artist_name";
+			tableColumns[1] = "artist_category";
+			tableColumns[2] = "artist_type";
+			types = new int[3];
+			types[0] = 2;
+			types[1] = 2;
+			types[2] = 1;
+			
+			dbStatus = checkConfiguration(connection, "artists_temp_after_singers", "updateOp");
+			if(dbStatus == 0){
 				
-		for(String[] arr: sigersCategories)
-			arr[2] = "0";
-		
-		for(String[] arr: musicalGroupsCategories)
-			arr[2] = "1";
-		
-		//Create temporary tables: update_artists_temp (includes duplicates), update_artists_distinct
-		createTable(connection, "update_artists_temp", 
-			"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_artists_temp(artist_name, artist_category, artist_type)'", 
-			"artist_name varchar(100) NOT NULL, ",
-			"artist_category varchar(100) NOT NULL, ",
-			"artist_type BIT NOT NULL");
-		
-		createTable(connection, "update_artists_distinct", 
-			"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_artists_distinct(artist_name, artist_type)'", 
-			"artist_name varchar(100) NOT NULL, ",
-			"artist_type BIT NOT NULL");
-		
-		
-		//populate artists_temp table with Singers
-		tableColumns = new String[3];
-		tableColumns[0] = "artist_name";
-		tableColumns[1] = "artist_category";
-		tableColumns[2] = "artist_type";
-		types = new int[3];
-		types[0] = 2;
-		types[1] = 2;
-		types[2] = 1;
-		
-		status = populateTable(connection, "update_artists_temp", tableColumns, types, sigersCategories);
-		status = populateTable(connection, "update_artists_temp", tableColumns, types, musicalGroupsCategories);
+				status = populateTable(connection, "update_artists_temp", tableColumns, types, sigersCategories);
+				if(!status) return false;
+				status = updateConfiguration(connection, "artists_temp_after_singers", "1", "operation", "updateOp");
+				if(!status) return false;
+			}
+			
+			dbStatus = checkConfiguration(connection, "artists_temp", "updateOp");
+			if(dbStatus == 0){
+	
+				status = populateTable(connection, "update_artists_temp", tableColumns, types, musicalGroupsCategories);
+				if(!status) return false;
+				status = updateConfiguration(connection, "artists_temp", "1", "operation", "updateOp");
+				if(!status) return false;
+			}
+		}
 		System.out.println("Update artists database: Completed step 1/5.");
 
 		//populate update_artists_distinct table
 		statementToExecute = "INSERT INTO update_artists_distinct(artist_name, artist_type) "
 				+ "SELECT DISTINCT artist_name, artist_type "
 				+ "FROM update_artists_temp ";
-		status = executeStatement(connection, statementToExecute);
+		status = insertPrimaryDataCycle(connection, statementToExecute, "update_artists_distinct", "updateOp");
+		if(!status) return false;
 		
 		//Update artists table
 		statementToExecute = "INSERT INTO artists(artist_name, artist_type) "
@@ -1402,7 +1439,6 @@ public class DataBaseManager {
 				+ "FROM update_artists_distinct AS UpdateArtist, artists AS Artists "
 				+ "WHERE  UpdateArtist.artist_name NOT IN (SELECT DISTINCT artist_name FROM artists)";
 		status = insertPrimaryDataCycle(connection, statementToExecute, "artists", "updateOp");
-		//status = executeStatement(connection, statementToExecute);
 		if(!status) return false;
 		System.out.println("Update artists database: Completed step 2/5.");
 
@@ -1418,7 +1454,7 @@ public class DataBaseManager {
 		statementToExecute = "INSERT INTO update_artists_categories_distinct(category_name) "
 				+ "SELECT DISTINCT artist_category "
 				+ "FROM update_artists_temp";
-		status = executeStatement(connection, statementToExecute);
+		status = insertPrimaryDataCycle(connection, statementToExecute, "update_artists_categories_distinct", "updateOp");
 		if(!status) return false;
 
 		//Update categories_of_artists table
@@ -1427,7 +1463,6 @@ public class DataBaseManager {
 				+ "FROM update_artists_categories_distinct AS UpdateCategory "
 				+ "WHERE  UpdateCategory.category_name NOT IN (SELECT DISTINCT categories_of_artists.category_name FROM categories_of_artists)";
 		status = insertPrimaryDataCycle(connection, statementToExecute, "categories_of_artists", "updateOp");
-		//status = executeStatement(connection, statementToExecute);
 		if(!status) return false;
 		System.out.println("Update artists database: Completed step 3/5.");
 
@@ -1449,7 +1484,7 @@ public class DataBaseManager {
 		statementToExecute = "INSERT INTO update_artist_category_temp(artist, category) "
 				+ "SELECT DISTINCT artist_name, artist_category "
 				+ "FROM update_artists_temp";
-		status = executeStatement(connection, statementToExecute);
+		status = insertPrimaryDataCycle(connection, statementToExecute, "update_artist_category_temp", "updateOp");
 		if(!status) return false;
 
 		statementToExecute = "INSERT INTO update_artist_category_id_temp(artist_id, category_id) "
@@ -1457,7 +1492,7 @@ public class DataBaseManager {
 				+ "FROM update_artist_category_temp AS Temp, artists AS Artist, categories_of_artists AS Category "
 				+ "WHERE Temp.artist = Artist.artist_name AND Temp.category = Category.category_name "
 				+ "LIMIT 2000";
-		status = executeStatement(connection, statementToExecute);
+		status = insertPrimaryDataCycle(connection, statementToExecute, "update_artist_category_id_temp", "updateOp");
 		if(!status) return false;
 		System.out.println("Update artists database: Completed step 4/5.");
 
@@ -1475,18 +1510,22 @@ public class DataBaseManager {
 		if(!status) return false;
 		System.out.println("Update artists database: Completed step 5/5.");
 
-		
-		//Drop temp tables: artist_category_temp
-		dropTable(connection, "update_artists_temp");
-		dropTable(connection, "update_artists_distinct");
-		dropTable(connection, "update_artists_categories_distinct");
-		dropTable(connection, "update_artist_category_temp");
-		dropTable(connection, "update_artist_category_id_temp");
-		
+		//Update configuration - finished updating artistsTables
 		status = updateConfiguration(connection, "artistsTables", "1", "operation", "updateOp");
 		
-		return status;
+		//Drop temp tables and update configuration
+		dropTable(connection, "update_artists_temp");
+		updateConfiguration(connection, "update_artists_temp", "0", "operation", "updateOp");
+		dropTable(connection, "update_artists_distinct");
+		updateConfiguration(connection, "update_artists_distinct", "0", "operation", "updateOp");
+		dropTable(connection, "update_artists_categories_distinct");
+		updateConfiguration(connection, "update_artists_categories_distinct", "0", "operation", "updateOp");
+		dropTable(connection, "update_artist_category_temp");
+		updateConfiguration(connection, "update_artist_category_temp", "0", "operation", "updateOp");
+		dropTable(connection, "update_artist_category_id_temp");
+		updateConfiguration(connection, "update_artist_category_id_temp", "0", "operation", "updateOp");
 		
+		return status;
 		
 	}
 	
