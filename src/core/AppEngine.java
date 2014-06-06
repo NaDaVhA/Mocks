@@ -50,7 +50,7 @@ public class AppEngine implements ApplicationInterface{
 		} catch (SQLException e) {
 			// Connection is lost.
 			e.printStackTrace();
-			return new Pair<Integer, Boolean>(-1, status);
+			return new Pair<Integer, Boolean>(-1, false);
 		}
 		if(!status)
 			System.out.println("Database initialization failure!");
@@ -93,7 +93,7 @@ public class AppEngine implements ApplicationInterface{
 		} catch (SQLException e) {
 			// Connection is lost.
 			e.printStackTrace();
-			return new Pair<Integer, Boolean>(-1, status);
+			return new Pair<Integer, Boolean>(-1, false);
 		}
 				
 		return new Pair<Integer, Boolean>(0, status);		
