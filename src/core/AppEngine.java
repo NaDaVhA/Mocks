@@ -208,7 +208,7 @@ public class AppEngine implements ApplicationInterface{
 	public Pair<Integer, Boolean> changeStatusSong(Pair<String,String> song) {
 		
 		boolean stat=true;
-		String song_name = song.getLeft();
+		String song_name = song.getRight();
 		
 		int user_id =this.user.getUserID();
 		int song_id;

@@ -115,7 +115,7 @@ public class dbActions implements DBActionsInterface{
 	
 	// need to check 
 	public boolean addArtistToUser(String user_id, String artist_id) throws SQLException{
-		String sql_query ="INSERT INTO `project`.`user_artist` " +
+		String sql_query ="INSERT INTO `user_artist` " +
 				"(`user_id`, `artist_id`) VALUES ('"+user_id+"', '"+artist_id+"');";
 		
 		if (executeQuery(sql_query,false)==null)
@@ -127,7 +127,7 @@ public class dbActions implements DBActionsInterface{
 	
 	@Override
 	public boolean removeFriendFromUser(int userID, int userFriendID) throws SQLException {
-		String sql_query ="DELETE FROM users_friends, " + 
+		String sql_query ="DELETE FROM users_friends " + 
 				"Where users_friends.user_id =" + userID + " And users_friends.user_friend_id = "+ userFriendID;
 		if (executeQuery(sql_query,false)==null)
 			return false; // true for  query is_select
@@ -138,8 +138,8 @@ public class dbActions implements DBActionsInterface{
 
 	@Override
 	public boolean removeSongFromUser(int userID, int songID) throws SQLException {
-		String sql_query ="DELETE FROM users_songs, " + 
-				"Where users_songs.user_id =" + userID + " And users_songs.song_id = "+ songID;
+		String sql_query ="DELETE FROM user_songs " + 
+				"Where user_songs.user_id =" + userID + " And user_songs.song_id = "+ songID;
 		if (executeQuery(sql_query,false)==null)
 			return false; // true for  query is_select
 		
