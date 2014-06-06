@@ -74,7 +74,7 @@ public class RecommenderEngineAdapter{
 		ArrayList<String[]> songPairs;
 		try {
 			songPairs = db.getSongsArtistList();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			songPairs = new ArrayList<String[]>();
 		}
 		
@@ -99,7 +99,7 @@ public class RecommenderEngineAdapter{
 		ArrayList<String[]> allUsersSet;
 		try {
 			allUsersSet = db.getUsersList();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			allUsersSet = new ArrayList<String[]>();
 		}
 		
