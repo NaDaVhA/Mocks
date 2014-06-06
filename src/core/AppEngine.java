@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import recommender.RecommenderEngineAdapter;
 import utilities.Pair;
 import db.ConnectionPool;
 import db.DBActionsInterface;
@@ -503,6 +504,13 @@ public class AppEngine implements ApplicationInterface{
 	public String getUsername() {
 		// TODO Auto-generated method stub
 		return this.user.getUserName();
+	}
+
+
+
+	@Override
+	public void InitalizeRecommender() {
+		RecommenderEngineAdapter.getInstance().initalize(dbActionRunner);
 	}
 	
 	

@@ -151,4 +151,7 @@ public interface ApplicationInterface {
 	
 	public String getUsername();
 		
+	
+	public void InitalizeRecommender();
+	
 }

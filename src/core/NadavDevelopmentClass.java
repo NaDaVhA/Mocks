@@ -211,6 +211,12 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 		
 	}
 
+	@Override
+	public void InitalizeRecommender() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 
 }

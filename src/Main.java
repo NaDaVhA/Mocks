@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import org.eclipse.swt.widgets.Display;
 
+import recommender.RecommenderEngineAdapter;
 import core.AppEngine;
 import core.ApplicationInterface;
 import ui.theMusicalNetwork;
@@ -36,6 +37,9 @@ public class Main {
 
 		//Continue with GUI loop
 		if(status){
+			
+			app.InitalizeRecommender();
+			
 			//NADAV - Continue with GUI ...
 			Display display=Display.getDefault();
 			theMusicalNetwork app1=new theMusicalNetwork(display,app);
