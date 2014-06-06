@@ -75,10 +75,26 @@ public interface ApplicationInterface {
 	 * 
 	 * @param username
 	 * @param song
-	 * @return true iff the change succeeded
+	 * @return true if the change succeeded
 	 */
 	public Pair<Integer, Boolean> changeStatusSong(Pair<String,String> song); //qaqa
 	
+	
+	/**
+	 * 
+	 * 
+	 * @param friendusername
+	 * @return true if the change succeeded
+	 */
+	public Pair<Integer, Boolean> removeFriendFromUser(String friendusername); //qaqa
+	
+	/**
+	 * 
+	 * @param friendusername
+	 * @return true if the change succeeded
+	 */
+	public Pair<Integer, Boolean> removeSongFromUser(String songname ,  String artistname); //qaqa
+
 	
 	
 	/**
@@ -153,5 +169,9 @@ public interface ApplicationInterface {
 		
 	
 	public void InitalizeRecommender();
+
+
+
+	
 	
 }

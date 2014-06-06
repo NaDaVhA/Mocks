@@ -512,6 +512,67 @@ public class AppEngine implements ApplicationInterface{
 	public void InitalizeRecommender() {
 		RecommenderEngineAdapter.getInstance().initalize(dbActionRunner);
 	}
+
+
+//if user friend is not exist or a problem in dbAction than return false
+	@Override
+	public Pair<Integer, Boolean> removeFriendFromUser(String friendusername) {
+		
+		boolean status = false;
+		
+		int user_id = this.user.getUserID();
+		
+		int user_friend_id;
+		try {
+			user_friend_id = this.dbActionRunner.getUserId(friendusername);
+			if (user_friend_id == -1 || user_friend_id == 0)
+				return new Pair<Integer, Boolean>(0, status);
+			
+			status = this.dbActionRunner.removeFriendFromUser(user_id, user_friend_id);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Pair<Integer, Boolean>(-1, status);
+		}
+		
+		
+		if (status)
+			this.user.removeFriendFromFriendList(friendusername);
+		
+		return new Pair<Integer, Boolean>(0, status);
+		
+	}
+
+
+
+	@Override
+	public Pair<Integer, Boolean> removeSongFromUser(String songname,String artistname) {
+		boolean status = false;
+		Pair<String,String> songArtist = new Pair<String,String>(songname, artistname);
+		
+		int user_id = this.user.getUserID();
+		
+		int user_song_id;
+		try {
+			user_song_id = this.dbActionRunner.getSongID(songname);
+			if (user_song_id == -1 || user_song_id == 0)
+				return new Pair<Integer, Boolean>(0, status);
+			
+			status = this.dbActionRunner.removeSongFromUser(user_id, user_song_id);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Pair<Integer, Boolean>(-1, status);
+		}
+		
+		
+		if (status)
+			this.user.removeSongFromSongArtistList(songArtist);
+		
+		return new Pair<Integer, Boolean>(0, status);
+	}
 	
 	
 	

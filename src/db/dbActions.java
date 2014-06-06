@@ -125,6 +125,28 @@ public class dbActions implements DBActionsInterface{
 		
 	}
 	
+	@Override
+	public boolean removeFriendFromUser(int userID, int userFriendID) throws SQLException {
+		String sql_query ="DELETE FROM users_friends, " + 
+				"Where users_friends.user_id =" + userID + " And users_friends.user_friend_id = "+ userFriendID;
+		if (executeQuery(sql_query,false)==null)
+			return false; // true for  query is_select
+		
+		return true;
+	}
+
+
+	@Override
+	public boolean removeSongFromUser(int userID, int songID) throws SQLException {
+		String sql_query ="DELETE FROM users_songs, " + 
+				"Where users_songs.user_id =" + userID + " And users_songs.song_id = "+ songID;
+		if (executeQuery(sql_query,false)==null)
+			return false; // true for  query is_select
+		
+		return true;
+	}
+	
+	
 	//{null} if there is not match
 	// need to check 
 	public String[] getUserName(int userID) throws SQLException {
@@ -348,7 +370,7 @@ public class dbActions implements DBActionsInterface{
 	/**
 	 * This method gets the userID corresponding to the given userName.
 	 * @param userName
-	 * @return userID if exists, -1 if no such user exists.
+	 * @return userID if exists, 0 if no such user exists, -1 if a problem occur.
 	 * @throws SQLException 
 	 */
 	@Override
@@ -610,6 +632,9 @@ public class dbActions implements DBActionsInterface{
 		if(!status)
 			System.out.println("Connection to database is lost. terminating application anyway.");
 	}
+
+
+	
 	
 	
 }

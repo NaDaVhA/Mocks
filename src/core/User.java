@@ -110,6 +110,16 @@ public class User {
 		this.freindsList.add(freind);
 	}
 	
+	public void removeFriendFromFriendList(String freind)
+	{
+		this.freindsList.remove(freind);
+	}
+	
+	public void removeSongFromSongArtistList(Pair<String,String> song_artist)
+	{
+		this.SongArtistlist.remove(song_artist);
+	}
+	
 	
 	
 	

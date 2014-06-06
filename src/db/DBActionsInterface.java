@@ -64,16 +64,18 @@ public interface DBActionsInterface {
 	
 	public boolean addArtistToUser(String user_id, String artist_id) throws SQLException;
 	
-	//mira
 	public boolean addSongToUser(String user_name, String song_name) throws SQLException;
-	//mira-
 	
 	public boolean setUserStatusSong(int userID, int songID) throws SQLException;
 	
+	//delete
+	
+	public boolean removeFriendFromUser(int userID, int userFriendID) throws SQLException;
+	
+	public boolean removeSongFromUser(int userID, int songID) throws SQLException;
+	
 	//gets
-	
-	
-	
+
 	//[user_id, user_name, status_song_id]
 	public ArrayList<String[]> getUsersList() throws SQLException;
 			
