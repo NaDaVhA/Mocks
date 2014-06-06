@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import utilities.Pair;
 import core.ApplicationInterface;
 
 
@@ -131,7 +132,7 @@ public class logInScreen extends Screen {
 
 			@Override
 			public void run() {
-				final boolean isUserRegisterd;
+				final Pair<Integer,Boolean> isUserRegisterd;
 				if(theMusicalNetwork.qaqa){
 					isUserRegisterd=theMusicalNetwork.nadav.isUserRegisterd(getUsername_s(), getPassword_s());
 				}
@@ -142,7 +143,7 @@ public class logInScreen extends Screen {
 				//final boolean isUserRegisterd=engine.isUserRegisterd(getUsername_s(), getPassword_s());
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						if(isUserRegisterd){ //QAQA  - PUT REAL FUNCTION HERE 
+						if(isUserRegisterd.getRight()){ //QAQA  - PUT REAL FUNCTION HERE 
 							closeWaiting();
 							disposeScreen(); //he is registerd!
 							//hideScreen();

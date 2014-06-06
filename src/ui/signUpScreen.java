@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import utilities.Pair;
 import core.ApplicationInterface;
 
 public class signUpScreen extends Screen{
@@ -146,7 +147,7 @@ public class signUpScreen extends Screen{
 			@Override
 			public void run() {
 				//final boolean isUserTaken=theMusicalNetwork.nadav.isUsernameTaken(signUpScreen.this.username_s);
-				final boolean isUserTaken;
+				final Pair<Integer,Boolean> isUserTaken;
 				if(theMusicalNetwork.qaqa){
 					isUserTaken=theMusicalNetwork.nadav.isUsernameTaken(signUpScreen.this.username_s);
 				}
@@ -156,7 +157,7 @@ public class signUpScreen extends Screen{
 				//final boolean isUserTaken=engine.isUsernameTaken(signUpScreen.this.username_s);
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						if(isUserTaken){ //QAQA  - PUT REAL FUNCTION HERE 
+						if(isUserTaken.getRight()){ //QAQA  - PUT REAL FUNCTION HERE 
 							closeWaiting();
 							showScreen();
 							errorPop("Sign up Error", "Username already taken");
@@ -168,7 +169,7 @@ public class signUpScreen extends Screen{
 
 								@Override
 								public void run() {
-									final boolean signUpUser;
+									final Pair<Integer,Boolean> signUpUser;
 									//final boolean signUpUser=theMusicalNetwork.nadav.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
 									if(theMusicalNetwork.qaqa){
 										signUpUser=theMusicalNetwork.nadav.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
@@ -179,7 +180,7 @@ public class signUpScreen extends Screen{
 									//final boolean signUpUser=engine.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
 									getDisplay().asyncExec(new Runnable() {
 										public void run() {
-											if(!signUpUser){ //QAQA  - PUT REAL FUNCTION HERE 
+											if(!signUpUser.getRight()){ //QAQA  - PUT REAL FUNCTION HERE 
 												closeWaiting();
 												showScreen();
 												errorPop("Sign up Error", "Failed to Sign up..");

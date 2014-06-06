@@ -182,7 +182,7 @@ public class addNewSongScreen extends Screen{
 
 				@Override
 				public void run() {
-					final ArrayList<Pair<String, String>> list ;
+					final Pair<Integer,ArrayList<Pair<String, String>>> list ;
 					if(searchByArtist){
 						if(theMusicalNetwork.qaqa){
 							list=theMusicalNetwork.nadav.getSearchResultsByArtist(text_to_search);
@@ -206,7 +206,7 @@ public class addNewSongScreen extends Screen{
 							//status_song=status;
 							
 							result_list.removeAll();
-							for(Pair<String, String> s:list){
+							for(Pair<String, String> s:list.getRight()){
 								TableItem item = new TableItem (result_list, SWT.NONE);
 								item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 								//item.setText(0, "artist "+s.getLeft());
@@ -317,7 +317,7 @@ public class addNewSongScreen extends Screen{
 
 				@Override
 				public void run() {
-					final boolean b;
+					final Pair<Integer,Boolean> b;
 					if(theMusicalNetwork.qaqa){
 						b=theMusicalNetwork.nadav.addSong(song_chosen.getRight(),song_chosen.getLeft());
 					}
@@ -330,7 +330,7 @@ public class addNewSongScreen extends Screen{
 						public void run() {
 							//status_song=status;
 							
-							if(!b){
+							if(!b.getRight()){
 								closeWaiting();
 								showScreen();
 								errorPop("Error", "Failed to add song.");	

@@ -167,7 +167,7 @@ public class mainScreen extends Screen{
 			public void run() {
 				
 				//final boolean b=theMusicalNetwork.nadav.changeStatusSong(username, song_selcted_table);
-				final boolean b;
+				final Pair<Integer,Boolean> b;
 				if(theMusicalNetwork.qaqa){
 					b=theMusicalNetwork.nadav.changeStatusSong(song_selcted_table);
 				}
@@ -179,7 +179,7 @@ public class mainScreen extends Screen{
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;
-						if(b){
+						if(b.getRight()){
 						status_song_label.setText("Status song:  "+song_selcted_table.getLeft()+" "+song_selcted_table.getRight());
 						updateStatusSong(song_selcted_table);
 						//Thread.currentThread();

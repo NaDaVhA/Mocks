@@ -7,6 +7,18 @@ import java.util.Map.Entry;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 import utilities.Pair;
 
 /**
@@ -18,7 +30,7 @@ import utilities.Pair;
 public class NadavDevelopmentClass implements ApplicationInterface {
 
 	@Override
-	public boolean isUserRegisterd(String username, String password) {
+	public Pair<Integer, Boolean> isUserRegisterd(String username, String password) {
 		// TODO Auto-generated method stub
 		int i=0;
 		while(i<1000){
@@ -26,13 +38,13 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 			System.out.println(i);
 		}
 		if((username.compareTo("nadav")==0)&&password.compareTo("as")==0){
-			return true;
+			return new Pair<Integer, Boolean>(0, true);
 		}
-		return false;
+		return new Pair<Integer, Boolean>(0, false);
 	}
 
 	@Override
-	public boolean isUsernameTaken(String username) {
+	public Pair<Integer, Boolean> isUsernameTaken(String username) {
 		// TODO Auto-generated method stub
 				int i=0;
 				while(i<1000){
@@ -40,13 +52,13 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 					System.out.println(i);
 				}
 				if((username.compareTo("nadav")==0)){
-					return true;
+					return new Pair<Integer, Boolean>(0, true);
 				}
-				return false;
+				return new Pair<Integer, Boolean>(0, false);
 	}
 
 	@Override
-	public boolean signUpUser(String username, String password) {
+	public Pair<Integer, Boolean> signUpUser(String username, String password) {
 		// TODO Auto-generated method stub
 				int i=0;
 				while(i<1000){
@@ -54,18 +66,18 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 					System.out.println(i);
 				}
 				if((username.compareTo("nadavi")==0)&&password.compareTo("as")==0){
-					return true;
+					return new Pair<Integer, Boolean>(0, true);
 				}
-				return false;
+				return new Pair<Integer, Boolean>(0, false);
 	}
 
 	@Override
-	public Pair<String, String> getStatusSong(String username) {
+	public Pair<Integer, Pair<String, String>> getStatusSong(String username) {
 		// TODO Auto-generated method stub
 		if(username.compareTo("chen")==0){
-			return new Pair<String, String>("song artist", "song title");
+			return new Pair<Integer, Pair<String, String>>(0, new Pair<String, String>("song artist", "song title"));
 		}
-		return new Pair<String, String>("", "");
+		return new Pair<Integer, Pair<String, String>>(0, new Pair<String, String>("", ""));
 	}
 
 
@@ -97,13 +109,13 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 	}
 
 	@Override
-	public ArrayList<String> getSearchResultsFriends(String friend_name) {
+	public Pair<Integer, ArrayList<String>> getSearchResultsFriends(String friend_name) {
 		// TODO Auto-generated method stub
 		ArrayList< String> l=new ArrayList<String>();
 		for(int i=0;i<10;i++){
 			l.add("friend "+i);
 		}
-		return l;
+		return new Pair<Integer, ArrayList<String>>(0, l);
 	
 	}
 
@@ -114,36 +126,36 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 	}
 
 	@Override
-	public ArrayList<Pair<String, String>> getSearchResultsByArtist(String artist_name) {
+	public Pair<Integer, ArrayList<Pair<String, String>>> getSearchResultsByArtist(String artist_name) {
 		ArrayList<Pair<String, String>> l=new ArrayList<Pair<String,String>>();
 		for(int i=0;i<10;i++){
 			l.add(new Pair<String, String>("artist by a "+i, "song by a "+i));
 		}
-		return l;
+		return  new Pair<Integer, ArrayList<Pair<String, String>>>(0, l);
 	}
 	
 	@Override
-	public ArrayList<Pair<String, String>> getSearchResultsBySong(String song_name) {
+	public Pair<Integer, ArrayList<Pair<String, String>>> getSearchResultsBySong(String song_name) {
 		ArrayList<Pair<String, String>> l=new ArrayList<Pair<String,String>>();
 		for(int i=0;i<10;i++){
 			l.add(new Pair<String, String>("artist by s "+i, "song by s"+i));
 		}
-		return l;
+		return new Pair<Integer, ArrayList<Pair<String, String>>>(0,l);
 	}
 
 
 
 
 	@Override
-	public boolean initializeApplication() {
+	public Pair<Integer, Boolean> initializeApplication() {
 		// TODO Auto-generated method stub
-		return false;
+		return new Pair<Integer, Boolean>(0, false);
 	}
 
 	@Override
-	public boolean updateMusicDatabase() {
+	public Pair<Integer, Boolean> updateMusicDatabase() {
 		// TODO Auto-generated method stub
-		return false;
+		return new Pair<Integer, Boolean>(0, false);
 	}
 
 	@Override
@@ -153,9 +165,9 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 	}
 
 	@Override
-	public boolean changeStatusSong(Pair<String, String> song) {
+	public Pair<Integer, Boolean> changeStatusSong(Pair<String, String> song) {
 		// TODO Auto-generated method stub
-		return false;
+		return new Pair<Integer, Boolean>(0, false);
 	}
 
 	@Override
@@ -171,19 +183,19 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 
 
 	@Override
-	public boolean addSong(String song, String artist) {
+	public Pair<Integer, Boolean> addSong(String song, String artist) {
 		// TODO Auto-generated method stub
-		return false;
+		return new Pair<Integer, Boolean>(0, false);
 	}
 
 	@Override
-	public List<Pair<String, String>> getSongList(String username) {
+	public Pair<Integer, List<Pair<String, String>>> getSongList(String username) {
 		
 		ArrayList<Pair<String, String>> l=new ArrayList<Pair<String,String>>();
 		for(int i=0;i<10;i++){
 			l.add(new Pair<String, String>("artist user "+i, "song user "+i));
 		}
-		return l;
+		return new Pair<Integer, List<Pair<String, String>>>(0,l);
 	
 	}
 
@@ -191,6 +203,12 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 	public String getUsername() {
 		// TODO Auto-generated method stub
 		return "nadav qa";
+	}
+
+	@Override
+	public void terminateDBConnection() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

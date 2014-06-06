@@ -8,10 +8,16 @@ import utilities.Pair;
 public interface ApplicationInterface {
 	
 	/**
+	 * all the functions return a pair the left element represent connection status
+	 */
+	
+	
+	/**
 	 * Initializes the application.
 	 * @return true if succeeded, false otherwise.
 	 */
 	public Pair<Integer, Boolean> initializeApplication();
+	
 	
 	
 	/**
@@ -37,7 +43,7 @@ public interface ApplicationInterface {
 	public Pair<Integer, Boolean> isUserRegisterd(String username,String password);
 	
 	/**
-	 * for sign up screnn
+	 * for sign up screen
 	 * @param username
 	 * @return true iff username is already in use
 	 */
@@ -144,8 +150,5 @@ public interface ApplicationInterface {
 	 */
 	
 	public String getUsername();
-	
-	
-	//till here!!!!!
-	
+		
 }

@@ -116,17 +116,17 @@ public class addNewFriendScreen extends Screen {
 
 			@Override
 			public void run() {
-				final Pair<String, String> friend_song;
-				final  ArrayList<Pair<String, String>> list;
+				final Pair<Integer, Pair<String, String>> friend_song;
+				final  Pair<Integer, java.util.List<Pair<String, String>>> list_p;
 				
 				if(theMusicalNetwork.qaqa){
 					 friend_song=theMusicalNetwork.nadav.getStatusSong(friend_name_to_show);
-					 list=(ArrayList<Pair<String, String>>) theMusicalNetwork.nadav.getSongList(friend_name_to_show);
+					 list_p= theMusicalNetwork.nadav.getSongList(friend_name_to_show);
 				}
 				else{ //true code
 				 friend_song=engine.getStatusSong(friend_name_to_show); //1.6.14
 					
-					 list=(ArrayList<Pair<String, String>>) engine.getSongList(friend_name_to_show); //1.6.14
+					 list_p= engine.getSongList(friend_name_to_show); //1.6.14
 					
 				}
 				
@@ -136,7 +136,7 @@ public class addNewFriendScreen extends Screen {
 						//status_song=status;
 						friend_status_song.setText(friend_song.getLeft()+" "+friend_song.getRight());
 						
-						for(Pair<String, String> s:list){
+						for(Pair<String, String> s:list_p.getRight()){
 							TableItem item = new TableItem (friend_songs, SWT.NONE);
 							item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 							//item.setText(0, "artist "+s.getLeft());
@@ -203,12 +203,12 @@ public class addNewFriendScreen extends Screen {
 
 			@Override
 			public void run() {
-				final  ArrayList<String> list;
+				final  Pair<Integer, ArrayList<String>> list_p;
 				if(theMusicalNetwork.qaqa){
-					 list=theMusicalNetwork.nadav.getSearchResultsFriends(name_to_search);
+					 list_p=theMusicalNetwork.nadav.getSearchResultsFriends(name_to_search);
 				}
 				else{//true code
-					 list=engine.getSearchResultsFriends(name_to_search);
+					 list_p=engine.getSearchResultsFriends(name_to_search);
 				}
 				
 				//final  ArrayList<String> list=engine.getSearchResultsFriends(name_to_search);
@@ -216,7 +216,7 @@ public class addNewFriendScreen extends Screen {
 					public void run() {
 						//status_song=status;
 						friend_result_list.removeAll();
-						for(String s:list){
+						for(String s:list_p.getRight()){
 							friend_result_list.add(s);
 						}
 						

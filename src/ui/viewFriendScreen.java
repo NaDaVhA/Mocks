@@ -67,7 +67,7 @@ private Thread t11,t12,t13,t14;
 			public void run() {
 				//final Pair<String,String> status=theMusicalNetwork.nadav.getStatusSong(username);
 				//final Pair<String,String> status=engine.getStatusSong(username); //1.6.14
-				final Pair<String,String> status;
+				final Pair<Integer,Pair<String,String>> status;
 				if(theMusicalNetwork.qaqa){
 					status=theMusicalNetwork.nadav.getStatusSong(user_name);
 				}
@@ -78,7 +78,7 @@ private Thread t11,t12,t13,t14;
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;
-						status_song_label.setText("Status song:  "+status.getLeft()+" "+status.getRight());
+						status_song_label.setText("Status song:  "+status.getRight().getLeft()+" "+status.getRight().getRight());
 						//updateStatusSong(status);
 						//Thread.currentThread();
 						pool.remove(t11);
