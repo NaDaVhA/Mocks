@@ -67,10 +67,11 @@ public class ConnectionPool {
 		// creating the new connection		
 		String url = "jdbc:mysql://" + host + ":" + port + "/" + dataBase;
 		
+		
 		Connection connection;
 		
 		try {
-			
+			//d
 			//open connection
 			connection = DriverManager.getConnection(url, dbUser, dbPassword);
 			
