@@ -1,5 +1,6 @@
 package recommender;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +71,12 @@ public class RecommenderEngineAdapter{
 		
 		List<Song> resultList = new ArrayList<Song>();
 		
-		ArrayList<String[]> songPairs = db.getSongsArtistList();
+		ArrayList<String[]> songPairs;
+		try {
+			songPairs = db.getSongsArtistList();
+		} catch (SQLException e) {
+			songPairs = new ArrayList<String[]>();
+		}
 		
 		for (int i=0;i<songPairs.size();i++)
 		{
@@ -90,7 +96,13 @@ public class RecommenderEngineAdapter{
 		List<User> resultList = new ArrayList<User>();
 		
 		//Create Users
-		ArrayList<String[]> allUsersSet = db.getUsersList();
+		ArrayList<String[]> allUsersSet;
+		try {
+			allUsersSet = db.getUsersList();
+		} catch (SQLException e) {
+			allUsersSet = new ArrayList<String[]>();
+		}
+		
 		for (int i=0;i<allUsersSet.size();i++)
 		{
 			String[] currentUserArr = allUsersSet.get(i);
@@ -104,14 +116,26 @@ public class RecommenderEngineAdapter{
 		//Add User Friends & Songs
 		for (User u : resultList)
 		{
-			ArrayList<String[]> userFriends = db.getUserFreindsList(Integer.parseInt(u.getId()));
+			ArrayList<String[]> userFriends;
+			try {
+				userFriends = db.getUserFreindsList(Integer.parseInt(u.getId()));
+			} catch (Exception e) {
+				userFriends = new ArrayList<String[]>();
+			}
+			
 			for (String[] friendArr : userFriends)
 			{
 				String friendUsername = friendArr[0];
 				u.addFriend(getUserByUsername(resultList,friendUsername));
 			}
 			
-			ArrayList<String[]> userSongs = db.getUserSongList(Integer.parseInt(u.getId()));
+			ArrayList<String[]> userSongs;
+			try {
+				userSongs = db.getUserSongList(Integer.parseInt(u.getId()));
+			} catch (Exception e) {
+				userSongs = new ArrayList<String[]>();
+			}
+			
 			for (String[] userSongArr : userSongs)
 			{
 				String artistName = userSongArr[1];
