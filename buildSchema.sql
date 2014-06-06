@@ -166,18 +166,18 @@ CONSTRAINT `user_id_user_songs`
     ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='userSongs(user_id , song_id)';
 
-CREATE TABLE `users_freinds` (
+CREATE TABLE `users_friends` (
   `user_id` int(11) NOT NULL,
-  `user_freind_id` int(11) NOT NULL,
-  PRIMARY KEY (`user_id`,`user_freind_id`),
-CONSTRAINT `user_id_users_freinds`
+  `user_friend_id` int(11) NOT NULL,
+  PRIMARY KEY (`user_id`,`user_friend_id`),
+CONSTRAINT `user_id_users_friends`
     FOREIGN KEY (`user_id`)
     REFERENCES `users` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `user_freind_id_users_freinds`
-    FOREIGN KEY (`user_freind_id`)
+  CONSTRAINT `user_friend_id_users_friends`
+    FOREIGN KEY (`user_friend_id`)
     REFERENCES `users` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='users_freinds(user_id,user_freind_id)';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='users_friends(user_id,user_friend_id)';
