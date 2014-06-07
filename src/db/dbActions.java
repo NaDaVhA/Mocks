@@ -31,30 +31,33 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 	
+	
+	//similar to getSongID
+	public int getArtistID(String artist_name) throws SQLException
+	{
+		String artist_name_c = ConvertStringCharToLegal(artist_name);
+		
+		String sql_query ="Select artist_id " + 
+				"From artist " +
+				"Where artist.artist_name = '" + artist_name_c +"'";
+		
+		ArrayList<String[]> result= executeQuery(sql_query,true);
+		return checkID(result);
+		
+		
+	}
+	
+	
 	public int getSongID(String song_name) throws SQLException
 	{
 		String song_name_c = ConvertStringCharToLegal(song_name);
-		System.out.println(song_name_c);
 		
 		String sql_query ="Select song_id " + 
 				"From songs " +
 				"Where songs.song_name = '" + song_name_c +"'";
 		
 		ArrayList<String[]> result= executeQuery(sql_query,true);
-		
-		if (result == null)
-		{
-			return -1;
-		}
-		
-		if (result.size()==0)
-		{
-			return 0;
-		}
-		
-		int song_id = Integer.parseInt(result.get(0)[0]);
-		return song_id;
-		
+		return checkID(result);
 	}
 	
 	public ArrayList<String[]> getSongsArtistList() throws SQLException{
@@ -63,7 +66,6 @@ public class dbActions implements DBActionsInterface{
 				"From songs,artist_song,artists " +
 				"Where songs.song_id = artist_song.song_id And artists.artist_id = artist_song.artist_id";
 		
-	
 		return executeQuery(sql_query,true);
 			
 	}
@@ -101,17 +103,24 @@ public class dbActions implements DBActionsInterface{
 	
 	
 	//Users DB// need to check
-	public boolean addSongToUser(String user_name, String song_name) throws SQLException{
+	public boolean addSongToUser(String user_name, String song_name,String artist_name) throws SQLException{
 		
+		boolean status = false;
 		int user_id = getUserId(user_name);
 		
-		int song_id = getSongID(song_name);
+		if (user_id == 0 || user_id == -1)
+			return status;
 		
-		if ((user_id == -1) || (song_id == -1) || (user_id == 0) || (song_id == 0))
-			return false;
+		int song_id = getSongID(song_name);
+		if (user_id == 0 || user_id == -1)
+			return status;
+		
+		int artist_id = getArtistID(artist_name);
+		if (artist_id == 0 || artist_id == -1)
+			return status;
 		
 		String sql_query ="INSERT INTO `user_songs` " +
-				"(`user_id`, `song_id`) VALUES ('"+user_id+"', '"+song_id+"');";
+				"(`user_id`, `song_id`, `artist_id` ) VALUES ('"+user_id+"', '"+song_id+"', '"+artist_id+"');";
 			
 		if (executeQuery(sql_query,false)==null)
 			return false; // true for  query is_select
@@ -387,18 +396,7 @@ public class dbActions implements DBActionsInterface{
 				"Where users.user_name ='" + username +"'";
 		
 		ArrayList<String[]> result= executeQuery(sql_query,true);
-		
-		if (result == null)  
-		{
-			return -1;
-		}	
-		if (result.size()==0)
-		{
-			return 0;
-		}
-		
-		int user_id = Integer.parseInt(result.get(0)[0]);
-		return user_id; // true for  query is_select 
+		return checkID(result);
 		
 	}
 		
@@ -645,6 +643,23 @@ public class dbActions implements DBActionsInterface{
 			return s;
 		String  ans = s.replaceAll("'","\\\\'");
 		return ans;
+	}
+	
+	private int checkID(ArrayList<String[]> arrayList)
+	{
+		if (arrayList == null)
+		{
+			return -1;
+		}
+		
+		if (arrayList.size()==0)
+		{
+			return 0;
+		}
+		
+		int song_id = Integer.parseInt(arrayList.get(0)[0]);
+		return song_id;
+		
 	}
 	
 	

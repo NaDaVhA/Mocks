@@ -410,7 +410,7 @@ public class AppEngine implements ApplicationInterface{
 		boolean stat = false;
 		
 		try {
-			stat = this.dbActionRunner.addSongToUser(user_name, song);
+			stat = this.dbActionRunner.addSongToUser(user_name,song,artist);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

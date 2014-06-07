@@ -163,10 +163,13 @@ CONSTRAINT `user_id_user_artist`
 
 
 CREATE TABLE `user_songs` (
-  `user_id` int(11) NOT NULL,
-  `song_id` int(11) NOT NULL,
-  PRIMARY KEY (`user_id`,`song_id`),
-CONSTRAINT `user_id_user_songs`
+  `user_id` INT NOT NULL,
+  `song_id` INT NOT NULL,
+  `artist_id` INT NOT NULL,
+  PRIMARY KEY (`user_id`, `song_id`, `artist_id`),
+  INDEX `song_id_user_songs_idx` (`song_id` ASC),
+  INDEX `artist_id_user_songs_idx` (`artist_id` ASC),
+  CONSTRAINT `user_id_user_songs`
     FOREIGN KEY (`user_id`)
     REFERENCES `users` (`user_id`)
     ON DELETE NO ACTION
@@ -175,21 +178,9 @@ CONSTRAINT `user_id_user_songs`
     FOREIGN KEY (`song_id`)
     REFERENCES `songs` (`song_id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='userSongs(user_id , song_id)';
-
-CREATE TABLE `users_friends` (
-  `user_id` int(11) NOT NULL,
-  `user_friend_id` int(11) NOT NULL,
-  PRIMARY KEY (`user_id`,`user_friend_id`),
-CONSTRAINT `user_id_users_friends`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `users` (`user_id`)
-    ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `user_friend_id_users_friends`
-    FOREIGN KEY (`user_friend_id`)
-    REFERENCES `users` (`user_id`)
+  CONSTRAINT `artist_id_user_songs`
+    FOREIGN KEY (`artist_id`)
+    REFERENCES `artists` (`artist_id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='users_friends(user_id,user_friend_id)';
+    ON UPDATE NO ACTION);

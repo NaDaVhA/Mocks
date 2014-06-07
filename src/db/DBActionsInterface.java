@@ -64,7 +64,7 @@ public interface DBActionsInterface {
 	
 	public boolean addArtistToUser(String user_id, String artist_id) throws SQLException;
 	
-	public boolean addSongToUser(String user_name, String song_name) throws SQLException;
+	public boolean addSongToUser(String user_name, String song_name,String artist_name) throws SQLException;
 	
 	public boolean setUserStatusSong(int userID, int songID) throws SQLException;
 	
