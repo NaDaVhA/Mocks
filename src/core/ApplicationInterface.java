@@ -142,7 +142,7 @@ public interface ApplicationInterface {
 	 * @param username
 	 * @return true iff the friend was added to the friend list
 	 */
-	public boolean addFriend(String username);
+	public Pair<Integer,Boolean> addFriend(String username);
 	
 	/**
 	 * for add song screen

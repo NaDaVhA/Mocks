@@ -208,7 +208,7 @@ public class AppEngine implements ApplicationInterface{
 	
 	@Override
 	public Pair<Integer, Boolean> changeStatusSong(Pair<String,String> song) {
-		
+	
 		boolean stat=true;
 		String song_name = song.getRight();
 		
@@ -331,7 +331,7 @@ public class AppEngine implements ApplicationInterface{
 
 	//mira-
 	@Override
-	public boolean addFriend(String username) {
+	public Pair<Integer, Boolean> addFriend(String username) {
 		
 		int user_id =this.user.getUserID();
 		int freind_user_id;
@@ -339,19 +339,22 @@ public class AppEngine implements ApplicationInterface{
 		
 		try {
 			freind_user_id = this.dbActionRunner.getUserId(username);
+			if (freind_user_id == -1 || freind_user_id == 0)
+				return new Pair<Integer, Boolean>(0, stat);
 			stat = this.dbActionRunner.addFreindToUser(user_id, freind_user_id);
 			
 			if (stat == false)
-			return stat;
+			return new Pair<Integer, Boolean>(0, stat);
 			
 			this.user.addFreindTofreindsList(username);
 		
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return new Pair<Integer, Boolean>(-1, stat);
 		}
 		
-		return stat;
+		return new Pair<Integer, Boolean>(0, stat);
 	
 	}
 
