@@ -21,11 +21,7 @@ public class dbActions implements DBActionsInterface{
 	
 	/**
 	 * 
-	 *@param
-	 *@return  
-	 * 
 	 */
-	
 	public ArrayList<String[]> getSongsList() throws SQLException{
 		
 		String sql_query ="Select song_name, song_id " + 
@@ -37,9 +33,12 @@ public class dbActions implements DBActionsInterface{
 	
 	public int getSongID(String song_name) throws SQLException
 	{
+		String song_name_c = ConvertStringCharToLegal(song_name);
+		System.out.println(song_name_c);
+		
 		String sql_query ="Select song_id " + 
 				"From songs " +
-				"Where songs.song_name = '" + song_name +"'";
+				"Where songs.song_name = '" + song_name_c +"'";
 		
 		ArrayList<String[]> result= executeQuery(sql_query,true);
 		
@@ -71,9 +70,10 @@ public class dbActions implements DBActionsInterface{
 	
 	public ArrayList<String[]> getSongsArtistList(String songname) throws SQLException{
 		
+		String song_name_c =  ConvertStringCharToLegal(songname);
 		String sql_query ="Select song_name, artist_name " + 
 				"From songs,artist_song,artists " +
-				"Where songs.song_name LIKE " + '"' + '%'+ songname + '%'+  '"' + "And songs.song_id = artist_song.song_id And artists.artist_id = artist_song.artist_id";
+				"Where songs.song_name LIKE " + '"' + '%'+ song_name_c + '%'+  '"' + "And songs.song_id = artist_song.song_id And artists.artist_id = artist_song.artist_id";
 	
 		return executeQuery(sql_query,true);
 			
@@ -81,9 +81,10 @@ public class dbActions implements DBActionsInterface{
 	
 	public ArrayList<String[]> getArtistList(String artist_name) throws SQLException
 	{
+		String artist_name_c =  ConvertStringCharToLegal(artist_name);
 		String sql_query ="Select song_name, artist_name " + 
 				"From artists, artist_song, songs " +
-				"Where artists.artist_name LIKE " + '"' + '%'+ artist_name + '%'+  '"' +
+				"Where artists.artist_name LIKE " + '"' + '%'+ artist_name_c + '%'+  '"' +
 				" And artists.artist_id = artist_song.artist_id And songs.song_id = artist_song.song_id";
 		return executeQuery(sql_query,true);
 		
@@ -638,8 +639,13 @@ public class dbActions implements DBActionsInterface{
 			System.out.println("Connection to database is lost. terminating application anyway.");
 	}
 
-
-	
+	private String ConvertStringCharToLegal(String s)
+	{	
+		if (s == null)
+			return s;
+		String  ans = s.replaceAll("'","\\\\'");
+		return ans;
+	}
 	
 	
 }
