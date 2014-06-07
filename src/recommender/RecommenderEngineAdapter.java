@@ -27,6 +27,7 @@ public class RecommenderEngineAdapter{
 		RecommenderEngine.getInstance().initalize(createAllUsers(), createAllSongs());
 	}
 	
+	//Returns a list of recommended Usernames
 	public List<String> recommendFriends(String username, int topK) throws Exception{
 		
 		RecommenderEngine engine = RecommenderEngine.getInstance();
@@ -44,6 +45,7 @@ public class RecommenderEngineAdapter{
 		return result;
 	}
 	
+	//Returns a list of <Arist Name, Song Name>
 	public List<Pair<String,String>> recommendSongs(String username, int topK) throws Exception{
 		
 		RecommenderEngine engine = RecommenderEngine.getInstance();
