@@ -317,7 +317,7 @@ public class dbActions implements DBActionsInterface{
 		
 		String sql_query ="Select song_name, artist_name " + 
 				"From user_songs, songs, artist_song, artists " +
-				"Where user_songs.user_id=" + StringUserID + " And songs.song_id =user_songs.song_id And songs.song_id = artist_song.song_id And artists.artist_id = artist_song.artist_id"; 
+				"Where user_songs.user_id=" + StringUserID + " And user_songs.artist_id = artists.artist_id And songs.song_id =user_songs.song_id And songs.song_id = artist_song.song_id And artists.artist_id = artist_song.artist_id"; 
 		
 		return executeQuery(sql_query,true);
 	}
