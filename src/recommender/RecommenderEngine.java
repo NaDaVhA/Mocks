@@ -87,7 +87,9 @@ public class RecommenderEngine{
 			throw new Exception("RecommenderEngine is not initalized");
 		
 		User targetUser = user;
-		List<User> similarUsers = getSimilarUsers(targetUser, (int)(allUsers.size()*0.05), true);		
+		int topUsers = (int)(allUsers.size()*0.05);
+		topUsers = Math.max(10, topUsers);
+		List<User> similarUsers = getSimilarUsers(targetUser, topUsers, true);		
 		
 		Hashtable<String,Integer> candidates = new Hashtable<String, Integer>();
 		
