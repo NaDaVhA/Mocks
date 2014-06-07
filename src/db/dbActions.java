@@ -13,13 +13,18 @@ public class dbActions implements DBActionsInterface{
 	private boolean qaqa = false;
 	private ConnectionPool connectionPool;
 
-	//mmm
 	//Constructor
 	public dbActions(ConnectionPool cp){
 		
 		this.connectionPool = cp;
 	}
 	
+	/**
+	 * 
+	 *@param
+	 *@return  
+	 * 
+	 */
 	
 	public ArrayList<String[]> getSongsList() throws SQLException{
 		
@@ -277,7 +282,7 @@ public class dbActions implements DBActionsInterface{
 		
 		String sql_query ="Select user_name " + 
 				"From users " +
-				"Where users.user_name= '" + username + "' AND users.password=" + password;
+				"Where users.user_name= '" + username + "' AND users.password= '" + password + "'";
 		
 		ArrayList<String[]> result= executeQuery(sql_query,true);
 		
