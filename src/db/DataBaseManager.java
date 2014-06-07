@@ -747,8 +747,8 @@ public class DataBaseManager {
 		//Drop artist_category_temp table
 		dropTable(connection, "artists_temp");
 		updateConfiguration(connection, "artists_temp", "0", "operation", "general");
-		dropTable(connection, "artist_category_temp");
-		updateConfiguration(connection, "artist_category_temp", "0", "operation", "general");
+		//dropTable(connection, "artist_category_temp");
+		//updateConfiguration(connection, "artist_category_temp", "0", "operation", "general");
 		
 		return status;
 	
