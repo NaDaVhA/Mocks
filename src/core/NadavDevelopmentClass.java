@@ -5,20 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import ui.initUpdateScreen;
 import utilities.Pair;
 
 /**
@@ -33,7 +20,7 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 	public Pair<Integer, Boolean> isUserRegisterd(String username, String password) {
 		// TODO Auto-generated method stub
 		int i=0;
-		while(i<1000){
+		while(i<100000){
 			i++;
 			System.out.println(i);
 		}
@@ -74,8 +61,8 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 	@Override
 	public Pair<Integer, Pair<String, String>> getStatusSong(String username) {
 		// TODO Auto-generated method stub
-		if(username.compareTo("chen")==0){
-			return new Pair<Integer, Pair<String, String>>(0, new Pair<String, String>("song artist", "song title"));
+		if(username.compareTo("friend 4")==0){
+			return new Pair<Integer, Pair<String, String>>(-1, new Pair<String, String>("song artist", "song title"));
 		}
 		return new Pair<Integer, Pair<String, String>>(0, new Pair<String, String>("", ""));
 	}
@@ -95,9 +82,9 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 		ArrayList<String> l=new ArrayList<String>();
 		//if(username.compareTo("nadav")==0){
 			
-	//		for(int i=0;i<100;i++){
-	//			l.add("friend "+i);
-	//		}
+		for(int i=0;i<100;i++){
+				l.add("friend "+i);
+			}
 		//}
 		return l;
 	}
@@ -120,9 +107,9 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 	}
 
 	@Override
-	public boolean addFriend(String username) {
+	public Pair<Integer, Boolean> addFriend(String username) {
 		// TODO Auto-generated method stub
-		return false;
+		return new Pair<Integer, Boolean>(0, true);
 	}
 
 	@Override
@@ -149,12 +136,35 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 	@Override
 	public Pair<Integer, Boolean> initializeApplication() {
 		// TODO Auto-generated method stub
-		return new Pair<Integer, Boolean>(0, false);
+		
+		int i,j;
+		for(i=0;i<1000;i++){
+			initUpdateScreen.updateProgressBar();
+			j=0;
+			while(j<10000){
+				j++;
+				//System.out.println(j);
+			}
+		}
+		
+		initUpdateScreen.setFinished(true);
+		return new Pair<Integer, Boolean>(0, true);
 	}
 
 	@Override
 	public Pair<Integer, Boolean> updateMusicDatabase() {
 		// TODO Auto-generated method stub
+		int i,j;
+		for(i=0;i<1000;i++){
+			initUpdateScreen.updateProgressBar();
+			j=0;
+			while(j<10000){
+				j++;
+				System.out.println(j);
+			}
+		}
+		
+		initUpdateScreen.setFinished(true);
 		return new Pair<Integer, Boolean>(0, false);
 	}
 
@@ -167,16 +177,16 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 	@Override
 	public Pair<Integer, Boolean> changeStatusSong(Pair<String, String> song) {
 		// TODO Auto-generated method stub
-		return new Pair<Integer, Boolean>(0, false);
+		return new Pair<Integer, Boolean>(-1, false);
 	}
 
 	@Override
 	public List<Pair<String, String>> getSongList() {
 		// TODO Auto-generated method stub
 		ArrayList<Pair<String, String>> l=new ArrayList<Pair<String,String>>();
-	//	for(int i=0;i<10;i++){
-	//		l.add(new Pair<String, String>("artist "+i, "song "+i));
-	//	}
+		for(int i=0;i<10;i++){
+			l.add(new Pair<String, String>("artist "+i, "song "+i));
+		}
 		return l;
 	}
 
@@ -185,7 +195,12 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 	@Override
 	public Pair<Integer, Boolean> addSong(String song, String artist) {
 		// TODO Auto-generated method stub
-		return new Pair<Integer, Boolean>(0, false);
+		int i=0;
+		while(i<100000){
+			i++;
+			System.out.println(i);
+		}
+		return new Pair<Integer, Boolean>(-1, false);
 	}
 
 	@Override
@@ -209,6 +224,29 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 	public void terminateDBConnection() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Pair<Integer, ArrayList<String>> getFriendList(String friend_name) {
+		// TODO Auto-generated method stub
+		ArrayList< String> l=new ArrayList<String>();
+		for(int i=0;i<10;i++){
+			l.add("friend "+i);
+		}
+		return new Pair<Integer, ArrayList<String>>(0, l);
+	}
+
+	@Override
+	public Pair<Integer, Boolean> removeFriendFromUser(String friendusername) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Pair<Integer, Boolean> removeSongFromUser(String songname,
+			String artistname) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override

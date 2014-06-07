@@ -49,7 +49,7 @@ public class mainScreen extends Screen{
 	private String friend_name;
 	
 	
-	private Thread t1,t2,t3,t4;
+	private Thread t1,t2,t3,t4,t5;
 	
 	//QAQA add here the rest
 	private Pair<String, String> song_selcted_table=null;
@@ -121,6 +121,43 @@ public class mainScreen extends Screen{
 		//data1.bottom = new FormAttachment (5, 0);
 		user_label.setLayoutData(data1);
 		
+		/*******/
+		class signout implements Runnable {
+
+			@Override
+			public void run() {
+				//final Pair<String,String> status=theMusicalNetwork.nadav.getStatusSong(username);
+				//final Pair<String,String> status=engine.getStatusSong(username); //1.6.14
+				final boolean status;
+				if(theMusicalNetwork.qaqa){
+					status=theMusicalNetwork.nadav.signOutUser(theMusicalNetwork.nadav.getUsername());
+				}
+				else{ //real code
+					 status=engine.signOutUser(engine.getUsername());
+				}
+				//final Pair<String,String> status=engine.getStatusSong();
+				getDisplay().asyncExec(new Runnable() {
+					public void run() {
+						//status_song=status;	
+						//Thread.currentThread();
+						disposeScreen();
+						logInScreen logIn=new logInScreen(getDisplay(),getShell(),engine);
+						logIn.createScreen();
+						
+						pool.remove(t5);
+						if(pool.isEmpty()){
+							
+							closeWaiting();
+							//showScreen();
+						}
+					}
+				});
+				
+			}
+		}
+		
+		/*******/
+		
 		
 		//sign out button
 		sign_out=new Button(getShell(),SWT.NONE);
@@ -136,9 +173,9 @@ public class mainScreen extends Screen{
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed sign out");
 				//signOutUser in interface qaqa
-				disposeScreen();
-				logInScreen logIn=new logInScreen(getDisplay(),getShell(),engine);
-				logIn.createScreen();
+				 t5 = new Thread(new signout());
+					pool.add(t5);
+					t5.start();
 			}
 		});
 		
@@ -179,10 +216,32 @@ public class mainScreen extends Screen{
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;
-						if(b.getRight()){
-						status_song_label.setText("Status song:  "+song_selcted_table.getLeft()+" "+song_selcted_table.getRight());
-						updateStatusSong(song_selcted_table);
-						//Thread.currentThread();
+						if(checkConnection(getShell(), b.getLeft())){
+							if(b.getRight()){
+								status_song_label.setText("Status song:  "+song_selcted_table.getLeft()+" "+song_selcted_table.getRight());
+								updateStatusSong(song_selcted_table);
+								//Thread.currentThread();
+									pool.remove(t4);
+									if(pool.isEmpty()){
+										
+										closeWaiting();
+										showScreen();
+									}
+								}
+								else{
+									pool.remove(t4);
+									if(pool.isEmpty()){
+										
+										closeWaiting();
+										showScreen();
+										errorPop("Error", "Failed to update status song");
+									}
+									
+									
+								}
+						}
+						
+						else{ //problem with connection want to cont.
 							pool.remove(t4);
 							if(pool.isEmpty()){
 								
@@ -190,17 +249,7 @@ public class mainScreen extends Screen{
 								showScreen();
 							}
 						}
-						else{
-							pool.remove(t4);
-							if(pool.isEmpty()){
-								
-								closeWaiting();
-								showScreen();
-								errorPop("Error", "Failed to update status song");
-							}
-							
-							
-						}
+					
 					}
 				});
 				}
@@ -298,7 +347,7 @@ public class mainScreen extends Screen{
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed add new friend");
 				disposeScreen();
-				addNewFriendScreen newFriend=new addNewFriendScreen(getDisplay(), getShell(),engine,username);
+				addNewFriendScreen newFriend=new addNewFriendScreen(getDisplay(), getShell(),engine);
 				newFriend.createScreen();
 			}
 		});
@@ -515,8 +564,9 @@ public class mainScreen extends Screen{
 					errorPop("Error", "Please select a friend first.");
 				}
 				else{
-				hideScreen();
+				//hideScreen();
 				viewFriendScreen view=new viewFriendScreen(getDisplay(),getShell(),engine,friend_name);
+				disposeScreen();
 				view.createScreen();
 				}
 			}

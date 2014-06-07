@@ -157,58 +157,72 @@ public class signUpScreen extends Screen{
 				//final boolean isUserTaken=engine.isUsernameTaken(signUpScreen.this.username_s);
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						if(isUserTaken.getRight()){ //QAQA  - PUT REAL FUNCTION HERE 
+						if(checkConnection(getShell(), isUserTaken.getLeft())){ //no problem
+							if(isUserTaken.getRight()){ //QAQA  - PUT REAL FUNCTION HERE 
+								closeWaiting();
+								showScreen();
+								errorPop("Sign up Error", "Username already taken");
+							}
+							else{//username is not taken and pass is ok..  sign up the user
+								//QAQA-in interface signUpUser
+								/*******/
+								class SignUpUser implements Runnable {
+
+									@Override
+									public void run() {
+										final Pair<Integer,Boolean> signUpUser;
+										//final boolean signUpUser=theMusicalNetwork.nadav.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
+										if(theMusicalNetwork.qaqa){
+											signUpUser=theMusicalNetwork.nadav.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
+										}
+										else{
+											signUpUser=engine.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
+										}
+										//final boolean signUpUser=engine.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
+										getDisplay().asyncExec(new Runnable() {
+											public void run() {
+												if(checkConnection(getShell(), signUpUser.getLeft())){
+													if(!signUpUser.getRight()){ //QAQA  - PUT REAL FUNCTION HERE 
+														closeWaiting();
+														showScreen();
+														errorPop("Sign up Error", "Failed to Sign up..");
+													}
+													else{//Sign up success.. go to main screen
+														PopUpinfo(getShell(),"Sign up", "sign up succes!");
+														closeWaiting();
+														disposeScreen();
+														logInScreen log=new logInScreen(getDisplay(), getShell(), engine);
+														log.createScreen();
+														//mainScreen main_screen=new mainScreen(getDisplay(), getShell(),engine,signUpScreen.this.username_s);
+														//main_screen.createScreen();
+														//else{...}
+													}
+												}
+												else{
+													closeWaiting();
+													showScreen();
+												}
+												
+											}
+										});
+										
+									}
+								}
+								
+								/*******/
+								
+								/***/
+								// create a thread to check if user registerd
+								Thread t1 = new Thread(new SignUpUser());
+								t1.start();
+								/***/
+							}
+						}
+						else{ //problem and want to continue
 							closeWaiting();
 							showScreen();
-							errorPop("Sign up Error", "Username already taken");
 						}
-						else{//username is not taken and pass is ok..  sign up the user
-							//QAQA-in interface signUpUser
-							/*******/
-							class SignUpUser implements Runnable {
-
-								@Override
-								public void run() {
-									final Pair<Integer,Boolean> signUpUser;
-									//final boolean signUpUser=theMusicalNetwork.nadav.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
-									if(theMusicalNetwork.qaqa){
-										signUpUser=theMusicalNetwork.nadav.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
-									}
-									else{
-										signUpUser=engine.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
-									}
-									//final boolean signUpUser=engine.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
-									getDisplay().asyncExec(new Runnable() {
-										public void run() {
-											if(!signUpUser.getRight()){ //QAQA  - PUT REAL FUNCTION HERE 
-												closeWaiting();
-												showScreen();
-												errorPop("Sign up Error", "Failed to Sign up..");
-											}
-											else{//Sign up success.. go to main screen
-												PopUpinfo("Sign up", "sign up succes!");
-												closeWaiting();
-												disposeScreen();
-												logInScreen log=new logInScreen(getDisplay(), getShell(), engine);
-												log.createScreen();
-												//mainScreen main_screen=new mainScreen(getDisplay(), getShell(),engine,signUpScreen.this.username_s);
-												//main_screen.createScreen();
-												//else{...}
-											}
-										}
-									});
-									
-								}
-							}
-							
-							/*******/
-							
-							/***/
-							// create a thread to check if user registerd
-							Thread t1 = new Thread(new SignUpUser());
-							t1.start();
-							/***/
-						}
+						
 					}
 				});
 				

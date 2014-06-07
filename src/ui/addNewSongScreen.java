@@ -204,18 +204,22 @@ public class addNewSongScreen extends Screen{
 					getDisplay().asyncExec(new Runnable() {
 						public void run() {
 							//status_song=status;
-							
-							result_list.removeAll();
-							for(Pair<String, String> s:list.getRight()){
-								TableItem item = new TableItem (result_list, SWT.NONE);
-								item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-								//item.setText(0, "artist "+s.getLeft());
-								//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
-								item.setText(0, s.getLeft());
-								item.setText(1, s.getRight());
+							if(checkConnection(getShell(), list.getLeft())){
+								result_list.removeAll();
+								for(Pair<String, String> s:list.getRight()){
+									TableItem item = new TableItem (result_list, SWT.NONE);
+									item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+									//item.setText(0, "artist "+s.getLeft());
+									//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
+									item.setText(0, s.getLeft());
+									item.setText(1, s.getRight());
+								}
+							}
+							else{ // problem want to cont..
+								
 							}
 							
-							//Thread.currentThread();
+							
 							pool.remove(t8);
 							if(pool.isEmpty()){
 								closeWaiting();
@@ -240,6 +244,7 @@ public class addNewSongScreen extends Screen{
 				@Override
 				public void widgetSelected (SelectionEvent e) {
 					System.out.println("qaqa - pressed search");
+					song_chosen=null;
 					text_to_search=search_box.getText();
 					System.out.println("qaqa - search with :"+text_to_search);
 								
@@ -284,7 +289,7 @@ public class addNewSongScreen extends Screen{
 			column1.setWidth(160);
 			
 			
-			//for (int i=0; i<12; i++) friend_result_list.add ("Friend resault " + i); //QAQA CHANGE WITH REAL SONGS
+			
 			
 			//result_list.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 			FormData data7 = new FormData ();
@@ -294,7 +299,7 @@ public class addNewSongScreen extends Screen{
 			data7.bottom = new FormAttachment (45, 0);
 			result_list.setLayoutData(data7);
 			result_list.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-			System.out.println("$$$$"+result_list.getBackgroundMode());
+			
 			result_list.addListener(SWT.Selection, new Listener () {
 				@Override
 				public void handleEvent (Event event) {
@@ -329,23 +334,28 @@ public class addNewSongScreen extends Screen{
 					getDisplay().asyncExec(new Runnable() {
 						public void run() {
 							//status_song=status;
-							
-							if(!b.getRight()){
-								closeWaiting();
-								showScreen();
-								errorPop("Error", "Failed to add song.");	
-								pool.remove(t8);
-							}
-							else{
-								
-								pool.remove(t8);
-								if(pool.isEmpty()){
+							if(checkConnection(getShell(), b.getLeft())){
+								if(!b.getRight()){
 									closeWaiting();
 									showScreen();
-									PopUpinfo("added song", "qaqa-succes!!!");
+									errorPop("Error", "Failed to add song.");	
+									pool.remove(t8);
 								}
+								else{
+									
+									pool.remove(t8);
+									if(pool.isEmpty()){
+										closeWaiting();
+										showScreen();
+										PopUpinfo(getShell(),"added song", "qaqa-succes!!!");
+									}
+								}
+							}
+							
+							else{ //problem with connection want to cont..
 								
 							}
+					
 						
 						}
 					});
@@ -371,9 +381,14 @@ public class addNewSongScreen extends Screen{
 				@Override
 				public void widgetSelected (SelectionEvent e) {
 					System.out.println("qaqa - pressed Add song");
+					if(song_chosen==null){
+						errorPop("Error", "Please choose a song first.");
+					}
+					else{
 					t8 = new Thread(new addSong());
 					 pool.add(t8);
 					 t8.start();
+					}
 				}
 			});
 			
@@ -393,7 +408,7 @@ public class addNewSongScreen extends Screen{
 					public void widgetSelected (SelectionEvent e) {
 						System.out.println("qaqa - pressed back home");
 						disposeScreen();
-						mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,"QAQA - USERNAME"); //QAQA ADD USERNAME
+						mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); //QAQA ADD USERNAME
 						mainScreen.createScreen();
 					}
 				});

@@ -26,6 +26,7 @@ public class logInScreen extends Screen {
 	private Label password=null;
 	private Button logIn=null;
 	private Button signUp=null;
+	private Button updateDb=null;
 	private Text user=null;
 	private Text pass=null;
 	
@@ -76,7 +77,7 @@ public class logInScreen extends Screen {
 		username.setAlignment(SWT.CENTER);
 		username.setText("Username:");
 		username.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		//username.setFont(SWTResourceManager.getFont("David", 12, SWT.BOLD));
+		
 		FormData data1 = new FormData ();
 		data1.width=65;
 		
@@ -143,19 +144,28 @@ public class logInScreen extends Screen {
 				//final boolean isUserRegisterd=engine.isUserRegisterd(getUsername_s(), getPassword_s());
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						if(isUserRegisterd.getRight()){ //QAQA  - PUT REAL FUNCTION HERE 
-							closeWaiting();
-							disposeScreen(); //he is registerd!
-							//hideScreen();
-							mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,getUsername_s());
-							mainScreen.createScreen();
+						if(checkConnection(getShell(),isUserRegisterd.getLeft())){ //want to try again
+							if(isUserRegisterd.getRight()){ //QAQA  - PUT REAL FUNCTION HERE 
+								closeWaiting();
+								disposeScreen(); //he is registerd!
+								//hideScreen();
+								mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,getUsername_s());
+								mainScreen.createScreen();
+							}
+							else{
+								closeWaiting();
+								showScreen();
+								errorPop("Log In Error", "Details given do not match a valid user.\n"+"Retype username and password.");
+								
+							}
+							return;
 						}
 						else{
 							closeWaiting();
 							showScreen();
-							errorPop("Log In Error", "Details given do not match a valid user.\n"+"Retype username and password.");
-							
+							return;
 						}
+					
 					}
 				});
 				
@@ -166,21 +176,28 @@ public class logInScreen extends Screen {
 		logIn.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
+				
 				System.out.println("qaqa - pressed log in"); //qaqa
+				
 				setUsername_s(user.getText());
 				setPassword_s(pass.getText());
-				System.out.println(getUsername_s());//qaqa
-				System.out.println(getPassword_s());//qaqa
+				
+				//System.out.println(getUsername_s());//qaqa
+				//System.out.println(getPassword_s());//qaqa
+				
+				if(getUsername_s().isEmpty() || getPassword_s().isEmpty()){
+					errorPop("Log in Error", "Username or password fields are empty.");
+				}
 				//QAQA - isUserRegistred in the interface
 				//QAQA - use asyncExec or syncExec runnable
 								
-				/***/
+				/***/else{
 				// create a thread to check if user registerd
 				Thread t = new Thread(new CheckUserRegisterd());
 				openWaiting();
 				t.start();
 				/***/
-			
+				}
 			}
 		});
 		
@@ -203,6 +220,37 @@ public class logInScreen extends Screen {
 			}
 		});
 		
+		
+		updateDb=new Button(getShell(),  SWT.NONE);
+		updateDb.setText("Update the db");
+		FormData data7 = new FormData ();
+		data7.width=110;
+		data7.height=40;
+		data7.right = new FormAttachment (97, 0);
+		data7.bottom = new FormAttachment (88, 0);
+		updateDb.setLayoutData(data7); 
+		updateDb.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected (SelectionEvent e) {
+				System.out.println("qaqa - pressed update db"); //qaqa
+
+					if(theMusicalNetwork.qaqa){			
+						getShell().setVisible(false);
+						initUpdateScreen update=new initUpdateScreen(getDisplay(), getShell(), theMusicalNetwork.nadav,"update");
+						update.createScreen();
+						getShell().setVisible(true);
+					}
+					else{
+						//disposeScreen();
+						getShell().setVisible(false);
+						initUpdateScreen update=new initUpdateScreen(getDisplay(), getShell(), engine,"update");
+						update.createScreen();
+						getShell().setVisible(true);
+					}
+
+			}
+		});
+		
 		this.getShell().layout();
 
 	}
@@ -217,6 +265,7 @@ public class logInScreen extends Screen {
 		this.username.dispose();
 		this.pass.dispose();
 		this.user.dispose();
+		this.updateDb.dispose();
 	}
 
 
@@ -230,6 +279,7 @@ public class logInScreen extends Screen {
 		this.username.setVisible(false);
 		this.pass.setVisible(false);
 		this.user.setVisible(false);
+		this.updateDb.setVisible(false);
 		
 		this.getShell().layout();
 		
@@ -246,6 +296,7 @@ public class logInScreen extends Screen {
 		this.username.setVisible(true);
 		this.pass.setVisible(true);
 		this.user.setVisible(true);
+		this.updateDb.setVisible(true);
 		this.getShell().layout();
 	}
 	

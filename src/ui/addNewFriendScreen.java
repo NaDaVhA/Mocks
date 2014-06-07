@@ -41,16 +41,16 @@ public class addNewFriendScreen extends Screen {
 	private Button search_button=null;
 	private String name_to_search;
 	
-	private String username;
+	//private String username;
 	private String friend_name_to_show;
 	
 	private Thread t5,t6,t7;
 	
 	//private mainScreen main_screen;
 	
-	public addNewFriendScreen(Display display, Shell shell,ApplicationInterface engine,String user){//,mainScreen main_screen) {
+	public addNewFriendScreen(Display display, Shell shell,ApplicationInterface engine){//,mainScreen main_screen) {
 		super(display, shell,engine);	
-		username=user;
+		//username=user;
 		//this.main_screen=main_screen;
 	}
 
@@ -124,9 +124,8 @@ public class addNewFriendScreen extends Screen {
 					 list_p= theMusicalNetwork.nadav.getSongList(friend_name_to_show);
 				}
 				else{ //true code
-				 friend_song=engine.getStatusSong(friend_name_to_show); //1.6.14
-					
-					 list_p= engine.getSongList(friend_name_to_show); //1.6.14
+				 friend_song=engine.getStatusSong(friend_name_to_show); //1.6.14	
+				 list_p= engine.getSongList(friend_name_to_show); //1.6.14
 					
 				}
 				
@@ -134,18 +133,23 @@ public class addNewFriendScreen extends Screen {
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;
-						friend_status_song.setText(friend_song.getLeft()+" "+friend_song.getRight());
-						
-						for(Pair<String, String> s:list_p.getRight()){
-							TableItem item = new TableItem (friend_songs, SWT.NONE);
-							item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-							//item.setText(0, "artist "+s.getLeft());
-							item.setText(0, s.getLeft());
-							//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
-							item.setText(1, s.getRight());
+						if(checkConnection(getShell(),friend_song.getLeft())&&checkConnection(getShell(),list_p.getLeft())){
+							friend_status_song.setText(friend_song.getRight().getLeft()+" "+friend_song.getRight().getRight());
+							
+							for(Pair<String, String> s:list_p.getRight()){
+								TableItem item = new TableItem (friend_songs, SWT.NONE);
+								item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+								//item.setText(0, "artist "+s.getLeft());
+								item.setText(0, s.getLeft());
+								//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
+								item.setText(1, s.getRight());
+							}	
+						}
+						else{
+							
 						}
 						
-						//Thread.currentThread();
+						//
 						pool.remove(t6);
 						if(pool.isEmpty()){
 							closeWaiting();
@@ -163,7 +167,6 @@ public class addNewFriendScreen extends Screen {
 		//search list
 		
 		friend_result_list=new List(getShell(), SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
-		//for (int i=0; i<12; i++) friend_result_list.add ("Friend resault " + i); //QAQA CHANGE WITH REAL SONGS
 		
 		friend_result_list.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		FormData data5 = new FormData ();
@@ -215,12 +218,18 @@ public class addNewFriendScreen extends Screen {
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;
-						friend_result_list.removeAll();
-						for(String s:list_p.getRight()){
-							friend_result_list.add(s);
+						if(checkConnection(getShell(), list_p.getLeft())){
+							friend_result_list.removeAll();
+							for(String s:list_p.getRight()){
+								friend_result_list.add(s);
+							}
+						}
+						else{
+							
+							
 						}
 						
-						//Thread.currentThread();
+						
 						pool.remove(t5);
 						if(pool.isEmpty()){
 							closeWaiting();
@@ -247,9 +256,12 @@ public class addNewFriendScreen extends Screen {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed search friend");
-				name_to_search=null;
+				friend_name_to_show="";
+				name_to_search=null; //qaqa ?? check search function
 				name_to_search=search_text.getText();
+				
 				System.out.println("qaqa - name to search: "+name_to_search);
+				
 				if(name_to_search.compareTo("")==0){
 					errorPop("Error", "you didnt enter a name to search.\nPlease enter the name.");
 				}
@@ -283,11 +295,13 @@ public class addNewFriendScreen extends Screen {
 		
 		friend_status_song.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		friend_status_song.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
-		friend_status_song.setText("qaqa");
+		
+		//friend_status_song.setText("qaqa");
+		
 		FormData data8 = new FormData ();
 		data8.width=600;
 		
-		data8.right = new FormAttachment (95, 0);
+		data8.right = new FormAttachment (93, 0);
 		data8.bottom = new FormAttachment (50, 0);
 		friend_status_song.setLayoutData(data8);
 		
@@ -332,7 +346,7 @@ public class addNewFriendScreen extends Screen {
 
 			@Override
 			public void run() {
-				final boolean add;
+				final Pair<Integer,Boolean> add;
 				if(theMusicalNetwork.qaqa){
 					add=theMusicalNetwork.nadav.addFriend(friend_name_to_show);
 				}
@@ -344,22 +358,33 @@ public class addNewFriendScreen extends Screen {
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;
-						if(!add){
-							closeWaiting();
-							showScreen();
-							errorPop("Error", "Failed to add friend.");	
-							pool.remove(t7);
+						if(checkConnection(getShell(), add.getLeft())){
+							if(!add.getRight()){
+								closeWaiting();
+								showScreen();
+								errorPop("Error", "Failed to add friend.");	
+								pool.remove(t7);
+							}
+							else{
+								
+								pool.remove(t7);
+								if(pool.isEmpty()){
+									closeWaiting();
+									showScreen();
+									PopUpinfo(getShell(),"added Friend", "qaqa-succes!!!");
+								}
+								
+							}
 						}
 						else{
-							
 							pool.remove(t7);
 							if(pool.isEmpty()){
 								closeWaiting();
 								showScreen();
-								PopUpinfo("added Friend", "qaqa-succes!!!");
+								//PopUpinfo(getShell(),"added Friend", "qaqa-succes!!!");
 							}
-							
 						}
+				
 						
 					}
 				});
@@ -386,7 +411,7 @@ public class addNewFriendScreen extends Screen {
 				System.out.println("qaqa - pressed add friend - "+friend_name_to_show);
 
 				if(friend_name_to_show.compareTo("")==0){
-					errorPop("Error", "Unknowen error.");
+					errorPop("Error", "Please selet a friend first.");
 				}
 				else{
 					openWaiting();
@@ -412,7 +437,7 @@ public class addNewFriendScreen extends Screen {
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed back home");
 				disposeScreen();
-				mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,"QAQA - USERNAME"); //QAQA ADD USERNAME
+				mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); //QAQA ADD USERNAME
 				mainScreen.createScreen();
 			}
 		});

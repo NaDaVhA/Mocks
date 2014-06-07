@@ -39,21 +39,23 @@ public class viewFriendScreen extends Screen {
 	private List friendList=null;
 	
 	
-	private Button view_friend=null;
+	//private Button view_friend=null;
 	
 	private Button back_button=null;
 	
-private Thread t11,t12,t13,t14;
+	
+	
+private Thread t11,t12,t13,t14,t15;
 	
 	//QAQA add here the rest
 	private Pair<String, String> song_selcted_table=null;
 	
-	private String user_name;
-	
+	private String friend_user_name;
+	private String friend_name_selected;
 	
 	public viewFriendScreen(Display display,Shell shell , ApplicationInterface engine,String username){
 		super(display, shell, engine);
-		this.user_name=username;
+		this.friend_user_name=username;
 	}
 
 	@Override
@@ -69,24 +71,46 @@ private Thread t11,t12,t13,t14;
 				//final Pair<String,String> status=engine.getStatusSong(username); //1.6.14
 				final Pair<Integer,Pair<String,String>> status;
 				if(theMusicalNetwork.qaqa){
-					status=theMusicalNetwork.nadav.getStatusSong(user_name);
+					status=theMusicalNetwork.nadav.getStatusSong(friend_user_name);
 				}
 				else{ //real code
-					 status=engine.getStatusSong(user_name);
+					 status=engine.getStatusSong(friend_user_name);
 				}
 				//final Pair<String,String> status=engine.getStatusSong();
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;
-						status_song_label.setText("Status song:  "+status.getRight().getLeft()+" "+status.getRight().getRight());
-						//updateStatusSong(status);
-						//Thread.currentThread();
-						pool.remove(t11);
-						if(pool.isEmpty()){
-							
-							closeWaiting();
-							showScreen();
+						if(checkConnection(getShell(), status.getLeft())){
+							status_song_label.setText("Status song:  "+status.getRight().getLeft()+" "+status.getRight().getRight());
+							//updateStatusSong(status);
+							//Thread.currentThread();
+							pool.remove(t11);
+							if(pool.isEmpty()){
+								
+								closeWaiting();
+								showScreen();
+							}
 						}
+						
+						else{//want to cont.
+							pool.remove(t11);
+							if(pool.isEmpty()){
+								
+								//back to main screen
+								closeWaiting();
+								disposeScreen();
+								if(theMusicalNetwork.qaqa){
+									mainScreen main=new mainScreen(getDisplay(), getShell(), engine, theMusicalNetwork.nadav.getUsername());
+									main.createScreen();
+								}
+								else{
+									mainScreen main=new mainScreen(getDisplay(), getShell(), engine, engine.getUsername());
+									main.createScreen();	
+								}
+								
+							}
+						}
+						
 					}
 				});
 				
@@ -106,7 +130,7 @@ private Thread t11,t12,t13,t14;
 		
 		user_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		user_label.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
-		user_label.setText("Username:  "+this.user_name);
+		user_label.setText("Username:  "+this.friend_user_name);
 		FormData data1 = new FormData ();
 		data1.width=700;
 		
@@ -146,31 +170,88 @@ private Thread t11,t12,t13,t14;
 		song_list_label.setAlignment(SWT.CENTER);
 		song_list_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		song_list_label.setFont(SWTResourceManager.getFont("MV Boli", 14, SWT.BOLD));
-		song_list_label.setText(this.user_name+" Songs");
+		song_list_label.setText("Songs list");
 		FormData data5 = new FormData ();
-		data5.width=100;
+		data5.width=140;
 		
-		data5.right = new FormAttachment (23, 0);
+		data5.right = new FormAttachment (24, 0);
 		data5.bottom = new FormAttachment (35, 0);
 		song_list_label.setLayoutData(data5);
 		
+		/*******/
+		class addSong implements Runnable {
+
+			@Override
+			public void run() {
+				final Pair<Integer,Boolean> b;
+				if(theMusicalNetwork.qaqa){
+					b=theMusicalNetwork.nadav.addSong(song_selcted_table.getRight(),song_selcted_table.getLeft());
+				}
+				else{//true code
+					b=engine.addSong(song_selcted_table.getRight(),song_selcted_table.getLeft());
+				}
+				//final boolean b=theMusicalNetwork.nadav.addSong("qaqa", song_chosen.getLeft(), song_chosen.getRight());
+				//final boolean b=engine.addSong(song_chosen.getLeft(), song_chosen.getRight());
+				getDisplay().asyncExec(new Runnable() {
+					public void run() {
+						//status_song=status;
+						if(checkConnection(getShell(), b.getLeft())){
+							if(!b.getRight()){
+								closeWaiting();
+								showScreen();
+								errorPop("Error", "Failed to add song.");	
+								pool.remove(t14);
+							}
+							else{
+								
+								pool.remove(t14);
+								if(pool.isEmpty()){
+									closeWaiting();
+									showScreen();
+									PopUpinfo(getShell(),"added song", "qaqa-succes!!!");
+								}
+								
+							}	
+						}
+						
+						else{//want to cont.
+							
+						}
+						
+
+					}
+				});
+				
+			}
+		}
+		
+		/*******/
+		
 		//add new song button
 		add_new_song=new Button(getShell(),SWT.NONE);
-		add_new_song.setText("Add New Song");
+		add_new_song.setText("Add Song");
 		FormData data6 = new FormData ();
 		data6.width=115;
 		data6.height=30;
-		data6.right = new FormAttachment (40, 0);
-		data6.bottom = new FormAttachment (35, 0);
+		data6.right = new FormAttachment (32, 0);
+		data6.bottom = new FormAttachment (90, 0);
 		add_new_song.setLayoutData(data6); 
 		add_new_song.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed add new song");
-				disposeScreen();
+				System.out.println("qaqa - pressed add song");
+				//disposeScreen();
 				//hideScreen();
-				addNewSongScreen newSong=new addNewSongScreen(getDisplay(), getShell(),engine);
-				newSong.createScreen();
+				//addNewSongScreen newSong=new addNewSongScreen(getDisplay(), getShell(),engine);
+				//newSong.createScreen();
+				if(song_selcted_table==null){
+					errorPop("Error", "Please select a song first");
+				}
+				else{
+				t14 = new Thread(new addSong());
+				pool.add(t14);
+				t14.start();
+				}
 			}
 		});
 		
@@ -181,7 +262,7 @@ private Thread t11,t12,t13,t14;
 		friend_list_label.setAlignment(SWT.CENTER);
 		friend_list_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		friend_list_label.setFont(SWTResourceManager.getFont("MV Boli", 14, SWT.BOLD));
-		friend_list_label.setText(this.user_name+" Friends");
+		friend_list_label.setText("Friends list");
 		FormData data7 = new FormData ();
 		data7.width=150;
 		
@@ -190,23 +271,21 @@ private Thread t11,t12,t13,t14;
 		friend_list_label.setLayoutData(data7);
 		
 		//add new friend button
-		add_new_friend=new Button(getShell(),SWT.NONE);
-		add_new_friend.setText("Add New Friend");
+	/*	add_new_friend=new Button(getShell(),SWT.NONE);
+		add_new_friend.setText("Add Friend");
 		FormData data8 = new FormData ();
 		data8.width=115;
-		data8.height=30;
+		data8.height=70;
 		data8.right = new FormAttachment (90, 0);
-		data8.bottom = new FormAttachment (35, 0);
+		data8.bottom = new FormAttachment (20, 0);
 		add_new_friend.setLayoutData(data8); 
 		add_new_friend.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed add new friend");
-				disposeScreen();
-				addNewFriendScreen newFriend=new addNewFriendScreen(getDisplay(), getShell(),engine,username);
-				newFriend.createScreen();
+				System.out.println("qaqa - pressed add friend");
+				
 			}
-		});
+		});*/
 		
 		//song list
 		/*songList_t= new Table (getShell(), SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION);
@@ -223,11 +302,11 @@ private Thread t11,t12,t13,t14;
 		column.setText ("Artist");
 		TableColumn column1 = new TableColumn (songList_t, SWT.NONE);
 		column1.setText ("Song name");
-		column.setWidth(135);
-		column1.setWidth(135);
+		column.setWidth(145);
+		column1.setWidth(145);
 		songList_t.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		FormData data9 = new FormData ();
-		data9.width=250;
+		data9.width=270;
 		data9.height=200;
 		data9.right = new FormAttachment (40, 0);
 		data9.bottom = new FormAttachment (83, 0);
@@ -251,40 +330,54 @@ private Thread t11,t12,t13,t14;
 			public void run() {
 				
 			//	final ArrayList<Pair<String,String>> f= engine.getSongList(username); //1.6.14
-				final ArrayList<Pair<String,String>> f;
+				final Pair<Integer, java.util.List<Pair<String, String>>> f;
 				if(theMusicalNetwork.qaqa){
-					f= (ArrayList<Pair<String, String>>) theMusicalNetwork.nadav.getSongList();
+					f=  theMusicalNetwork.nadav.getSongList(friend_user_name);
 				}
 				else{
-					f= (ArrayList<Pair<String, String>>) engine.getSongList();
+					f=  engine.getSongList(friend_user_name);
 				}
 				//final ArrayList<Pair<String,String>> f= (ArrayList<Pair<String, String>>) engine.getSongList();
 						
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						
-					
-						for(Pair<String,String> s:f){
-							//friendList.add (s);
-							TableItem item = new TableItem (songList_t, SWT.NONE);
-							item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-							//item.setText(0, "artist "+s.getLeft());
-							//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
-							item.setText(0, s.getLeft());
-							item.setText(1, s.getRight());
-						}
-						
-						
-						//System.out.println(pool.size());
-						
-						pool.remove(t12);
-						if(pool.isEmpty()){
+						if(checkConnection(getShell(), f.getLeft())){
+							for(Pair<String,String> s:f.getRight()){
+								//friendList.add (s);
+								TableItem item = new TableItem (songList_t, SWT.NONE);
+								item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+								//item.setText(0, "artist "+s.getLeft());
+								//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
+								item.setText(0, s.getLeft());
+								item.setText(1, s.getRight());
+							}
 							
-							closeWaiting();
-							showScreen();
+							
+							//System.out.println(pool.size());
+							
+							pool.remove(t12);
+							if(pool.isEmpty()){
+								
+								closeWaiting();
+								showScreen();
+							}
 						}
-
 						
+						
+						else{ //want to cont..
+							//back to main screen
+							closeWaiting();
+							disposeScreen();
+							if(theMusicalNetwork.qaqa){
+								mainScreen main=new mainScreen(getDisplay(), getShell(), engine, theMusicalNetwork.nadav.getUsername());
+								main.createScreen();
+							}
+							else{
+								mainScreen main=new mainScreen(getDisplay(), getShell(), engine, engine.getUsername());
+								main.createScreen();	
+							}
+						}
+					
 				
 					}
 				});
@@ -324,30 +417,43 @@ private Thread t11,t12,t13,t14;
 
 			@Override
 			public void run() {
-				final ArrayList<String> f;
+				final Pair <Integer,ArrayList<String>> f;
 				if(theMusicalNetwork.qaqa){
-					 f=theMusicalNetwork.nadav.getFriendList();
+					 f=theMusicalNetwork.nadav.getFriendList(friend_user_name);
 				}
 				else{
-					f=engine.getFriendList();
+					f=engine.getFriendList(friend_user_name);
 				}
 				
 				//final ArrayList<String> f=engine.getFriendList();
 						
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						for(String s:f){
-							friendList.add (s);
-						}
-						
-						pool.remove(t13);
-						
-						System.out.println(pool.size());
-						if(pool.isEmpty()){
+						if(checkConnection(getShell(), f.getLeft())){
+							for(String s:f.getRight()){
+								friendList.add (s);
+							}
 							
-							closeWaiting();
-							showScreen();
+							pool.remove(t13);
+							
+							System.out.println(pool.size());
+							if(pool.isEmpty()){
+								
+								closeWaiting();
+								showScreen();
+							}
 						}
+						else{
+							pool.remove(t13);
+							
+							System.out.println(pool.size());
+							if(pool.isEmpty()){
+								
+								closeWaiting();
+								showScreen();
+							}
+						}
+						
 					}
 				});
 				
@@ -369,26 +475,99 @@ private Thread t11,t12,t13,t14;
 		friendList.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		FormData data10 = new FormData ();
 		data10.width=270;
-		data10.height=200;
+		data10.height=220;
 		data10.right = new FormAttachment (90, 0);
-		data10.bottom = new FormAttachment (80, 0);
+		data10.bottom = new FormAttachment (83, 0);
 		friendList.setLayoutData(data10);
 		
+		friendList.addListener(SWT.Selection, new Listener () {
+			@Override
+			public void handleEvent (Event event) {
+				//System.out.println(event.data);//qaqa
+				int[] selection = friendList.getSelectionIndices();
+				
+				for (int i=0; i<selection.length; i++) {
+					System.out.println(friendList.getItem(selection[i])); //qaqa
+						friend_name_selected=friendList.getItem(selection[i]);
+					}
+				//openWaiting();
+				
+				
+			}
+		});		
+		
+		/*******/
+		class addFriend implements Runnable {
+
+			@Override
+			public void run() {
+				final Pair<Integer,Boolean> add;
+				if(theMusicalNetwork.qaqa){
+					add=theMusicalNetwork.nadav.addFriend(friend_name_selected);
+				}
+				else{
+					add=engine.addFriend(friend_name_selected);
+				}
+				//final boolean add=theMusicalNetwork.nadav.addFriend(friend_name_to_show);
+				//final boolean add=engine.addFriend(friend_name_to_show);
+				getDisplay().asyncExec(new Runnable() {
+					public void run() {
+						//status_song=status;
+						if(checkConnection(getShell(), add.getLeft())){
+							if(!add.getRight()){
+								closeWaiting();
+								showScreen();
+								errorPop("Error", "Failed to add friend.");	
+								pool.remove(t15);
+							}
+							else{
+								
+								pool.remove(t15);
+								if(pool.isEmpty()){
+									closeWaiting();
+									showScreen();
+									PopUpinfo(getShell(),"added Friend", "qaqa-succes!!!");
+								}
+								
+							}
+						}
+						else{
+							pool.remove(t15);
+							if(pool.isEmpty()){
+								closeWaiting();
+								showScreen();
+								//PopUpinfo(getShell(),"added Friend", "qaqa-succes!!!");
+							}
+						}
+						
+						
+						
+					}
+				});
+				
+			}
+		}
+		
+		/*******/
 	
 		
 		//whats humming button
-		view_friend=new Button(getShell(),SWT.NONE);
-		view_friend.setText("View friend");
+		add_new_friend=new Button(getShell(),SWT.NONE);
+		add_new_friend.setText("Add friend");
 		FormData data12 = new FormData ();
 		data12.width=115;
 		data12.height=30;
 		data12.right = new FormAttachment (82, 0);
 		data12.bottom = new FormAttachment (90, 0);
-		view_friend.setLayoutData(data12); 
-		view_friend.addSelectionListener(new SelectionAdapter() {
+		add_new_friend.setLayoutData(data12); 
+		add_new_friend.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed view friend");
+				System.out.println("qaqa - pressed add_new_friend");
+				 t15 = new Thread(new addFriend());
+					pool.add(t15);
+					
+					t15.start();
 			}
 		});
 		
@@ -406,8 +585,14 @@ private Thread t11,t12,t13,t14;
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed back home");
 				disposeScreen();
-				mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,"QAQA - USERNAME"); //QAQA ADD USERNAME
+				if(theMusicalNetwork.qaqa){
+				mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,theMusicalNetwork.nadav.getUsername()); //QAQA ADD USERNAME
 				mainScreen.createScreen();
+				}
+				else{
+					mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); //QAQA ADD USERNAME
+					mainScreen.createScreen();	
+				}
 			}
 		});
 		
@@ -440,7 +625,7 @@ private Thread t11,t12,t13,t14;
 		this.songList_t.dispose();
 		this.status_song_label.dispose();
 		this.user_label.dispose();
-		this.view_friend.dispose();
+		//this.view_friend.dispose();
 		this.back_button.dispose();
 	}
 
@@ -455,7 +640,7 @@ private Thread t11,t12,t13,t14;
 		this.songList_t.setVisible(false);
 		this.status_song_label.setVisible(false);
 		this.user_label.setVisible(false);
-		this.view_friend.setVisible(false);
+		//this.view_friend.setVisible(false);
 		this.back_button.setVisible(false);
 		this.getShell().layout();
 	}
@@ -471,7 +656,7 @@ private Thread t11,t12,t13,t14;
 		this.songList_t.setVisible(true);
 		this.status_song_label.setVisible(true);
 		this.user_label.setVisible(true);
-		this.view_friend.setVisible(true);
+	//	this.view_friend.setVisible(true);
 		this.back_button.setVisible(true);
 		this.getShell().layout();
 	}

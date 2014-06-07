@@ -55,13 +55,15 @@ public abstract class Screen {
 		return shell;
 	}
 	
+	
+	
 	/**
 	 * opens a pop up window 
 	 * @param head - the title of the pop up message
 	 * @param body - the body of the pop up message
 	 * n
 	 */
-	protected boolean PopUpinfo(String head,String body){
+	protected boolean PopUpinfo(Shell shell,String head,String body){
 		MessageBox messageBox =   new MessageBox(shell, SWT.OK| SWT.ICON_INFORMATION);
 		messageBox.setText(head);
 		messageBox.setMessage(body);
@@ -75,7 +77,7 @@ public abstract class Screen {
 	 * @param body - the body of the pop up message
 	 * @return true iff OK button was chosen
 	 */
-	protected boolean PopUpWarning(String head,String body){
+	protected boolean PopUpWarning(Shell shell,String head,String body){
 		MessageBox messageBox =   new MessageBox(shell, SWT.OK| SWT.CANCEL| SWT.ICON_WARNING);
 		messageBox.setText(head);
 		messageBox.setMessage(body);
@@ -97,8 +99,31 @@ public abstract class Screen {
 		messageBox.open();
 	}
 	
+	/**
+	 * 
+	 * @param conection_value
+	 * @return true if no problem , false if problem and want to continue
+	 */
+	protected boolean checkConnection(Shell shell,int conection_value){
+		boolean val=true;
+		if(conection_value==0){
+			return true;
+		}
+		else{
+			val=PopUpWarning(shell,"Connection Problem", "Connection to the db was lost.\nPlease fix your connection and press ok to try again\n or cancel to exit the program.");
+			if(val){
+				return false;
+			}
+			else{
+				display.dispose();
+				System.exit(0);
+				return val;
+			}
+		}	
+	}
+	
 	protected void openWaiting(){
-		//this.hideScreen();   //qaqa 1.6.14
+		this.hideScreen();   //qaqa 1.6.14
 		waiting= new Label(getShell(), SWT.INHERIT_DEFAULT);
 		waiting.setAlignment(SWT.CENTER);
 		waiting.setText("Please wait while we are processing your request");
@@ -111,39 +136,14 @@ public abstract class Screen {
 		data.bottom = new FormAttachment (15, 0);
 		waiting.setLayoutData(data);
 		
-	/*	bar_c=new Composite(getShell(), SWT.NONE);
-		bar = new ProgressBar(bar_c, SWT.SMOOTH|SWT.FILL);
-		
-		
-		FormData data1 = new FormData ();
-		data1.width=1000;
-		data1.right = new FormAttachment (100, 0);
-		data1.bottom = new FormAttachment (50, 0);
-		
-		bar_c.setLayoutData(data1);
-		Rectangle clientArea = bar_c.getClientArea ();
-		//
-		bar.setBounds (clientArea.x, clientArea.y, 1000, 32);
-		//final int maximum = bar.getMaximum();
-		display.timerExec(200, new Runnable() {
-			int i = 0;
-			@Override
-			public void run() {
-				if (bar.isDisposed()) return;
-				bar.setSelection(i++);
-				if (i <= bar.getMaximum()) display.timerExec(200, this);
-			}
-		});*/
-		
-	//	this.getShell().layout();    //qaqa 1.6.14
+		this.getShell().layout();    //qaqa 1.6.14
 		
 	}
 	
 	protected void closeWaiting(){
 		
 		this.waiting.dispose();
-		//this.bar.dispose();
-		//this.bar_c.dispose();
+	
 		//this.showScreen();
 	}
 	
