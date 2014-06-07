@@ -21,7 +21,7 @@ public abstract class Screen {
 	
 	private Display display=null;
 	private Shell shell=null;
-	private Label waiting=null;
+//	private Label waiting=null;
 	protected ApplicationInterface engine;
 	//protected ProgressBar bar=null;
 	//private Composite bar_c=null;
@@ -123,8 +123,8 @@ public abstract class Screen {
 	}
 	
 	protected void openWaiting(){
-		this.hideScreen();   //qaqa 1.6.14
-		waiting= new Label(getShell(), SWT.INHERIT_DEFAULT);
+	//	this.hideScreen();   //qaqa 1.6.14
+	/*	waiting= new Label(getShell(), SWT.INHERIT_DEFAULT);
 		waiting.setAlignment(SWT.CENTER);
 		waiting.setText("Please wait while we are processing your request");
 		waiting.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE)); //change color to white
@@ -134,7 +134,7 @@ public abstract class Screen {
 		data.width=1000;
 		data.right = new FormAttachment (100, 0);
 		data.bottom = new FormAttachment (15, 0);
-		waiting.setLayoutData(data);
+		waiting.setLayoutData(data);*/
 		
 		this.getShell().layout();    //qaqa 1.6.14
 		
@@ -142,7 +142,7 @@ public abstract class Screen {
 	
 	protected void closeWaiting(){
 		
-		this.waiting.dispose();
+		//this.waiting.dispose();
 	
 		//this.showScreen();
 	}
