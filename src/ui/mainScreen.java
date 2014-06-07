@@ -74,18 +74,21 @@ public class mainScreen extends Screen{
 			public void run() {
 				//final Pair<String,String> status=theMusicalNetwork.nadav.getStatusSong(username);
 				//final Pair<String,String> status=engine.getStatusSong(username); //1.6.14
-				final Pair<String,String> status;
+				final Pair<Integer, Pair<String, String>> status;
 				if(theMusicalNetwork.qaqa){
-					status=theMusicalNetwork.nadav.getStatusSong();
+					status=theMusicalNetwork.nadav.getStatusSong(engine.getUsername());
 				}
 				else{ //real code
-					 status=engine.getStatusSong();
+					
+					// status=engine.getStatusSong();//7.6
+					status=engine.getStatusSong(engine.getUsername());
 				}
 				//final Pair<String,String> status=engine.getStatusSong();
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;
-						status_song_label.setText("Status song:  "+status.getLeft()+" "+status.getRight());
+						//7.6
+					/*	status_song_label.setText("Status song:  "+status.getLeft()+" "+status.getRight());
 						updateStatusSong(status);
 						//Thread.currentThread();
 						pool.remove(t1);
@@ -93,6 +96,21 @@ public class mainScreen extends Screen{
 							
 							closeWaiting();
 							showScreen();
+						}*/
+						//7.6
+						if(checkConnection(getShell(), status.getLeft())){
+							status_song_label.setText("Status song:  "+status.getRight().getLeft()+" "+status.getRight().getRight());
+							updateStatusSong(status.getRight());
+							//Thread.currentThread();
+							pool.remove(t1);
+							if(pool.isEmpty()){
+								
+								closeWaiting();
+								showScreen();
+							}
+						}
+						else{
+							//back to log in
 						}
 					}
 				});
@@ -397,20 +415,22 @@ public class mainScreen extends Screen{
 			public void run() {
 				
 			//	final ArrayList<Pair<String,String>> f= engine.getSongList(username); //1.6.14
-				final ArrayList<Pair<String,String>> f;
+				final Pair<Integer, java.util.List<Pair<String, String>>> f;
 				if(theMusicalNetwork.qaqa){
-					f= (ArrayList<Pair<String, String>>) theMusicalNetwork.nadav.getSongList();
+					f=  theMusicalNetwork.nadav.getSongList("TT");
 				}
 				else{
-					f= (ArrayList<Pair<String, String>>) engine.getSongList();
+					//f= (ArrayList<Pair<String, String>>) engine.getSongList(); //7.6
+					f=  engine.getSongList(engine.getUsername());
+					
 				}
 				//final ArrayList<Pair<String,String>> f= (ArrayList<Pair<String, String>>) engine.getSongList();
 						
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						
-					
-						for(Pair<String,String> s:f){
+					//7.6
+					/*	for(Pair<String,String> s:f){
 							//friendList.add (s);
 							TableItem item = new TableItem (songList_t, SWT.NONE);
 							item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -428,8 +448,32 @@ public class mainScreen extends Screen{
 							
 							closeWaiting();
 							showScreen();
+						}*/
+						//7.6
+						if(checkConnection(getShell(), f.getLeft())){
+							for(Pair<String,String> s:f.getRight()){
+								//friendList.add (s);
+								TableItem item = new TableItem (songList_t, SWT.NONE);
+								item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+								//item.setText(0, "artist "+s.getLeft());
+								//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
+								item.setText(0, s.getLeft());
+								item.setText(1, s.getRight());
+							}
+							
+							
+							//System.out.println(pool.size());
+							
+							pool.remove(t2);
+							if(pool.isEmpty()){
+								
+								closeWaiting();
+								showScreen();
+							}
 						}
-
+						else{
+							//back to log in
+						}
 						
 				
 					}
@@ -470,19 +514,21 @@ public class mainScreen extends Screen{
 
 			@Override
 			public void run() {
-				final ArrayList<String> f;
+				final Pair<Integer, ArrayList<String>> f;
 				if(theMusicalNetwork.qaqa){
-					 f=theMusicalNetwork.nadav.getFriendList();
+					 f=theMusicalNetwork.nadav.getFriendList("TT");
 				}
 				else{
-					f=engine.getFriendList();
+					//f=engine.getFriendList(); //7.6
+					f=engine.getFriendList(engine.getUsername());
 				}
 				
 				//final ArrayList<String> f=engine.getFriendList();
 						
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						for(String s:f){
+						//7.6
+					/*	for(String s:f){
 							friendList.add (s);
 						}
 						
@@ -493,6 +539,24 @@ public class mainScreen extends Screen{
 							
 							closeWaiting();
 							showScreen();
+						}*/
+						//7.6
+						if(checkConnection(getShell(), f.getLeft())){
+							for(String s:f.getRight()){
+								friendList.add (s);
+							}
+							
+							pool.remove(t3);
+							
+							System.out.println(pool.size());
+							if(pool.isEmpty()){
+								
+								closeWaiting();
+								showScreen();
+							}	
+						}
+						else{
+							//back to log in
 						}
 					}
 				});
