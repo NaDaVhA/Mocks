@@ -750,6 +750,8 @@ public class DataBaseManager {
 		//dropTable(connection, "artist_category_temp");
 		//updateConfiguration(connection, "artist_category_temp", "0", "operation", "general");
 		
+		//DROP artist_cat
+		
 		return status;
 	
 	}
