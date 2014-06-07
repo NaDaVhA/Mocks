@@ -10,13 +10,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import parsing.RawDataUnit;
 import parsing.yagoMiner;
+import ui.initUpdateScreen;
 
 
 public class DataBaseManager {
 	
 	
 	private static boolean qaqa = true;	
-	
+	private static int progress = 5000;
 	
 	///////////////////////////////////////
 	// 		Atomic database actions 
@@ -159,7 +160,16 @@ public class DataBaseManager {
 			
 			for(int i=0; i<numberOfStatements; i++){
 				status = stmt.execute(statements[i]);
+				if(!status){
+					if(statements[i].startsWith("SET")){
+						continue;
+					}else{
+						System.out.println("Transaction error in: " + statements[i] + ". Transaction is aborted.");
+						return status;
+					}
+				}	
 			}
+			
 			
 			//Commit transaction
 			if(qaqa) System.out.println("executeTransaction: Commiting transaction..");
@@ -211,13 +221,12 @@ public class DataBaseManager {
 			if(connection.isValid(3))
 				return status;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return status;
 		}
 		
 		//If connection is not valid, throw exception
-		throw new SQLException("connectionLost");
+		throw new SQLException("connection is Lost");
 	
 	}
 	
@@ -295,6 +304,10 @@ public class DataBaseManager {
 					count = 0;
 					pstmt.executeBatch();
 					if(qaqa) System.out.println("populateTable: batch #" + ++batch);
+					
+					//Progress pBar
+					initUpdateScreen.updateProgressBar();
+					
 				}else{
 					if(!linesIter.hasNext()){
 						pstmt.executeBatch();
@@ -384,73 +397,8 @@ public class DataBaseManager {
 	// 		initialize app's database
 	////////////////////////////////////
 	
-
-	
-	/**
-	 * Checks whether database is already initialized.
-	 * @param connection
-	 * @return true if database is already initialized, false otherwise.
-	 */
-	public static boolean getDatabaseInitializationStatus(Connection connection){
-				
-		//If table already exists, it will just skip creating table again
-		//createTable(connection, "configuration", null, "parameter VARCHAR(45) NOT NULL, ", "dbStatus INT NOT NULL DEFAULT 0");
-		
-		PreparedStatement stmt = null;
-		
-		try {
-			
-			Statement tstmt = connection.createStatement();
-			ResultSet rs = tstmt.executeQuery("SELECT * FROM configuration WHERE parameter = 'initialized'");
-			int dbStatusValue = 99; //QAQA
-			if(rs.next() == true)
-				dbStatusValue = rs.getInt("dbStatus");
-			
-			if(dbStatusValue == 1)
-				return true;
-
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}finally{
-			safelyClose(stmt);
-		}
-		
-		return false;
-		
-	}
 	
 	
-	/**
-	 * Sets database initialization status to true.
-	 * @param connection
-	 * @return true if succeeded, false otherwise.
-	 */
-	public static boolean setDatabaseStatusToInitialized(Connection connection){
-		
-		boolean status = true;
-				
-		PreparedStatement stmt = null;
-		String insertaionAction = "UPDATE configuration SET dbStatus = 1 WHERE parameter LIKE 'initialized'";
-		
-		stmt = null;
-		
-		try {
-			stmt = connection.prepareStatement(insertaionAction);
-			stmt.executeUpdate();
-
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}finally{
-			safelyClose(stmt);
-		}
-		
-		return status;
-		
-	}
-	
-
 	/**
 	 * Checks value of an attribute in configuration table.
 	 * @param connection
@@ -562,8 +510,10 @@ public class DataBaseManager {
 		//Mine relevant data from Yago in one batch-
 		String[] transitiveAttributes = {"groups", "singers", "songs"};
 		RawDataUnit rawMusicData = yagoMiner.mineDataUnit(YagoTransitiveTypeFile, transitiveAttributes, 2);
+		progressTheMFProgressBar(5);
 		String[] factsAttributes = {"created"};
 		RawDataUnit rawCreatorCreationsData = yagoMiner.mineDataUnit(yagoFactsFile, factsAttributes, 2);
+		progressTheMFProgressBar(5);
 		
 		if((rawMusicData == null)||(rawCreatorCreationsData == null)){
 			System.out.println("Data extraction failed. Check Yago files, or <YagoFolderPath> value correctness.");
@@ -573,11 +523,16 @@ public class DataBaseManager {
 		//Extract raw data from mined data - singers, musical groups, songs
 		RawDataUnit rawSinger = new RawDataUnit();
 		rawSinger = extractRawLinesByAttribute(rawMusicData, 2, "singers", rawSinger);
+		progressTheMFProgressBar(5);
+
 		RawDataUnit rawMusicalGroups = new RawDataUnit();
 		rawMusicalGroups = extractRawLinesByAttribute(rawMusicData, 2, "groups", rawMusicalGroups);
+		progressTheMFProgressBar(5);
+
 		RawDataUnit rawSongs = new RawDataUnit();
 		rawSongs = extractRawLinesByAttribute(rawMusicData, 2, "songs", rawSongs);
-	
+		progressTheMFProgressBar(5);
+
 		//Build database
 		
 		//Artists data base creation
@@ -602,6 +557,9 @@ public class DataBaseManager {
 		
 		System.out.println("Database creation succeeded. Hooray!");
 		
+		//pBar - set finish
+		initUpdateScreen.setFinished(true);
+		
 		return status;
 		
 	}
@@ -618,8 +576,11 @@ public class DataBaseManager {
 		
 		//Check configuration
 		int dbStatus = checkConfiguration(connection, "artistsTables", "general");
-		if(dbStatus == 1)	
+		if(dbStatus == 1){
+			progressTheMFProgressBar(25);
 			return true;
+		}
+			
 		
 		System.out.println("Building the artists database.");
 		
@@ -697,6 +658,7 @@ public class DataBaseManager {
 			}
 		}
 		System.out.println("Artist database: Completed step 1/5.");
+		progressTheMFProgressBar(5);
 		
 		//populate artists table
 		statementToExecute = "INSERT INTO artists(artist_name, artist_type) "
@@ -705,7 +667,7 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "artists", "general");
 		if(!status) return false;
 		System.out.println("Artist database: Completed step 2/5.");
-
+		progressTheMFProgressBar(5);
 		
 		//populate categories_of_artists table
 		statementToExecute = "INSERT INTO categories_of_artists(category_name) "
@@ -714,15 +676,14 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "categories_of_artists", "general");
 		if(!status) return false;	
 		System.out.println("Artist database: Completed step 3/5.");
-
+		progressTheMFProgressBar(5);
 		
-		//populate artist_category_temp table
-		//Create temp table: artist_category_temp
 		createTable(connection, "artist_category_temp", 
 				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='artist_category(artist, category)'", 
 				"artist varchar(100) NOT NULL, ",
 				"category varchar(100) NOT NULL, ",
-				"PRIMARY KEY (artist, category)");
+				"artist_id int(11) DEFAULT NULL, ",
+				"category_id int(11) DEFAULT NULL");
 		
 		statementToExecute = "INSERT INTO artist_category_temp(artist, category) "
 				+ "SELECT DISTINCT artist_name, artist_category "
@@ -730,25 +691,50 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_category_temp", "general");
 		if(!status) return false;
 		System.out.println("Artist database: Completed step 4/5.");
-
+		progressTheMFProgressBar(5);
+		
+		String[] statements = new String[4];
+		statements[0] = "SET SQL_SAFE_UPDATES = 0";
+		statements[1] = "UPDATE artist_category_temp " +
+						"INNER JOIN artists " + 
+						"ON artist_category_temp.artist = artists.artist_name " +
+						"SET artist_category_temp.artist_id = artists.artist_id";
+		statements[2] = "UPDATE artist_category_temp " +
+						"INNER JOIN categories_of_artists " + 
+						"ON artist_category_temp.category = categories_of_artists.category_name " +
+						"SET artist_category_temp.category_id = categories_of_artists.category_artist_id";
+		statements[3] = "SET SQL_SAFE_UPDATES = 1";
+		
+		status = executeTransaction(connection, statements);
+		
 		//populate artist_category table
-		statementToExecute = "INSERT INTO artist_category(artist_id, category_id) "
-				+ "SELECT DISTINCT Artist.artist_id, Category.category_artist_id "
-				+ "FROM artist_category_temp AS Temp, artists AS Artist, categories_of_artists AS Category "
-				+ "WHERE Temp.artist = Artist.artist_name  AND  Temp.category = Category.category_name "
-				+ "LIMIT 2000";
+		if(status){
+			statementToExecute = "INSERT INTO artist_category(artist_id, category_id) "
+					+ "SELECT DISTINCT artist_id, category_artist_id "
+					+ "FROM artist_category_temp";
+			System.out.println("artist_category through transaction!");
+		}else{
+			statementToExecute = "INSERT INTO artist_category(artist_id, category_id) "
+					+ "SELECT DISTINCT Artist.artist_id, Category.category_artist_id "
+					+ "FROM artist_category_temp AS Temp, artists AS Artist, categories_of_artists AS Category "
+					+ "WHERE Temp.artist = Artist.artist_name  AND  Temp.category = Category.category_name "
+					+ "LIMIT 10000";
+			System.out.println("artist_category LIMITED...");
+		}
 		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_category", "general");
 		if(!status) return false;
 		System.out.println("Artist database: Completed step 5/5.");
-
+		progressTheMFProgressBar(5);
+		
+		
 		//Update configuration - finished artistsTables
 		status = updateConfiguration(connection, "artistsTables", "1", "operation", "general");
 		
 		//Drop artist_category_temp table
 		dropTable(connection, "artists_temp");
 		updateConfiguration(connection, "artists_temp", "0", "operation", "general");
-		//dropTable(connection, "artist_category_temp");
-		//updateConfiguration(connection, "artist_category_temp", "0", "operation", "general");
+		dropTable(connection, "artist_category_temp");
+		updateConfiguration(connection, "artist_category_temp", "0", "operation", "general");
 		
 		//DROP artist_cat
 		
@@ -768,8 +754,10 @@ public class DataBaseManager {
 		
 		//Check configuration
 		int dbStatus = checkConfiguration(connection, "songsTables", "general");
-		if(dbStatus == 1)	
+		if(dbStatus == 1){
+			progressTheMFProgressBar(25);
 			return true;
+		}
 		
 		System.out.println("Building the songs database. Please wait...");
 		
@@ -808,7 +796,8 @@ public class DataBaseManager {
 			if(!status) return false;
 		}		
 		System.out.println("Songs database: Completed step 1/5.");
-
+		progressTheMFProgressBar(5);
+		
 		//Create temporary table: song_category_distinct
 		createTable(connection, "song_category_distinct", 
 				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='song_category_distinct(song, category)'", 
@@ -824,7 +813,8 @@ public class DataBaseManager {
 		//status = executeStatement(connection, statementToExecute);		
 		if(!status) return false;
 		System.out.println("Songs database: Completed step 2/5.");
-
+		progressTheMFProgressBar(5);
+		
 		//populate songs table
 		statementToExecute = "INSERT INTO songs(song_name) "
 				+ "SELECT DISTINCT song "
@@ -832,7 +822,7 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "songs", "general");
 		if(!status) return false;
 		System.out.println("Songs database: Completed step 3/5.");
-
+		progressTheMFProgressBar(5);
 		
 		//Categories of songs - 
 		
@@ -852,7 +842,8 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "song_category", "general");
 		if(!status) return false;
 		System.out.println("Songs database: Completed step 5/5.");
-
+		progressTheMFProgressBar(5);
+		
 		//Update configuration - finished songsTables
 		status = updateConfiguration(connection, "songsTables", "1", "operation", "general");
 		
@@ -876,8 +867,10 @@ public class DataBaseManager {
 		
 		//Check configuration
 		int dbStatus = checkConfiguration(connection, "creatorCreationTables", "general");
-		if(dbStatus == 1)	
+		if(dbStatus == 1){
+			progressTheMFProgressBar(25);
 			return true;
+		}
 		
 		System.out.println("Finishing the database creation. Hang on a while longer!");
 		
@@ -913,7 +906,8 @@ public class DataBaseManager {
 			
 		}
 		System.out.println("Creations database: Completed step 1/5.");
-
+		progressTheMFProgressBar(5);
+		
 		//Populate DISTINCT values
 		createTable(connection, "artist_song_temp_distinct", 
 				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='artist_song_temp(artist, song)'", 
@@ -927,7 +921,8 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song_temp_distinct", "general");
 		if(!status) return false;
 		System.out.println("Creations database: Completed step 2/5.");
-
+		progressTheMFProgressBar(5);
+		
 		//Populate artist_song table
 		statementToExecute = "INSERT INTO artist_song(song_id, artist_id) "
 				+ "SELECT DISTINCT Song.song_id, Artist.artist_id "
@@ -936,7 +931,7 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song", "general");
 		if(!status) return false;
 		System.out.println("Creations database: Completed step 3/5.");
-
+		progressTheMFProgressBar(5);
 		
 		//Add unknown connections
 		
@@ -954,7 +949,8 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "unknown_song_id", "general");
 		if(!status) return false;
 		System.out.println("Creations database: Completed step 4/5.");
-
+		progressTheMFProgressBar(5);
+		
 		//Add songs with no artists to artist_song table
 		statementToExecute = "INSERT INTO artist_song(song_id, artist_id) "
 				+ "SELECT DISTINCT Song.song_id, UnknownArtist.artist_id "
@@ -964,6 +960,7 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song_additions", "general");
 		if(!status) return false;
 		System.out.println("Creations database: Completed step 5/5.");
+		progressTheMFProgressBar(5);
 		
 		//Update configuration - finished CreatorCreationsTables
 		status = updateConfiguration(connection, "creatorCreationTables", "1", "operation", "general");
@@ -980,7 +977,7 @@ public class DataBaseManager {
 		return status;
 	}
 
-	
+
 	
 	////////////////////////////////////
 	// 		Music database updater
@@ -1016,8 +1013,10 @@ public class DataBaseManager {
 		//Mine relevant data from Yago in one batch-
 		String[] transitiveAttributes = {"groups", "singers", "songs"};
 		RawDataUnit rawMusicData = yagoMiner.mineDataUnit(YagoTransitiveTypeFile, transitiveAttributes, 2);
+		progressTheMFProgressBar(5);
 		String[] factsAttributes = {"created"};
 		RawDataUnit rawCreatorCreationsData = yagoMiner.mineDataUnit(yagoFactsFile, factsAttributes, 2);
+		progressTheMFProgressBar(5);
 		
 		if((rawMusicData == null)||(rawCreatorCreationsData == null)){
 			System.out.println("Data extraction failed. Check Yago files, or <UpdateYagoFolderPath> value correctness.");
@@ -1028,11 +1027,14 @@ public class DataBaseManager {
 		//Extract raw data from Yago - singers, musical groups, songs
 		RawDataUnit rawSinger = new RawDataUnit();
 		rawSinger = extractRawLinesByAttribute(rawMusicData, 2, "singers", rawSinger);
+		progressTheMFProgressBar(5);
 		RawDataUnit rawMusicalGroups = new RawDataUnit();
 		rawMusicalGroups = extractRawLinesByAttribute(rawMusicData, 2, "groups", rawMusicalGroups);
+		progressTheMFProgressBar(5);
 		RawDataUnit rawSongs = new RawDataUnit();
 		rawSongs = extractRawLinesByAttribute(rawMusicData, 2, "songs", rawSongs);
-	
+		progressTheMFProgressBar(5);
+		
 		//Update database
 		System.out.println("Finished extracting data from yago. Updating tables...");
 
@@ -1057,6 +1059,9 @@ public class DataBaseManager {
 			return checkConnectionValidity(connection, status);
 		
 		System.out.println("Finished updating the database.");
+		
+		//pBar - set finish
+		initUpdateScreen.setFinished(true);
 		
 		return status;
 		
@@ -1112,6 +1117,7 @@ public class DataBaseManager {
 			
 		}
 		System.out.println("Update creations database: Completed step 1/4.");
+		progressTheMFProgressBar(6);
 		
 		//Populate DISTINCT values
 		createTable(connection, "update_artist_song_distinct", 
@@ -1126,7 +1132,8 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "update_artist_song_distinct", "updateOp");
 		if(!status) return false;
 		System.out.println("Update creations database: Completed step 2/4.");
-
+		progressTheMFProgressBar(6);
+		
 		//Create temp table: update_artist_song_id
 		createTable(connection, "update_artist_song_id", 
 				"ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='update_artist_song_id(song_id, artist_id)'", 
@@ -1160,7 +1167,7 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song", "updateOp");
 		if(!status) return false;
 		System.out.println("Update creations database: Completed step 3/4.");
-
+		progressTheMFProgressBar(6);
 		
 		//Update unknown connections
 		//Add songs with no artists to artist_song table
@@ -1172,6 +1179,7 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song_additions", "updateOp");
 		if(!status) return false;
 		System.out.println("Update creations database: Completed step 4/4.");
+		progressTheMFProgressBar(6);
 		
 		//Update configuration - finished updating creatorCreationTables
 		status = updateConfiguration(connection, "creatorCreationTables", "1", "operation", "updateOp");
@@ -1243,7 +1251,8 @@ public class DataBaseManager {
 			if(!status) return false;	
 		}
 		System.out.println("Update songs database: Completed step 1/6.");
-
+		progressTheMFProgressBar(4);
+		
 		//populate update_song_category_distinct with songs-categories distinct values
 		statementToExecute = "INSERT INTO update_song_category_distinct(song, category) "
 				+ "SELECT DISTINCT song, category "
@@ -1251,7 +1260,8 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "update_song_category_distinct", "updateOp");
 		if(!status) return false;
 		System.out.println("Update songs database: Completed step 2/6.");
-
+		progressTheMFProgressBar(4);
+		
 		//Update songs table
 		statementToExecute = "INSERT INTO songs(song_name) "
 				+ "SELECT DISTINCT Temp.song "
@@ -1260,7 +1270,7 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "songs", "updateOp");
 		if(!status) return false;
 		System.out.println("Update songs database: Completed step 3/6.");
-
+		progressTheMFProgressBar(4);
 		
 		//Categories of songs update - 
 		
@@ -1284,7 +1294,7 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "categories_of_songs", "updateOp");
 		if(!status) return false;
 		System.out.println("Update songs database: Completed step 4/6.");
-		
+		progressTheMFProgressBar(4);
 		
 		// Song-Category update - 
 		
@@ -1304,7 +1314,7 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "update_song_category_id", "updateOp");
 		if(!status) return false;
 		System.out.println("Update songs database: Completed step 5/6.");
-
+		progressTheMFProgressBar(4);
 
 		//Update song_category table
 		statementToExecute = "INSERT INTO song_category(song_id, category_id) "
@@ -1317,7 +1327,8 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "song_category", "updateOp");
 		if(!status) return false;
 		System.out.println("Update songs database: Completed step 6/6.");
-
+		progressTheMFProgressBar(5);
+		
 		//Update configuration - finished updating songsTables
 		status = updateConfiguration(connection, "songsTables", "1", "operation", "updateOp");
 		
@@ -1427,7 +1438,8 @@ public class DataBaseManager {
 			}
 		}
 		System.out.println("Update artists database: Completed step 1/5.");
-
+		progressTheMFProgressBar(5);
+		
 		//populate update_artists_distinct table
 		statementToExecute = "INSERT INTO update_artists_distinct(artist_name, artist_type) "
 				+ "SELECT DISTINCT artist_name, artist_type "
@@ -1443,7 +1455,7 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "artists", "updateOp");
 		if(!status) return false;
 		System.out.println("Update artists database: Completed step 2/5.");
-
+		progressTheMFProgressBar(5);
 		
 		//Artist categories - 
 		
@@ -1467,7 +1479,8 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "categories_of_artists", "updateOp");
 		if(!status) return false;
 		System.out.println("Update artists database: Completed step 3/5.");
-
+		progressTheMFProgressBar(5);
+		
 		//Update artist_category table -
 		
 		//Create temp table: update_artist_category_temp
@@ -1497,7 +1510,7 @@ public class DataBaseManager {
 		status = insertPrimaryDataCycle(connection, statementToExecute, "update_artist_category_id_temp", "updateOp");
 		if(!status) return false;
 		System.out.println("Update artists database: Completed step 4/5.");
-
+		progressTheMFProgressBar(5);
 		
 		//Update artist_category table
 		statementToExecute = "INSERT INTO artist_category(artist_id, category_id) "
@@ -1511,7 +1524,8 @@ public class DataBaseManager {
 		//status = executeStatement(connection, statementToExecute);
 		if(!status) return false;
 		System.out.println("Update artists database: Completed step 5/5.");
-
+		progressTheMFProgressBar(5);
+		
 		//Update configuration - finished updating artistsTables
 		status = updateConfiguration(connection, "artistsTables", "1", "operation", "updateOp");
 		
@@ -1550,6 +1564,34 @@ public class DataBaseManager {
 		
 		return status;
 	}
+	
+	
+	
+	////////////////////////////////////
+	// 		Other help methods
+	////////////////////////////////////
+	
+	
+	
+	/**
+	 * Progress the progress bar in the given percentage out of 100.
+	 * @param steps
+	 */
+	private static void progressTheMFProgressBar(int percentage){
+		
+		int onePercent = progress/100;
+		
+		for(int i=0; i<percentage; i++){
+			//Do one percent
+			for(int j=0; j<onePercent; j++)
+				initUpdateScreen.updateProgressBar();
+		}
+			
+			
+	}
+	
+	
+	
 	
 	
 	
