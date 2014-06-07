@@ -276,6 +276,33 @@ public class AppEngine implements ApplicationInterface{
 	public ArrayList<String> getFriendList() {
 		return this.user.getfreindsList();
 	}
+	
+	@Override
+	public Pair<Integer, ArrayList<String>> getFriendList(String username) {
+		int user_id;
+		ArrayList<String[]> lst = null;
+		
+		try {
+			user_id = this.dbActionRunner.getUserId(username);
+			
+			if (user_id==-1)
+				return new Pair<Integer, ArrayList<String>>(0, null);
+			
+			lst = this.dbActionRunner.getUserFreindsList(user_id);
+			if (lst == null)
+				return new Pair<Integer, ArrayList<String>>(0, null);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Pair<Integer, ArrayList<String>>(-1, null);
+
+		}
+		
+		ArrayList<String> result = ConvertListArrayToList(lst);
+		return new Pair<Integer, ArrayList<String>>(0, result);
+	}
+	
 
 	
 	@Override
@@ -578,6 +605,9 @@ public class AppEngine implements ApplicationInterface{
 		return List;
 		
 	}
+
+
+
 	
 
 

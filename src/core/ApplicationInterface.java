@@ -111,10 +111,17 @@ public interface ApplicationInterface {
 	
 	/**
 	 * for main screen
-	 * @param username
+	 * @param 
 	 * @return
 	 */
 	public ArrayList<String> getFriendList();
+	
+	/**
+	 * for main screen
+	 * @param username
+	 * @return
+	 */
+	public Pair<Integer, ArrayList<String>> getFriendList(String username);
 	
 	/**
 	 * for main screen
