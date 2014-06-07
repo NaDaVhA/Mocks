@@ -38,7 +38,7 @@ public class dbActions implements DBActionsInterface{
 		String artist_name_c = ConvertStringCharToLegal(artist_name);
 		
 		String sql_query ="Select artist_id " + 
-				"From artist " +
+				"From artists " +
 				"Where artists.artist_name = '" + artist_name_c +"'";
 		
 		ArrayList<String[]> result= executeQuery(sql_query,true);
