@@ -39,7 +39,7 @@ public class dbActions implements DBActionsInterface{
 		
 		String sql_query ="Select artist_id " + 
 				"From artist " +
-				"Where artist.artist_name = '" + artist_name_c +"'";
+				"Where artists.artist_name = '" + artist_name_c +"'";
 		
 		ArrayList<String[]> result= executeQuery(sql_query,true);
 		return checkID(result);
