@@ -112,24 +112,6 @@ public class ConnectionPool {
 	}
 	
 	
-/*	
-	*//**
-	 * Retrieves connection from connection pool. 
-	 * Connection is removed from pool.
-	 * if no connections are available, creates and Retrieves a new connection.
-	 * @return a DataBaseConnection object.
-	 *//*
-	public Connection getConnectionFromPool(){
-		
-		if(this.availableConnectionsNumber == 0)
-			this.createNewConnectionInPool(this.host, this.port, this.dataBase, this.dbUser, this.dbPassword);
-		
-		this.availableConnectionsNumber--;
-		
-		return this.pool.pop();
-		
-	};
-	*/
 	
 	/**
 	 * Retrieves connection from connection pool. 
@@ -223,6 +205,8 @@ public class ConnectionPool {
 				break;
 			
 		}
+		
+
 		
 		return status;
 		

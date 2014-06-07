@@ -10,7 +10,7 @@ import java.util.LinkedList;
 public class yagoMiner {
 	
 	static boolean qaqa = true;
-	
+	static boolean normalize;
 	
 	/**
 	 * Extracts data from the given file. 
@@ -114,6 +114,8 @@ public class yagoMiner {
 		
 		for(int i=0; i<array.length; i++){
 			array[i] = array[i].toLowerCase();
+			if(normalize)
+				array[i] = normalizeDataWord(array[i]);
 		}
 		
 		return array;
@@ -121,6 +123,25 @@ public class yagoMiner {
 	
 		
 	
+	public static String normalizeDataWord(String word){
+		
+		
+		if(word.startsWith("<")&&word.endsWith(">")){
+			
+			//crop edges
+			word = word.substring(1, word.length()-1);
+			
+			//remove '_'s
+			word = word.replace('_', ' ');
+			
+			//Bring to lowercase form
+			word = word.toLowerCase();
+			
+			
+		}
+		
+		return word;
+	}
 	
 	
 

@@ -1041,11 +1041,13 @@ public class DataBaseManager {
 		
 		//Update songs data base 
 		status = updateSongsTables(connection, rawSongs);
-		if(!status) return false;
-
-		//Update creator-Creations links data 
+		if(!status)
+			return checkConnectionValidity(connection, status);
+		
+			//Update creator-Creations links data 
 		status = updateCreatorCreationsTable(connection, rawCreatorCreationsData);
-		if(!status) return false;
+		if(!status)
+			return checkConnectionValidity(connection, status);
 	
 		//Initialize configuration table - update values !!!  QAQA 
 		status = initializeConfigurationTuple(connection, "updateOp");
