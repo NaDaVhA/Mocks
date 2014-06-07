@@ -201,8 +201,8 @@ public class dbActions implements DBActionsInterface{
 		String StringUserID= ConvertIntegerToString(userID);
 		
 		String sql_query ="Select user_name " + 
-				"From users_freinds, users " +
-				"Where users_freinds.user_id=" + StringUserID + " And users.user_id = users_freinds.user_freind_id "; 
+				"From users_friends, users " +
+				"Where users_friends.user_id=" + StringUserID + " And users.user_id = users_friends.user_friend_id "; 
 	
 		return executeQuery(sql_query,true);
 		
@@ -211,8 +211,8 @@ public class dbActions implements DBActionsInterface{
 	@Override
 	public boolean addFreindToUser(int userID, int userFreindID) throws SQLException
 	{
-				String sql_query ="INSERT INTO `users_freinds` " +
-						"(`user_id`, `user_freind_id`) VALUES ('"+userID+"', '"+userFreindID+"');";
+				String sql_query ="INSERT INTO `users_friends` " +
+						"(`user_id`, `user_friend_id`) VALUES ('"+userID+"', '"+userFreindID+"');";
 				if (executeQuery(sql_query,false)==null)
 					return false; // true for  query is_select
 				
