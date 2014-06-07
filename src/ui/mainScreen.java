@@ -48,6 +48,7 @@ public class mainScreen extends Screen{
 	private Button view_friend=null;
 	private String friend_name;
 	
+	private Button recommendBtn=null;
 	
 	private Thread t1,t2,t3,t4,t5;
 	
@@ -611,6 +612,27 @@ public class mainScreen extends Screen{
 			}
 		});
 		
+		//Recommend Me Button
+		recommendBtn =new Button(getShell(),SWT.NONE);
+		recommendBtn.setText("Recommend");
+		FormData recommendFormData = new FormData ();
+		recommendFormData.width=110;
+		recommendFormData.height=30;
+		recommendFormData.right = new FormAttachment (97, 0);
+		recommendFormData.bottom = new FormAttachment (20, 0);
+		recommendBtn.setLayoutData(recommendFormData); 
+		
+		recommendBtn.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected (SelectionEvent e) {
+				RecomendationsScreen recomendationsScreen = new RecomendationsScreen(getDisplay(),getShell(),engine);
+				disposeScreen();
+				recomendationsScreen.createScreen();
+			}
+		});
+		
+		
+		
 		//whats humming button
 		view_friend=new Button(getShell(),SWT.NONE);
 		view_friend.setText("View friend");
@@ -668,6 +690,7 @@ public class mainScreen extends Screen{
 		this.user_label.dispose();
 		this.view_friend.dispose();
 		this.entertain_me.dispose();
+		this.recommendBtn.dispose();
 	}
 
 
