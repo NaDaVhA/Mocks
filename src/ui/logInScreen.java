@@ -149,6 +149,9 @@ public class logInScreen extends Screen {
 								closeWaiting();
 								disposeScreen(); //he is registerd!
 								//hideScreen();
+								
+								engine.InitalizeRecommender();
+								
 								mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,getUsername_s());
 								mainScreen.createScreen();
 							}
