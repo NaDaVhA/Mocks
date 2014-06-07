@@ -84,10 +84,10 @@ public class initUpdateScreen extends Screen{
 			head_label=new Label(bar_shell, SWT.NONE);
 			head_label.setAlignment(SWT.CENTER);
 		if(type.compareTo("update")==0){
-			head_label.setText("Please Wait while we are updating the db\nPlease be patient");
+			head_label.setText("Please Wait while we are updating the db");
 		}
 		else{
-			head_label.setText("Welcome!\nPlease Wait while we are building the db\nPlease be patient");
+			head_label.setText("Welcome!\nPlease Wait while we are building the db");
 		}
 		
 		head_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE)); //change color to white
