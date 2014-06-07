@@ -10,7 +10,7 @@ import java.util.LinkedList;
 public class yagoMiner {
 	
 	static boolean qaqa = true;
-	static boolean normalize;
+	static boolean normalize = true;
 	
 	/**
 	 * Extracts data from the given file. 
@@ -75,10 +75,14 @@ public class yagoMiner {
 			  				continue;
 			  			}
 			  			
-			  			if(array[indexInLine].contains(attribute)){
+			  			/*if(array[indexInLine].contains(attribute)){
+			  				listOfLines.add(array);
+			  			}*/
+			  				
+			  			if(array[indexInLine].endsWith(attribute)){
 			  				listOfLines.add(array);
 			  			}
-			  				
+			  			
 			  			
 			  			break;
 					}
@@ -104,7 +108,7 @@ public class yagoMiner {
 	
 
 	/**
-	 * Splits line around "\t", returns "closes", in lowercase.
+	 * Splits line around "\t", returns "closes", in normalized form.
 	 * @param Line
 	 * @return
 	 */
@@ -122,7 +126,11 @@ public class yagoMiner {
 	}
 	
 		
-	
+	/**
+	 * Normalize word: crops '<', '>', removes '_' and brings to lower case.
+	 * @param word
+	 * @return word in normalized form.
+	 */
 	public static String normalizeDataWord(String word){
 		
 		

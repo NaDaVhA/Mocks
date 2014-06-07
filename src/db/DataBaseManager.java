@@ -560,9 +560,9 @@ public class DataBaseManager {
 		System.out.println("Extracting data from Yago. Please wait.");
 		
 		//Mine relevant data from Yago in one batch-
-		String[] transitiveAttributes = {"_groups>", "_singers>", "_songs>"};
+		String[] transitiveAttributes = {"groups", "singers", "songs"};
 		RawDataUnit rawMusicData = yagoMiner.mineDataUnit(YagoTransitiveTypeFile, transitiveAttributes, 2);
-		String[] factsAttributes = {"<created>"};
+		String[] factsAttributes = {"created"};
 		RawDataUnit rawCreatorCreationsData = yagoMiner.mineDataUnit(yagoFactsFile, factsAttributes, 2);
 		
 		if((rawMusicData == null)||(rawCreatorCreationsData == null)){
@@ -572,11 +572,11 @@ public class DataBaseManager {
 		
 		//Extract raw data from mined data - singers, musical groups, songs
 		RawDataUnit rawSinger = new RawDataUnit();
-		rawSinger = extractRawLinesByAttribute(rawMusicData, 2, "_singers>", rawSinger);
+		rawSinger = extractRawLinesByAttribute(rawMusicData, 2, "singers", rawSinger);
 		RawDataUnit rawMusicalGroups = new RawDataUnit();
-		rawMusicalGroups = extractRawLinesByAttribute(rawMusicData, 2, "_groups>", rawMusicalGroups);
+		rawMusicalGroups = extractRawLinesByAttribute(rawMusicData, 2, "groups", rawMusicalGroups);
 		RawDataUnit rawSongs = new RawDataUnit();
-		rawSongs = extractRawLinesByAttribute(rawMusicData, 2, "_songs>", rawSongs);
+		rawSongs = extractRawLinesByAttribute(rawMusicData, 2, "songs", rawSongs);
 	
 		//Build database
 		
@@ -629,7 +629,7 @@ public class DataBaseManager {
 		String statementToExecute;
 		
 		//Add generic artist name
-		String[] unknownArtist = {"<unknownartist>", "garbage", "<unknowncategory>"};
+		String[] unknownArtist = {"unknownartist", "garbage", "unknowncategory"};
 		rawSinger.addLine(unknownArtist);
 		
 		
@@ -960,7 +960,7 @@ public class DataBaseManager {
 				+ "SELECT DISTINCT Song.song_id, UnknownArtist.artist_id "
 				+ "FROM songs AS Song, artists AS UnknownArtist "
 				+ "WHERE Song.song_id NOT IN (SELECT DISTINCT song_id FROM artist_song) "
-				+ "AND UnknownArtist.artist_name = '<unknownartist>'";
+				+ "AND UnknownArtist.artist_name = 'unknownartist'";
 		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song_additions", "general");
 		if(!status) return false;
 		System.out.println("Creations database: Completed step 5/5.");
@@ -1014,9 +1014,9 @@ public class DataBaseManager {
 		//Prepare data
 		
 		//Mine relevant data from Yago in one batch-
-		String[] transitiveAttributes = {"_groups>", "_singers>", "_songs>"};
+		String[] transitiveAttributes = {"groups", "singers", "songs"};
 		RawDataUnit rawMusicData = yagoMiner.mineDataUnit(YagoTransitiveTypeFile, transitiveAttributes, 2);
-		String[] factsAttributes = {"<created>"};
+		String[] factsAttributes = {"created"};
 		RawDataUnit rawCreatorCreationsData = yagoMiner.mineDataUnit(yagoFactsFile, factsAttributes, 2);
 		
 		if((rawMusicData == null)||(rawCreatorCreationsData == null)){
@@ -1027,11 +1027,11 @@ public class DataBaseManager {
 		
 		//Extract raw data from Yago - singers, musical groups, songs
 		RawDataUnit rawSinger = new RawDataUnit();
-		rawSinger = extractRawLinesByAttribute(rawMusicData, 2, "_singers>", rawSinger);
+		rawSinger = extractRawLinesByAttribute(rawMusicData, 2, "singers", rawSinger);
 		RawDataUnit rawMusicalGroups = new RawDataUnit();
-		rawMusicalGroups = extractRawLinesByAttribute(rawMusicData, 2, "_groups>", rawMusicalGroups);
+		rawMusicalGroups = extractRawLinesByAttribute(rawMusicData, 2, "groups", rawMusicalGroups);
 		RawDataUnit rawSongs = new RawDataUnit();
-		rawSongs = extractRawLinesByAttribute(rawMusicData, 2, "_songs>", rawSongs);
+		rawSongs = extractRawLinesByAttribute(rawMusicData, 2, "songs", rawSongs);
 	
 		//Update database
 		System.out.println("Finished extracting data from yago. Updating tables...");
@@ -1168,7 +1168,7 @@ public class DataBaseManager {
 				+ "SELECT DISTINCT Song.song_id, UnknownArtist.artist_id "
 				+ "FROM songs AS Song, artists AS UnknownArtist "
 				+ "WHERE Song.song_id NOT IN (SELECT DISTINCT song_id FROM artist_song) "
-				+ "AND UnknownArtist.artist_name = '<unknownartist>'";
+				+ "AND UnknownArtist.artist_name = 'unknownartist'";
 		status = insertPrimaryDataCycle(connection, statementToExecute, "artist_song_additions", "updateOp");
 		if(!status) return false;
 		System.out.println("Update creations database: Completed step 4/4.");
