@@ -48,7 +48,7 @@ public class mainScreen extends Screen{
 	private Button view_friend=null;
 	private String friend_name;
 	
-	private Button recommendBtn=null;
+	//private Button recommendBtn=null;
 	
 	private Thread t1,t2,t3,t4,t5;
 	
@@ -598,7 +598,7 @@ public class mainScreen extends Screen{
 		
 		//entertain me button
 		entertain_me=new Button(getShell(),SWT.NONE);
-		entertain_me.setText("Entertain Me!");
+		entertain_me.setText("Recomend Me!");
 		FormData data11 = new FormData ();
 		data11.width=115;
 		data11.height=30;
@@ -609,27 +609,13 @@ public class mainScreen extends Screen{
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed entertain me");
-			}
-		});
-		
-		//Recommend Me Button
-		recommendBtn =new Button(getShell(),SWT.NONE);
-		recommendBtn.setText("Recommend");
-		FormData recommendFormData = new FormData ();
-		recommendFormData.width=110;
-		recommendFormData.height=30;
-		recommendFormData.right = new FormAttachment (97, 0);
-		recommendFormData.bottom = new FormAttachment (20, 0);
-		recommendBtn.setLayoutData(recommendFormData); 
-		
-		recommendBtn.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected (SelectionEvent e) {
 				RecomendationsScreen recomendationsScreen = new RecomendationsScreen(getDisplay(),getShell(),engine);
 				disposeScreen();
 				recomendationsScreen.createScreen();
 			}
 		});
+		
+	
 		
 		
 		
@@ -690,7 +676,7 @@ public class mainScreen extends Screen{
 		this.user_label.dispose();
 		this.view_friend.dispose();
 		this.entertain_me.dispose();
-		this.recommendBtn.dispose();
+		//this.recommendBtn.dispose();
 	}
 
 
