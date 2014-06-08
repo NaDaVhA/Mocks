@@ -162,6 +162,22 @@ CONSTRAINT `user_id_user_artist`
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='userArtist(user_id,artist_id)';
 
 
+CREATE TABLE `users_friends` (
+  `user_id` INT NOT NULL,
+  `user_friend_id` INT NOT NULL,
+  PRIMARY KEY (`user_id`, `user_friend_id`),
+  INDEX `user_friend_id_users_friend_idx` (`user_friend_id` ASC),
+  CONSTRAINT `user_id_users_friend`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `users` (`user_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `user_friend_id_users_friend`
+    FOREIGN KEY (`user_friend_id`)
+    REFERENCES `users` (`user_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
 CREATE TABLE `user_songs` (
   `user_id` INT NOT NULL,
   `song_id` INT NOT NULL,
