@@ -608,15 +608,8 @@ public class dbActions implements DBActionsInterface{
 		
 		Connection connection = this.connectionPool.getConnectionFromPool();
 		
-		if(DataBaseManager.getDatabaseInitializationStatus(connection) != true){
+		status = this.buildMusicDB(yagoFilesPath);
 			
-			status = this.buildMusicDB(yagoFilesPath);
-			
-			if(status)
-				status = DataBaseManager.setDatabaseStatusToInitialized(connection);
-			
-		}
-		
 		this.connectionPool.returnConnectionToPool(connection);
 		
 		return status;

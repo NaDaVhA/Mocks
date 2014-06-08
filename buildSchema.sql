@@ -1,3 +1,26 @@
+CREATE TABLE `configuration` (
+  `operation` varchar(45) NOT NULL,
+  `status` bit(1) NOT NULL DEFAULT b'0',
+  `artists` bit(1) NOT NULL DEFAULT b'0',
+  `categories_of_artists` bit(1) NOT NULL DEFAULT b'0',
+  `artist_category` bit(1) NOT NULL DEFAULT b'0',
+  `songs` bit(1) NOT NULL DEFAULT b'0',
+  `categories_of_songs` bit(1) NOT NULL DEFAULT b'0',
+  `song_category` bit(1) NOT NULL DEFAULT b'0',
+  `artist_song` bit(1) NOT NULL DEFAULT b'0',
+  `artist_song_additions` bit(1) NOT NULL DEFAULT b'0',
+  `artistsTables` bit(1) NOT NULL  DEFAULT b'0',
+  `songsTables` bit(1) NOT NULL  DEFAULT b'0',
+  `creatorCreationTables` bit(1) NOT NULL  DEFAULT b'0',
+  PRIMARY KEY (`operation`),
+  UNIQUE KEY `operation_UNIQUE` (`operation`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+INSERT INTO `configuration` (`operation`) VALUES ('general');
+INSERT INTO `configuration` (`operation`) VALUES ('update');
+
+
 CREATE TABLE `artist_category` (
   `artist_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,

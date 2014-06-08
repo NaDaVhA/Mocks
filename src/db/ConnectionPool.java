@@ -8,8 +8,10 @@ import java.util.Stack;
 public class ConnectionPool {
 
 	private Stack<Connection> pool;
+	private Stack<Connection> unclosedConnections;
 	private int availableConnectionsNumber;
-	
+	private int unclosedConnectionNumber;
+
 	//A connection pool instance is associated with exactly one user and database pair.
 	private String host;
 	private String port;
@@ -44,7 +46,7 @@ public class ConnectionPool {
 	
 	
 	/**
-	 * Opens connection to DB.
+	 * Opens a new connection to DB and adds it to the connection pool.
 	 * @param host - the connection's host
 	 * @param port - the connection's port
 	 * @param dataBase - the name of the DB
@@ -58,7 +60,7 @@ public class ConnectionPool {
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
 		}catch(ClassNotFoundException e) {
-			System.out.println("Unable to load the MySQL JDBC driver..");
+			System.out.println("Unable to load the MySQL JDBC driver. Exiting application.");
 			return false;
 		}
 
@@ -79,7 +81,10 @@ public class ConnectionPool {
 		
 		} catch (SQLException e) {
 			System.out.println("Unable to connect - " + e.getMessage());
+			int errorCode = e.getErrorCode();
+			System.out.println("Error code = " + errorCode + ", SQLState = " + e.getSQLState());
 			connection = null;
+			
 			return false;
 		}
 		
@@ -88,9 +93,10 @@ public class ConnectionPool {
 
 	
 	/**
-	 * Closes the connection
+	 * Closes the given connection.
+	 * @return true if connection was closed, false otherwise.
 	 */
-	public void closeConnection(Connection connection) {
+	public boolean closeConnection(Connection connection) {
 		
 		// closing the connection
 		try {
@@ -98,7 +104,10 @@ public class ConnectionPool {
 		} catch (SQLException e) {
 			System.out.println("Unable to close the connection - "
 					+ e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	
@@ -121,6 +130,50 @@ public class ConnectionPool {
 	};
 	
 	
+	
+	public Connection SAFEgetConnectionFromPool() throws SQLException{
+		
+		if(this.availableConnectionsNumber == 0)
+			this.createNewConnectionInPool(this.host, this.port, this.dataBase, this.dbUser, this.dbPassword);
+						
+		Connection con = null;
+		boolean validConnection = false;
+		
+		while(this.availableConnectionsNumber > 0){
+			
+			con = this.pool.pop();
+			this.availableConnectionsNumber--;
+			
+			//Check whether connection is valid (using 10 seconds timeout)
+			try {
+				validConnection = con.isValid(10);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			if(validConnection){
+				break;
+			}else{
+				//Try to close connection. If failed, insert connection to unclosedConnections and try again later.
+				if(!this.closeConnection(con)){
+					unclosedConnections.push(con);
+					this.unclosedConnectionNumber++;
+				};
+				
+			}
+				
+		}
+		
+		if(!validConnection)
+			throw new SQLException("connectionLost");
+		
+		return con;
+		
+	};
+	
+	
+	
 	/**
 	 * Returns connection to the connection pool
 	 * @param dbConn
@@ -132,6 +185,35 @@ public class ConnectionPool {
 		this.availableConnectionsNumber++;
 			
 	};
+	
+	
+	/**
+	 * Closes all connections in connection pool.
+	 * @return true if all connections are closed, false otherwise.
+	 */
+	public boolean closeConnectionPool(){
+		
+		boolean status = true;
+		
+		while(this.availableConnectionsNumber > 0){
+			
+			Connection con = this.getConnectionFromPool();
+			
+			//Try to close connection at most 5 times
+			for(int i=0; i< 5; i++){
+				status = this.closeConnection(con);
+				if(status)
+					break;
+			}
+			
+			if(!status)
+				break;
+			
+		}
+		
+		return status;
+		
+	}
 	
 	
 }
