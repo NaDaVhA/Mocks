@@ -31,7 +31,7 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 	
-	
+	@Override
 	//similar to getSongID
 	public int getArtistID(String artist_name) throws SQLException
 	{
@@ -343,7 +343,7 @@ public class dbActions implements DBActionsInterface{
 		
 		String sql_query ="Select song_name, artist_name " + 
 				"From users, songs , artist_song , artists " +
-				"Where users.user_id=" + StringUserID + " And artist_song.song_id = users.status_song_id And songs.song_id = users.status_song_id And artists.artist_id = artist_song.artist_id "; 
+				"Where users.user_id=" + StringUserID + " And artists.artist_id = users.status_artist_id And artist_song.song_id = users.status_song_id And songs.song_id = users.status_song_id And artists.artist_id = artist_song.artist_id "; 
 		
 		ArrayList<String[]> result= executeQuery(sql_query,true);
 		
@@ -361,10 +361,10 @@ public class dbActions implements DBActionsInterface{
 	}
 
 	@Override
-	public boolean setUserStatusSong(int userID, int songID) throws SQLException {
+	public boolean setUserStatusSong(int userID, int songID , int artistID) throws SQLException {
 		
 		String sql_query ="UPDATE `users` " +
-				" set status_song_id = " + songID 
+				" set status_song_id = " + songID + ", status_artist_id =" + artistID
 				+ " where users.user_id =" + userID;
 		if (executeQuery(sql_query,false)==null)
 			return false; // true for  query is_select

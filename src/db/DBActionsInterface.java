@@ -66,7 +66,7 @@ public interface DBActionsInterface {
 	
 	public boolean addSongToUser(String user_name, String song_name,String artist_name) throws SQLException;
 	
-	public boolean setUserStatusSong(int userID, int songID) throws SQLException;
+	public boolean setUserStatusSong(int userID, int songID , int artistID) throws SQLException;
 	
 	//delete
 	
@@ -99,5 +99,7 @@ public interface DBActionsInterface {
 	public boolean updateMusicDB(String yagoFilesPath) throws SQLException;
 	
 	public void terminateConnectionToDB();
+
+	int getArtistID(String artist_name) throws SQLException;
 	
 }
