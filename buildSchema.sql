@@ -59,23 +59,26 @@ UNIQUE INDEX `category_name_UNIQUE` (`category_name` ASC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='categories_of_songs(category_id, category_name )';
 
 
-CREATE TABLE `artists` (
-  `artist_id` int(11) NOT NULL AUTO_INCREMENT,
-  `artist_name` varchar(100) DEFAULT NULL,
-  `artist_type` BIT NULL,
-  PRIMARY KEY (`artist_id`),
-UNIQUE INDEX `artist_name_UNIQUE` (`artist_name` ASC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='artists(artist_id, artist_name, artist_type)';
-
-
 CREATE TABLE `users` (
-  `user_id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_name` varchar(45) DEFAULT NULL,
-  `password` varchar(45) DEFAULT NULL,
-  `status_song_id` int(11) DEFAULT NULL,
+  `user_id` INT NOT NULL AUTO_INCREMENT,
+  `user_name` VARCHAR(45) NULL,
+  `password` VARCHAR(45) NULL,
+  `status_song_id` INT NULL,
+  `status_artist_id` INT NULL,
   PRIMARY KEY (`user_id`),
-UNIQUE INDEX `user_name_UNIQUE` (`user_name` ASC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='users(user_id, user_name , password , status_song_id)';
+  UNIQUE INDEX `user_name_UNIQUE` (`user_name` ASC),
+  INDEX `status_song_idx` (`status_song_id` ASC),
+  INDEX `status_artist_idx` (`status_artist_id` ASC),
+  CONSTRAINT `status_song`
+    FOREIGN KEY (`status_song_id`)
+    REFERENCES `songs` (`song_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `status_artist`
+    FOREIGN KEY (`status_artist_id`)
+    REFERENCES `artists` (`artist_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
 
 CREATE TABLE `songs` (
   `song_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -161,6 +164,22 @@ CONSTRAINT `user_id_user_artist`
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='userArtist(user_id,artist_id)';
 
+
+CREATE TABLE `users_friends` (
+  `user_id` INT NOT NULL,
+  `user_friend_id` INT NOT NULL,
+  PRIMARY KEY (`user_id`, `user_friend_id`),
+  INDEX `user_friend_id_users_friend_idx` (`user_friend_id` ASC),
+  CONSTRAINT `user_id_users_friend`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `users` (`user_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `user_friend_id_users_friend`
+    FOREIGN KEY (`user_friend_id`)
+    REFERENCES `users` (`user_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
 
 CREATE TABLE `user_songs` (
   `user_id` INT NOT NULL,

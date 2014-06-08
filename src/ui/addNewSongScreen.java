@@ -206,13 +206,18 @@ public class addNewSongScreen extends Screen{
 							//status_song=status;
 							if(checkConnection(getShell(), list.getLeft())){
 								result_list.removeAll();
-								for(Pair<String, String> s:list.getRight()){
-									TableItem item = new TableItem (result_list, SWT.NONE);
-									item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-									//item.setText(0, "artist "+s.getLeft());
-									//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
-									item.setText(0, s.getLeft());
-									item.setText(1, s.getRight());
+								if(list.getRight().isEmpty()){
+									PopUpinfo(getShell(), "Search results info", "The search results are empty!");
+								}
+								else{
+									for(Pair<String, String> s:list.getRight()){
+										TableItem item = new TableItem (result_list, SWT.NONE);
+										item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+										//item.setText(0, "artist "+s.getLeft());
+										//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
+										item.setText(0, s.getLeft());
+										item.setText(1, s.getRight());
+									}
 								}
 							}
 							else{ // problem want to cont..
@@ -247,11 +252,15 @@ public class addNewSongScreen extends Screen{
 					song_chosen=null;
 					text_to_search=search_box.getText();
 					System.out.println("qaqa - search with :"+text_to_search);
-								
+					if(text_to_search.isEmpty()){
+						errorPop("Search error", "You didnt enter any text to search.\nPlease enter text and try again.");
+					}
+					else{		
 					 openWaiting();			
 					 t8 = new Thread(new searchSongs());
 					 pool.add(t8);
 					 t8.start();
+					}
 					
 				}
 			});
@@ -270,7 +279,7 @@ public class addNewSongScreen extends Screen{
 			data6.width=200;
 			
 			data6.right = new FormAttachment (30, 0);
-			data6.bottom = new FormAttachment (25, 0);
+			data6.bottom = new FormAttachment (26, 0);
 			search_results_label.setLayoutData(data6);
 			
 			
@@ -294,9 +303,9 @@ public class addNewSongScreen extends Screen{
 			//result_list.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 			FormData data7 = new FormData ();
 			data7.width=304;
-			data7.height=100;
+			data7.height=250;
 			data7.right = new FormAttachment (64);
-			data7.bottom = new FormAttachment (45, 0);
+			data7.bottom = new FormAttachment (78, 0);
 			result_list.setLayoutData(data7);
 			result_list.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 			
@@ -375,7 +384,7 @@ public class addNewSongScreen extends Screen{
 			data8.width=324;
 			data8.height=26;
 			data8.right = new FormAttachment (64, 0);
-			data8.bottom = new FormAttachment (58, 0);
+			data8.bottom = new FormAttachment (88, 0);
 			add_song_button.setLayoutData(data8); 
 			add_song_button.addSelectionListener(new SelectionAdapter() {
 				@Override

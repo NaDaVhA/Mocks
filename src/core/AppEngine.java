@@ -209,16 +209,23 @@ public class AppEngine implements ApplicationInterface{
 	@Override
 	public Pair<Integer, Boolean> changeStatusSong(Pair<String,String> song) {
 	
-		boolean stat=true;
+		boolean stat=false;
 		String song_name = song.getRight();
+		String artist_name = song.getLeft();
 		
 		int user_id =this.user.getUserID();
-		int song_id;
+		int song_id, artist_id;
 		try {
 			
 			song_id = this.dbActionRunner.getSongID(song_name);
+			if (song_id == 0 ||song_id ==-1)
+				return new Pair<Integer, Boolean>(0, stat);
+			
+			artist_id = this.dbActionRunner.getArtistID(artist_name);
+			if (artist_id == 0 ||artist_id ==-1)
+				return new Pair<Integer, Boolean>(0, stat);
 		
-			stat = this.dbActionRunner.setUserStatusSong(user_id, song_id);
+			stat = this.dbActionRunner.setUserStatusSong(user_id, song_id, artist_id);
 			if (!stat)
 			{
 				return new Pair<Integer, Boolean>(0, stat);

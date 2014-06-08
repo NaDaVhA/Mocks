@@ -82,11 +82,14 @@ public void runApp(){
 		if(qaqa){
 			initUpdateScreen init=new initUpdateScreen(display,main_shell, nadav,"init");
 			init.createScreen();
+			//nadav.InitalizeRecommender();
 		}
 		else{//real code
 			initUpdateScreen init=new initUpdateScreen(display,main_shell, engine,"init");
 			init.createScreen();
+			
 		}
+		
 		
 		
 		logInScreen logIn=new logInScreen(display,main_shell,engine);
