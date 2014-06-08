@@ -35,6 +35,30 @@ public class AppEngine implements ApplicationInterface{
 	// 		Application's management code 
 	/////////////////////////////////////////////////
 	
+	
+	
+	/**
+	 * Checks database status.
+	 * @return true if database is initialized, false otherwise.
+	 */
+	public Pair<Integer, Boolean> checkInitializationStatus(){
+		
+		boolean status = false;
+		
+		try {
+			status = this.dbActionRunner.isDatabaseInitialized();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Pair<Integer, Boolean>(-1, false);
+		}
+
+		return new Pair<Integer, Boolean>(0, status);
+		
+	}
+	
+	
+	
 	/**
 	 * First, checks whether database is initialized. If needed - initializes application's database.
 	 * @return Pair<0,true> if succeeded, Pair<0,false> if not and Pair<-1,something>.

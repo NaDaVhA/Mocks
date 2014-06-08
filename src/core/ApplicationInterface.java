@@ -11,6 +11,12 @@ public interface ApplicationInterface {
 	 * all the functions return a pair the left element represent connection status
 	 */
 	
+	/**
+	 * Checks database status.
+	 * @return true if database is initialized, false otherwise.
+	 */
+	public Pair<Integer, Boolean> checkInitializationStatus();
+	
 	
 	/**
 	 * Initializes the application.
