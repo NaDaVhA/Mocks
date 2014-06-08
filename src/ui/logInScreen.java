@@ -150,7 +150,7 @@ public class logInScreen extends Screen {
 								disposeScreen(); //he is registerd!
 								//hideScreen();
 								
-								engine.InitalizeRecommender();
+								//engine.InitalizeRecommender(); //QAQA add this in seperate thread
 								
 								mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,getUsername_s());
 								mainScreen.createScreen();

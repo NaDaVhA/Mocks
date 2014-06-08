@@ -60,7 +60,7 @@ public class mainScreen extends Screen{
 		// TODO Auto-generated constructor stub
 		super(display, shell, engine);
 		this.username=username;
-	
+		
 	}
 	
 	
@@ -609,6 +609,9 @@ public class mainScreen extends Screen{
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed entertain me");
+				
+				
+				
 				RecomendationsScreen recomendationsScreen = new RecomendationsScreen(getDisplay(),getShell(),engine);
 				disposeScreen();
 				recomendationsScreen.createScreen();
