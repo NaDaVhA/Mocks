@@ -112,7 +112,6 @@ public class ConnectionPool {
 	}
 	
 	
-	
 	/**
 	 * Retrieves connection from connection pool. 
 	 * Connection is removed from pool.

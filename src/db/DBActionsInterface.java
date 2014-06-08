@@ -6,6 +6,12 @@ import java.util.ArrayList;
 
 public interface DBActionsInterface {
 
+	
+	/////////////////////////////
+	// 		Music Database 	
+	/////////////////////////////
+	
+	
 	//[song_name, song_id]
 	public ArrayList<String[]> getSongsList() throws SQLException;
 	
@@ -42,10 +48,6 @@ public interface DBActionsInterface {
 	public boolean disconnectUser(int userID) throws SQLException;
 	
 	
-	
-	
-	
-	
 	//[song_name, artist_name]
 	public ArrayList<String[]> getUserSongList(int userID) throws SQLException;
 	
@@ -56,8 +58,15 @@ public interface DBActionsInterface {
 	public String[] getUserStatusSong(int userID) throws SQLException;
 	
 	
-
-	//Users DB
+	int getArtistID(String artist_name) throws SQLException;
+	
+	
+	
+	/////////////////////////////
+	// 		Users Database 	
+	/////////////////////////////
+	
+	
 	
 	//adds
 	public boolean addFreindToUser(int userID, int userFreindID) throws SQLException;
@@ -91,7 +100,14 @@ public interface DBActionsInterface {
 	
 	
 	
-	//Database management	
+	/////////////////////////////
+	// Database management	
+	/////////////////////////////
+
+	
+	
+	public boolean isDatabaseInitialized() throws SQLException;
+	
 	public boolean initializeDatabase(String yagoFilesPath) throws SQLException;
 
 	public boolean buildMusicDB(String yagoFilesPath) throws SQLException;
@@ -100,6 +116,6 @@ public interface DBActionsInterface {
 	
 	public void terminateConnectionToDB();
 
-	int getArtistID(String artist_name) throws SQLException;
+
 	
 }

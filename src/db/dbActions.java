@@ -554,6 +554,37 @@ public class dbActions implements DBActionsInterface{
 	///////////////////////////////////////
 	
 	
+	/**
+	 * Checks whether the database is initialized or not.
+	 * Returns true if initialized, false otherwise.
+	 */
+	public boolean isDatabaseInitialized() throws SQLException{
+		
+		boolean status = false;
+		
+		Connection connection;
+		try {
+			connection = this.connectionPool.getConnectionFromPool();
+		} catch (SQLException e) {
+			// Connection is lost! Unable to get connection. Throw exception.
+			e.printStackTrace();
+			throw e;
+		}
+		
+		status = DataBaseManager.checkDatabaseStatus(connection);
+
+		this.connectionPool.returnConnectionToPool(connection);
+		
+		return status;
+		
+		
+	}
+	
+	
+	/**
+	 * Initializes the database. 
+	 * Builds the database from scratch or starts from the last successful point.
+	 */
 	public boolean initializeDatabase(String yagoFilesPath) throws SQLException{
 		
 		boolean status = true;
@@ -630,6 +661,10 @@ public class dbActions implements DBActionsInterface{
 	}
 
 
+	/**
+	 * Terminates the connection to the database, including closing all open connections from 
+	 * the connection pool.
+	 */
 	public void terminateConnectionToDB(){
 		
 		boolean status = this.connectionPool.closeConnectionPool();
@@ -637,6 +672,14 @@ public class dbActions implements DBActionsInterface{
 			System.out.println("Connection to database is lost. terminating application anyway.");
 	}
 
+	
+	
+	///////////////////////////////////////
+	// 		Other help methods
+	///////////////////////////////////////
+	
+	
+	
 	private String ConvertStringCharToLegal(String s)
 	{	
 		if (s == null)
@@ -644,6 +687,7 @@ public class dbActions implements DBActionsInterface{
 		String  ans = s.replaceAll("'","\\\\'");
 		return ans;
 	}
+	
 	
 	private int checkID(ArrayList<String[]> arrayList)
 	{

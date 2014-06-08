@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+
 import parsing.RawDataUnit;
 import parsing.yagoMiner;
 import ui.initUpdateScreen;
@@ -18,6 +19,7 @@ public class DataBaseManager {
 	
 	private static boolean qaqa = true;	
 	private static int progress = 5000;
+	
 	
 	///////////////////////////////////////
 	// 		Atomic database actions 
@@ -472,6 +474,25 @@ public class DataBaseManager {
 		}
 
 		return status;
+	}
+	
+	
+	/**
+	 * Checks whether the database is initialized.
+	 * @param connection
+	 * @return true if DB is initialized, false otherwise.
+	 */
+	public static boolean checkDatabaseStatus(Connection connection){
+		
+		int dbStatus = DataBaseManager.checkConfiguration(connection, "status", "general");
+		
+		if(dbStatus == 1){
+			return true;
+		}else{
+			return false;
+		}
+			
+
 	}
 	
 	

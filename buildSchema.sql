@@ -44,6 +44,15 @@ INSERT INTO `configuration` (`operation`) VALUES ('updateOp');
 
 
 
+CREATE TABLE `artists` (
+   `artist_id` int(11) NOT NULL AUTO_INCREMENT,
+   `artist_name` varchar(100) DEFAULT NULL,
+   `artist_type` BIT NULL,
+   PRIMARY KEY (`artist_id`),
+ UNIQUE INDEX `artist_name_UNIQUE` (`artist_name` ASC)
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='artists(artist_id, artist_name, artist_type)';
+
+
 CREATE TABLE `categories_of_artists` (
   `category_artist_id` int(11) NOT NULL AUTO_INCREMENT,
   `category_name` varchar(100) DEFAULT NULL,
@@ -58,18 +67,23 @@ CREATE TABLE `categories_of_songs` (
 UNIQUE INDEX `category_name_UNIQUE` (`category_name` ASC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='categories_of_songs(category_id, category_name )';
 
+CREATE TABLE `songs` (
+  `song_id` int(11) NOT NULL AUTO_INCREMENT,
+  `song_name` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`song_id`),
+UNIQUE INDEX `song_name_UNIQUE` (`song_name` ASC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='songs(song_id, song_name)';
+
 
 CREATE TABLE `users` (
-  `user_id` INT NOT NULL AUTO_INCREMENT,
-  `user_name` VARCHAR(45) NULL,
-  `password` VARCHAR(45) NULL,
-  `status_song_id` INT NULL,
-  `status_artist_id` INT NULL,
+`user_id` int(11) NOT NULL AUTO_INCREMENT,
+ `user_name` varchar(45) DEFAULT NULL,
+ `password` varchar(45) DEFAULT NULL,
+ `status_song_id` int(11) DEFAULT NULL,
+ `status_artist_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE INDEX `user_name_UNIQUE` (`user_name` ASC),
-  INDEX `status_song_idx` (`status_song_id` ASC),
-  INDEX `status_artist_idx` (`status_artist_id` ASC),
-  CONSTRAINT `status_song`
+    CONSTRAINT `status_song`
     FOREIGN KEY (`status_song_id`)
     REFERENCES `songs` (`song_id`)
     ON DELETE NO ACTION
@@ -79,13 +93,6 @@ CREATE TABLE `users` (
     REFERENCES `artists` (`artist_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
-
-CREATE TABLE `songs` (
-  `song_id` int(11) NOT NULL AUTO_INCREMENT,
-  `song_name` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`song_id`),
-UNIQUE INDEX `song_name_UNIQUE` (`song_name` ASC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='songs(song_id, song_name)';
 
 
 
@@ -169,7 +176,6 @@ CREATE TABLE `users_friends` (
   `user_id` INT NOT NULL,
   `user_friend_id` INT NOT NULL,
   PRIMARY KEY (`user_id`, `user_friend_id`),
-  INDEX `user_friend_id_users_friend_idx` (`user_friend_id` ASC),
   CONSTRAINT `user_id_users_friend`
     FOREIGN KEY (`user_id`)
     REFERENCES `users` (`user_id`)
@@ -186,8 +192,6 @@ CREATE TABLE `user_songs` (
   `song_id` INT NOT NULL,
   `artist_id` INT NOT NULL,
   PRIMARY KEY (`user_id`, `song_id`, `artist_id`),
-  INDEX `song_id_user_songs_idx` (`song_id` ASC),
-  INDEX `artist_id_user_songs_idx` (`artist_id` ASC),
   CONSTRAINT `user_id_user_songs`
     FOREIGN KEY (`user_id`)
     REFERENCES `users` (`user_id`)
