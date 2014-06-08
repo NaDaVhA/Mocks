@@ -11,6 +11,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -120,10 +121,12 @@ public class initUpdateScreen extends Screen{
 			@Override
 			public void run() {
 				zookini = getApp().initializeApplication();
+				//setFinished(true);
 
 				getDisplay().asyncExec(new Runnable() {
 				public void run() {
 					status=maximum+1;
+					setFinished(true);
 				/*	if(checkConnection(bar_shell,zookini.getLeft())){//no problem in connection
 						b = zookini.getRight();
 						System.out.println(b);
@@ -172,6 +175,7 @@ public class initUpdateScreen extends Screen{
 				getDisplay().asyncExec(new Runnable() {
 				public void run() {
 					status=maximum+1;
+					setFinished(true);
 				/*	if(checkConnection(bar_shell,zookini.getLeft())){//no problem in connection
 						b = zookini.getRight();
 						System.out.println(b);
@@ -240,47 +244,99 @@ public class initUpdateScreen extends Screen{
 							
 								bar.setSelection(status);
 							}
-							else{
+							else{ //finished
+								
 								System.out.println("QAQA finished!!!");
 								//status=maximum+1;
-								if(checkConnection(bar_shell,zookini.getLeft())){//no problem in connection
-									b = zookini.getRight();
-									System.out.println(b);
-									if(b){
-										
-										bar.setSelection(maximum);
-										//status=maximum+1;
-										if(type.compareTo("update")==0){
-											PopUpinfo(bar_shell,"Db update", "Finished to update db.");//qaqa
+								if(type.compareTo("update")==0){
+									
+									if(checkConnection(bar_shell,zookini.getLeft())){//no problem in connection
+										b = zookini.getRight();
+										//System.out.println(b);
+										if(b){
+											
+											bar.setSelection(maximum);
+											//status=maximum+1;
+										//	if(type.compareTo("update")==0){
+												PopUpinfo(bar_shell,"Db update", "Finished to update db.");//qaqa
+										//	}
+											//else{
+											//	PopUpinfo(bar_shell,"Db build", "Finished to build db.");//qaqa
+											//}
+											
+											//getShell().dispose();
+											bar_shell.dispose();
+											return;
+											
 										}
 										else{
-											PopUpinfo(bar_shell,"Db build", "Finished to build db.");//qaqa
+											
+										//	if(type.compareTo("update")==0){
+												PopUpinfo(bar_shell,"Db update", "Failed to update db.");//qaqa
+										//	}
+										//	else{
+										//		PopUpinfo(bar_shell,"Db build", "Failed to build db.");//qaqa
+										//	}
+											
+											//getShell().dispose();
+											//status=maximum+1; //qaqa 6.6
+											bar_shell.dispose();
+											return;
 										}
-										
-										//getShell().dispose();
-										bar_shell.dispose();
-										return;
-										
 									}
 									else{
-										
-										if(type.compareTo("update")==0){
-											PopUpinfo(bar_shell,"Db update", "Failed to update db.");//qaqa
-										}
-										else{
-											PopUpinfo(bar_shell,"Db build", "Failed to build db.");//qaqa
-										}
-										
-										//getShell().dispose();
-										//status=maximum+1; //qaqa 6.6
 										bar_shell.dispose();
 										return;
 									}
 								}
-								else{
-									bar_shell.dispose();
-									return;
+								
+							else{ //type = init
+									if(checkConnectionInit(bar_shell, zookini.getLeft())){
+										b = zookini.getRight();
+										//System.out.println(b);
+										if(b){
+											
+											bar.setSelection(maximum);
+											//status=maximum+1;
+										//	if(type.compareTo("update")==0){
+											//	PopUpinfo(bar_shell,"Db update", "Finished to update db.");//qaqa
+										//	}
+											//else{
+												PopUpinfo(bar_shell,"Db build", "Finished to build db.");//qaqa
+											//}
+											
+											//getShell().dispose();
+											bar_shell.dispose();
+											return;
+											
+										}
+										else{
+											
+										//	if(type.compareTo("update")==0){
+											//	PopUpinfo(bar_shell,"Db update", "Failed to update db.");//qaqa
+										//	}
+										//	else{
+												PopUpinfo(bar_shell,"Db build", "Failed to build db.");//qaqa
+										//	}
+											
+											//getShell().dispose();
+											//status=maximum+1; //qaqa 6.6
+												//qaqa maybe exit here???
+											bar_shell.dispose();
+											return;
+										}
+									}
+									else{
+										getDisplay().dispose();
+										System.exit(0);
+										
+									}
 								}
+									
+									
+									
+								//}
+								
 						
 								
 							}
@@ -322,6 +378,21 @@ public class initUpdateScreen extends Screen{
 	protected void showScreen() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	protected boolean checkConnectionInit(Shell shell,int conection_value){
+		//boolean val=true;
+		if(conection_value==0){
+			return true;
+		}
+		else{
+			MessageBox messageBox =   new MessageBox(shell, SWT.OK| SWT.ICON_WARNING);
+			messageBox.setText("Connection Problem");
+			messageBox.setMessage("Connection to the db was lost.\nThe program will exit, please fix the problem and try again.");
+			if(messageBox.open()==SWT.OK)
+				return false;
+				else return false;
+		}	
 	}
 
 }
