@@ -176,6 +176,12 @@ public interface DBActionsInterface {
 	 */
 	public void terminateConnectionToDB();
 
+	public Boolean send_massage(int username_send_id, int username_receive_id,
+			String msg) throws SQLException;
+
+	public ArrayList<String[]> get_history_massage(int username_send_id,
+			int username_receive_id,String sender_name, String receiver_name ) throws SQLException;
+
 
 	
 }

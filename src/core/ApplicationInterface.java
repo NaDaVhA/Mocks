@@ -187,14 +187,6 @@ public interface ApplicationInterface {
 
 	
 	
-	/**
-	 * @param username_send
-	 * @param username_receive
-	 * @return null if it is not work, String is the massage
-	 */
-	public Pair<Integer, String> receiveMassage(String username_send,String username_receive);
-
-	
 
 	/**
 	 * @param username_send
