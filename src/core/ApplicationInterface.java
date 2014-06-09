@@ -20,7 +20,8 @@ public interface ApplicationInterface {
 	
 	/**
 	 * Initializes the application.
-	 * @return true if succeeded, false otherwise.
+	 * @return true if succeeded, false otherwise. 
+	 * Special return value: int = -1 if connection error, -2 if Path Error. 
 	 */
 	public Pair<Integer, Boolean> initializeApplication();
 	
@@ -36,6 +37,7 @@ public interface ApplicationInterface {
 	/**
 	 * Updates  the application's music database.
 	 * @return true if succeeded, false otherwise.
+	 * Special return value: int = -1 if connection error, -2 if Path Error. 
 	 */
 	public Pair<Integer, Boolean> updateMusicDatabase();
 	

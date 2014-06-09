@@ -1,6 +1,7 @@
 package core;
 
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,12 @@ public class AppEngine implements ApplicationInterface{
 		
 		String yagoFilesPath =  Configurator.getYagoFolderPath("projectConfig.xml", false); 
 		
+		File f = new File(yagoFilesPath);
+		if(!f.exists()){
+			System.out.println("checkInitializationStatus: Error in given path: " + yagoFilesPath);
+			return new Pair<Integer, Boolean>(-2, false);
+		}
+		
 		try {
 			status = this.dbActionRunner.initializeDatabase(yagoFilesPath);
 		} catch (SQLException e) {
@@ -96,10 +103,16 @@ public class AppEngine implements ApplicationInterface{
 		
 		boolean status = true;
 		
-		String yagoFilesPath =  Configurator.getYagoFolderPath("projectConfig.xml", true); 
+		String yagoUpdateFilesPath =  Configurator.getYagoFolderPath("projectConfig.xml", true); 
+		
+		File f = new File(yagoUpdateFilesPath);
+		if(!f.exists()){
+			System.out.println("updateMusicDatabase: Error in given path: " + yagoUpdateFilesPath);
+			return new Pair<Integer, Boolean>(-2, false);
+		}
 		
 		try {
-			status = this.dbActionRunner.updateMusicDB(yagoFilesPath);
+			status = this.dbActionRunner.updateMusicDB(yagoUpdateFilesPath);
 		} catch (SQLException e) {
 			// Connection is lost.
 			System.out.println("updateMusicDatabase: Connection exception.");
