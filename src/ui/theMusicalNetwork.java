@@ -32,7 +32,7 @@ public class theMusicalNetwork {
 	private boolean init=false;
 	
 	public static NadavDevelopmentClass nadav;  //qaqa this  design is not good
-	public static boolean qaqa=true;
+	public static boolean qaqa=false;
 
 
 
