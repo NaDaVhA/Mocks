@@ -587,7 +587,6 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 	
-
 	public boolean initializeDatabase(String yagoFilesPath) throws SQLException{
 		
 		boolean status = true;
@@ -610,7 +609,6 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 
-
 	public boolean buildMusicDB(String yagoFilesPath) throws SQLException{
 		
 		Connection connection = null;
@@ -631,7 +629,6 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 	
-
 	public boolean updateMusicDB(String yagoFilesPath) throws SQLException{
 		
 		Connection connection;
@@ -652,7 +649,6 @@ public class dbActions implements DBActionsInterface{
 	}
 
 
-	
 	public void terminateConnectionToDB(){
 		
 		boolean status = this.connectionPool.closeConnectionPool();
