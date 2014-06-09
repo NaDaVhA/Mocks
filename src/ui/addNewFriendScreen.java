@@ -119,7 +119,6 @@ public class addNewFriendScreen extends Screen {
 						 list_p=engine.getSearchResultsFriends(name_to_search);
 					}
 					
-					//final  ArrayList<String> list=engine.getSearchResultsFriends(name_to_search);
 					getDisplay().asyncExec(new Runnable() {
 						public void run() {
 							//status_song=status;
@@ -134,9 +133,9 @@ public class addNewFriendScreen extends Screen {
 									}
 								}
 							}
-							else{
+							else{ //Connection not good but user want to continue
 								
-								
+								//dont change the screen just return
 							}
 							
 							
@@ -231,19 +230,19 @@ public class addNewFriendScreen extends Screen {
 							public void run() {
 								//status_song=status;
 								if(checkConnection(getShell(),friend_song.getLeft())&&checkConnection(getShell(),list_p.getLeft())){
+									
 									friend_status_song.setText(friend_song.getRight().getLeft()+" "+friend_song.getRight().getRight());
 									
 									for(Pair<String, String> s:list_p.getRight()){
 										TableItem item = new TableItem (friend_songs, SWT.NONE);
 										item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-										//item.setText(0, "artist "+s.getLeft());
 										item.setText(0, s.getLeft());
-										//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
 										item.setText(1, s.getRight());
 									}	
 								}
-								else{
+								else{//connection is not good and want to stay
 									
+									//do nothing stay in the screen
 								}
 								
 								//
@@ -273,7 +272,7 @@ public class addNewFriendScreen extends Screen {
 		friend_result_list.addListener(SWT.Selection, new Listener () {
 			@Override
 			public void handleEvent (Event event) {
-				//System.out.println(event.data);//qaqa
+				
 				int[] selection = friend_result_list.getSelectionIndices();
 				
 				for (int i=0; i<selection.length; i++) {
@@ -373,8 +372,7 @@ public class addNewFriendScreen extends Screen {
 				else{
 					add=engine.addFriend(friend_name_to_show);
 				}
-				//final boolean add=theMusicalNetwork.nadav.addFriend(friend_name_to_show);
-				//final boolean add=engine.addFriend(friend_name_to_show);
+				
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;
@@ -391,17 +389,16 @@ public class addNewFriendScreen extends Screen {
 								if(pool.isEmpty()){
 									closeWaiting();
 									showScreen();
-									PopUpinfo(getShell(),"added Friend", "qaqa-succes!!!");
+									PopUpinfo(getShell(),"Added Friend", "The friend was added to your friend list successfully!");
 								}
 								
 							}
 						}
-						else{
+						else{//connection is not good and want to stay
 							pool.remove(t7);
 							if(pool.isEmpty()){
 								closeWaiting();
 								showScreen();
-								//PopUpinfo(getShell(),"added Friend", "qaqa-succes!!!");
 							}
 						}
 				
@@ -424,8 +421,8 @@ public class addNewFriendScreen extends Screen {
 		add_friend_button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				//System.out.println("qaqa - pressed add friend");
-				System.out.println("qaqa - pressed add friend - "+friend_name_to_show);
+				
+			//	System.out.println("qaqa - pressed add friend - "+friend_name_to_show);
 
 				if(friend_name_to_show.compareTo("")==0){
 					errorPop("Error", "Please selet a friend first.");

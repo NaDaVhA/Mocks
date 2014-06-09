@@ -25,6 +25,8 @@ public abstract class Screen {
 
 	protected Set<Thread> pool;
 	
+
+	
 	
 	/**
 	 * CTOR
@@ -36,6 +38,7 @@ public abstract class Screen {
 		this.shell=shell;
 		this.engine=engine;
 		pool=new HashSet<Thread>();
+		
 	}
 	
 	/**
@@ -102,20 +105,24 @@ public abstract class Screen {
 	 * @return true if no problem , false if problem and want to continue
 	 */
 	protected boolean checkConnection(Shell shell,int conection_value){
-		boolean val=true;
+		boolean val;
+		System.out.println("QAQA - CONNECTION VALUE: "+conection_value);
 		if(conection_value==0){
 			return true;
 		}
 		else{
+			
 			val=PopUpWarning(shell,"Connection Problem", "Connection to the db was lost.\nPlease fix your connection and press ok to try again\n or cancel to exit the program.");
 			if(val){
 				return false;
 			}
 			else{
 				display.dispose();
+				engine.terminateDBConnection();//qaqa - i think it not necessary because there is no connection!!
 				System.exit(0);
 				return val;
 			}
+			
 		}	
 	}
 	

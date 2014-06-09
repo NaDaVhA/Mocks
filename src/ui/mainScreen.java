@@ -119,7 +119,12 @@ public class mainScreen extends Screen{
 							}
 						}
 						else{
-							//back to log in
+							//qaqa back to log in
+							pool.remove(t1);
+							disposeScreen();
+							logInScreen logIn=new logInScreen(getDisplay(),getShell(),engine);
+							logIn.createScreen();
+							
 							
 							
 						}
@@ -152,8 +157,7 @@ public class mainScreen extends Screen{
 
 			@Override
 			public void run() {
-				//final Pair<String,String> status=theMusicalNetwork.nadav.getStatusSong(username);
-				//final Pair<String,String> status=engine.getStatusSong(username); //1.6.14
+		
 				final boolean status;
 				if(theMusicalNetwork.qaqa){
 					status=theMusicalNetwork.nadav.signOutUser(theMusicalNetwork.nadav.getUsername());
@@ -161,11 +165,10 @@ public class mainScreen extends Screen{
 				else{ //real code
 					 status=engine.signOutUser(engine.getUsername());
 				}
-				//final Pair<String,String> status=engine.getStatusSong();
+				
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						//status_song=status;	
-						//Thread.currentThread();
+						
 						disposeScreen();
 						logInScreen logIn=new logInScreen(getDisplay(),getShell(),engine);
 						logIn.createScreen();
@@ -174,7 +177,7 @@ public class mainScreen extends Screen{
 						if(pool.isEmpty()){
 							
 							closeWaiting();
-							//showScreen();
+							
 						}
 					}
 				});
@@ -233,7 +236,7 @@ public class mainScreen extends Screen{
 			@Override
 			public void run() {
 				
-				//final boolean b=theMusicalNetwork.nadav.changeStatusSong(username, song_selcted_table);
+				
 				final Pair<Integer,Boolean> b;
 				if(theMusicalNetwork.qaqa){
 					b=theMusicalNetwork.nadav.changeStatusSong(song_selcted_table);
@@ -241,7 +244,7 @@ public class mainScreen extends Screen{
 				else{
 					b=engine.changeStatusSong(song_selcted_table);
 				}
-				//final boolean b=engine.changeStatusSong(song_selcted_table);
+				
 				
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
@@ -250,7 +253,7 @@ public class mainScreen extends Screen{
 							if(b.getRight()){
 								status_song_label.setText("Status song:  "+song_selcted_table.getLeft()+" "+song_selcted_table.getRight());
 								updateStatusSong(song_selcted_table);
-								//Thread.currentThread();
+								
 									pool.remove(t4);
 									if(pool.isEmpty()){
 										
@@ -338,8 +341,7 @@ public class mainScreen extends Screen{
 		recommend_me.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed recommend_me");
-
+				
 				RecomendationsScreen recomendationsScreen = new RecomendationsScreen(getDisplay(),getShell(),engine);
 				disposeScreen();
 				recomendationsScreen.createScreen();
@@ -366,10 +368,10 @@ public class mainScreen extends Screen{
 		songList_t.addListener(SWT.Selection, new Listener () {
 			@Override
 			public void handleEvent (Event event) {
-				System.out.println(event.item);//qaqa
+				//System.out.println(event.item);//qaqa
 				TableItem item=(TableItem)event.item;
-				System.out.println(item.getText(0));//qaqa
-				System.out.println(item.getText(1));//qaqa
+				//System.out.println(item.getText(0));//qaqa
+				//System.out.println(item.getText(1));//qaqa
 				Pair<String, String> s=new Pair<String, String>(item.getText(0), item.getText(1));
 				song_selcted_table=s;
 			}
@@ -414,7 +416,6 @@ public class mainScreen extends Screen{
 								//qaqa remove the item from table and update atble
 								songList_t.remove(songList_t.getSelectionIndices());
 										
-								
 									pool.remove(t6);
 									if(pool.isEmpty()){
 										
@@ -430,8 +431,7 @@ public class mainScreen extends Screen{
 										showScreen();
 										errorPop("Error", "Failed to delete song");
 									}
-									
-									
+										
 								}
 						}
 						
@@ -643,7 +643,6 @@ public class mainScreen extends Screen{
 			@Override
 			public void run() {
 				
-			//	final ArrayList<Pair<String,String>> f= engine.getSongList(username); //1.6.14
 				final Pair<Integer, java.util.List<Pair<String, String>>> f;
 				if(theMusicalNetwork.qaqa){
 					f=  theMusicalNetwork.nadav.getSongList("TT");
@@ -700,8 +699,13 @@ public class mainScreen extends Screen{
 								showScreen();
 							}
 						}
-						else{
+					
+						else{//problem with connection
 							//back to log in
+							pool.remove(t2);
+							disposeScreen();
+							logInScreen logIn=new logInScreen(getDisplay(),getShell(),engine);
+							logIn.createScreen();
 						}
 						
 				
@@ -764,6 +768,10 @@ public class mainScreen extends Screen{
 						}
 						else{
 							//back to log in
+							pool.remove(t3);
+							disposeScreen();
+							logInScreen logIn=new logInScreen(getDisplay(),getShell(),engine);
+							logIn.createScreen();
 						}
 					}
 				});
@@ -785,6 +793,9 @@ public class mainScreen extends Screen{
 	
 	@Override
 	protected void disposeScreen(){
+		this.c.dispose();
+		this.c1.dispose();
+		this.c2.dispose();
 		this.add_new_friend.dispose();
 		this.add_new_song.dispose();
 		this.change_status_song.dispose();
@@ -800,9 +811,7 @@ public class mainScreen extends Screen{
 		//this.recommendBtn.dispose();
 		this.delete_friend.dispose();
 		this.delete_song.dispose();
-		this.c.dispose();
-		this.c1.dispose();
-		this.c2.dispose();
+
 	}
 
 

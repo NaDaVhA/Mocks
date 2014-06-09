@@ -241,9 +241,9 @@ public class signUpScreen extends Screen{
 				setUsername(user.getText());
 				setPassword(pass.getText());
 				setPasswordRepeat(R_pass.getText());
-				System.out.println("qaqa - username: "+signUpScreen.this.username_s); //qaqa
-				System.out.println("qaqa - pass: "+signUpScreen.this.password_s); //qaqa
-				System.out.println("qaqa - pass repeat: "+signUpScreen.this.password_repeat_s); //qaqa
+				//System.out.println("qaqa - username: "+signUpScreen.this.username_s); //qaqa
+				//System.out.println("qaqa - pass: "+signUpScreen.this.password_s); //qaqa
+				//System.out.println("qaqa - pass repeat: "+signUpScreen.this.password_repeat_s); //qaqa
 				if(signUpScreen.this.password_s.compareTo(signUpScreen.this.password_repeat_s)!=0){
 					errorPop("Sign up Error", "Passwords doesnt match.\nPlease try again.");
 				}

@@ -41,6 +41,8 @@ public class viewFriendScreen extends Screen {
 		
 	private Button back_button=null;
 	
+	
+	
 	private Composite c=null;
 	private Composite c1=null;
 	private Composite c2=null;
@@ -69,8 +71,7 @@ private Thread t11,t12,t13,t14,t15;
 
 			@Override
 			public void run() {
-				//final Pair<String,String> status=theMusicalNetwork.nadav.getStatusSong(username);
-				//final Pair<String,String> status=engine.getStatusSong(username); //1.6.14
+				
 				final Pair<Integer,Pair<String,String>> status;
 				if(theMusicalNetwork.qaqa){
 					status=theMusicalNetwork.nadav.getStatusSong(friend_user_name);
@@ -78,7 +79,7 @@ private Thread t11,t12,t13,t14,t15;
 				else{ //real code
 					 status=engine.getStatusSong(friend_user_name);
 				}
-				//final Pair<String,String> status=engine.getStatusSong();
+				
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;
@@ -210,8 +211,7 @@ private Thread t11,t12,t13,t14,t15;
 								//friendList.add (s);
 								TableItem item = new TableItem (songList_t, SWT.NONE);
 								item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-								//item.setText(0, "artist "+s.getLeft());
-								//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
+															
 								item.setText(0, s.getLeft());
 								item.setText(1, s.getRight());
 							}
@@ -316,14 +316,21 @@ private Thread t11,t12,t13,t14,t15;
 									if(pool.isEmpty()){
 										closeWaiting();
 										showScreen();
-										PopUpinfo(getShell(),"added song", "qaqa-succes!!!");
+										PopUpinfo(getShell(),"Added Song", "The song was added to your song list successfully!");
 									}
 									
 								}	
 							}
 							
 							else{//want to cont.
-								
+								//stay in screen
+								//popSync=false;
+								pool.remove(t14);
+								if(pool.isEmpty()){
+									closeWaiting();
+									showScreen();
+									
+								}
 							}
 							
 
@@ -414,14 +421,15 @@ private Thread t11,t12,t13,t14,t15;
 							showScreen();
 						}
 					}
-					else{
+					else{ //no connection and want to continue
 						pool.remove(t13);
-						
-						System.out.println(pool.size());
-						if(pool.isEmpty()){
-							
-							closeWaiting();
-							showScreen();
+						if(theMusicalNetwork.qaqa){
+							mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,"a");
+							mainScreen.createScreen();
+						}
+						else{
+						mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername());
+						mainScreen.createScreen();
 						}
 					}
 					

@@ -180,8 +180,6 @@ public class addNewSongScreen extends Screen{
 									for(Pair<String, String> s:list.getRight()){
 										TableItem item = new TableItem (result_list, SWT.NONE);
 										item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-										//item.setText(0, "artist "+s.getLeft());
-										//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
 										item.setText(0, s.getLeft());
 										item.setText(1, s.getRight());
 									}
@@ -189,6 +187,7 @@ public class addNewSongScreen extends Screen{
 							}
 							else{ // problem want to cont..
 								
+								//do nothing just stay in the screen
 							}
 							
 							
@@ -276,7 +275,7 @@ public class addNewSongScreen extends Screen{
 		result_list.addListener(SWT.Selection, new Listener () {
 			@Override
 			public void handleEvent (Event event) {
-				//System.out.println(event.data);//qaqa
+			
 				int [] selection = result_list.getSelectionIndices ();
 				
 				for (int i=0; i<selection.length; i++) {
@@ -302,8 +301,7 @@ public class addNewSongScreen extends Screen{
 				else{//true code
 					b=engine.addSong(song_chosen.getRight(),song_chosen.getLeft());
 				}
-				//final boolean b=theMusicalNetwork.nadav.addSong("qaqa", song_chosen.getLeft(), song_chosen.getRight());
-				//final boolean b=engine.addSong(song_chosen.getLeft(), song_chosen.getRight());
+				;
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						//status_song=status;
@@ -320,13 +318,14 @@ public class addNewSongScreen extends Screen{
 								if(pool.isEmpty()){
 									closeWaiting();
 									showScreen();
-									PopUpinfo(getShell(),"added song", "qaqa-succes!!!");
+									PopUpinfo(getShell(),"Added Song", "The song was added to your song list successfully!");
 								}
 							}
 						}
 						
 						else{ //problem with connection want to cont..
 							
+							//do nothing - stay on the screen
 						}
 				
 					

@@ -125,8 +125,7 @@ public class logInScreen extends Screen {
 				else{//real code
 					isUserRegisterd=engine.isUserRegisterd(getUsername_s(), getPassword_s());
 				}
-				//final boolean isUserRegisterd=theMusicalNetwork.nadav.isUserRegisterd(getUsername_s(), getPassword_s());
-				//final boolean isUserRegisterd=engine.isUserRegisterd(getUsername_s(), getPassword_s());
+		
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						if(checkConnection(getShell(),isUserRegisterd.getLeft())){ //want to try again
@@ -179,8 +178,6 @@ public class logInScreen extends Screen {
 				setUsername_s(user.getText());
 				setPassword_s(pass.getText());
 				
-				//System.out.println(getUsername_s());//qaqa
-				//System.out.println(getPassword_s());//qaqa
 				
 				if(getUsername_s().isEmpty() || getPassword_s().isEmpty()){
 					errorPop("Log in Error", "Username or password fields are empty.");
