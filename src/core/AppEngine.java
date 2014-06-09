@@ -556,20 +556,35 @@ public class AppEngine implements ApplicationInterface{
 	//////////////////////////////////
 	
 
-	@Override
-	public Pair<Integer, String> receiveMassage(String username_send,
-			String username_receive) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
 
 	@Override
 	public Pair<Integer, Boolean> sendMassage(String username_send,
 			String username_receive, String msg) {
-		// TODO Auto-generated method stub
-		return null;
+		boolean status = false;
+		
+		try {
+			
+			int username_send_id = this.dbActionRunner.getUserId(username_send);
+			if (username_send_id == -1 || username_send_id == 0)
+				return new Pair<Integer, Boolean>(0, status);
+			
+			
+			int username_receive_id = this.dbActionRunner.getUserId(username_receive);
+			if (username_receive_id == -1 || username_receive_id == 0)
+				return new Pair<Integer, Boolean>(0, status);
+			
+			status = this.dbActionRunner.send_massage(username_send_id,username_receive_id,msg);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Pair<Integer, Boolean>(-1, status);
+		}
+		
+		return new Pair<Integer, Boolean>(0, status);
+		
 	}
 
 
@@ -577,10 +592,29 @@ public class AppEngine implements ApplicationInterface{
 	@Override
 	public Pair<Integer, ArrayList<String[]>> getHistoryMassages(
 			String username_send, String username_receive) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		ArrayList<String[]> msgHistory = new ArrayList<String[]>();
+		try {
+			
+			int username_send_id = this.dbActionRunner.getUserId(username_send);
+			if (username_send_id == -1 || username_send_id == 0)
+				return new Pair<Integer, ArrayList<String[]>>(0, null);
+			
+			
+			int username_receive_id = this.dbActionRunner.getUserId(username_receive);
+			if (username_receive_id == -1 || username_receive_id == 0)
+				return new Pair<Integer, ArrayList<String[]>>(0, null);
+			
+			msgHistory = this.dbActionRunner.get_history_massage(username_send_id,username_receive_id,username_send,username_receive);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new Pair<Integer, ArrayList<String[]>>(-1, msgHistory);
+		}
+		
+		return new Pair<Integer, ArrayList<String[]>>(0, msgHistory);
 	}
-
 
 	
 	
