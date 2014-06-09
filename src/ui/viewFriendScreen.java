@@ -312,11 +312,12 @@ private Thread t11,t12,t13,t14,t15;
 								}
 								else{
 									
+									PopUpinfo(getShell(),"Added Song", "The song was added to your song list successfully!");
 									pool.remove(t14);
 									if(pool.isEmpty()){
 										closeWaiting();
 										showScreen();
-										PopUpinfo(getShell(),"Added Song", "The song was added to your song list successfully!");
+										
 									}
 									
 								}	
@@ -500,7 +501,7 @@ private Thread t11,t12,t13,t14,t15;
 							if(pool.isEmpty()){
 								closeWaiting();
 								showScreen();
-								PopUpinfo(getShell(),"added Friend", "qaqa-succes!!!");
+								PopUpinfo(getShell(),"Add Friend", "The friend was added to your friend list successfully!!");
 							}
 							
 						}
