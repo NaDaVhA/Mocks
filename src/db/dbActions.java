@@ -13,14 +13,18 @@ public class dbActions implements DBActionsInterface{
 	private boolean qaqa = false;
 	private ConnectionPool connectionPool;
 
+	
 	//Constructor
 	public dbActions(ConnectionPool cp){
 		
 		this.connectionPool = cp;
 	}
 	
+
+
 	/**
-	 * 
+	 * Returns a list of all the songs in the database.
+	 * @return 
 	 */
 	public ArrayList<String[]> getSongsList() throws SQLException{
 		
@@ -32,7 +36,6 @@ public class dbActions implements DBActionsInterface{
 	
 	
 	@Override
-	//similar to getSongID
 	public int getArtistID(String artist_name) throws SQLException
 	{
 		String artist_name_c = ConvertStringCharToLegal(artist_name);
@@ -288,13 +291,23 @@ public class dbActions implements DBActionsInterface{
 	//needcheck
 	//PORBLEM:  false on not - matching and also failurQuery..
 	@Override
-	public boolean authenticateUser(String username, String password) throws SQLException {
+	public boolean authenticateUser(String username, String password) throws SQLException{
 		
 		String sql_query ="Select user_name " + 
 				"From users " +
 				"Where users.user_name= '" + username + "' AND users.password= '" + password + "'";
 		
-		ArrayList<String[]> result= executeQuery(sql_query,true);
+		
+		ArrayList<String[]> result;
+		try {
+			result = executeQuery(sql_query,true);
+		} catch (SQLException e) {
+			System.out.println("authenticateUser: Connection exception.");
+			e.printStackTrace();
+			throw e;
+		}
+		
+		System.out.println("authenticateUser: DID IT!!!");
 		
 		if (result == null)
 		{
@@ -495,51 +508,47 @@ public class dbActions implements DBActionsInterface{
 		boolean loopAround = true;
 		Connection connection = null;
 		
-		while(loopAround){
+		
+		//Try to get connection from pool
+		try {
+			connection = this.connectionPool.getConnectionFromPool();
+			loopAround = false;
+		} catch (SQLException e1) {
+			// Connection is lost! Unable to get connection. Throw exception.
+			System.out.println("executeQuery: Connection exception.");
+			e1.printStackTrace();
+			throw e1;
+		}
+
+
+		System.out.println("executeQuery: Got connection.");
+
+		//Execute query
+		try {
+
+			stmt = connection.createStatement();
 			
-			try {
-				
-				//Try to get connection from pool
-				try {
-					connection = this.connectionPool.getConnectionFromPool();
-				} catch (SQLException e1) {
-					// Connection is lost! Unable to get connection. Throw exception.
-					e1.printStackTrace();
-					throw e1;
-				}
-				
-				
-				stmt = connection.createStatement();
-				
-				if (is_Select)
-				{
-					rs = stmt.executeQuery(sql_query);
-					String[] SelectCol = parseSelectQuery(sql_query);
-					int  SelectColLength = SelectCol.length;
-					List = ReturnSelectQuery(rs,SelectColLength,SelectCol);
-				}
-				else
-				{
-					stmt.executeUpdate(sql_query);
-					
-				}
-				
-				loopAround = false;
-				
-			} catch (SQLException e) {
-				
-				List=null;
-				System.out.println("ERROR execute_query_Failed - " + e.getMessage());
-				
-				if(connection.isValid(0)){
-					loopAround = false;
-				}
-			
-			} finally {
-				this.connectionPool.returnConnectionToPool(connection);
-				DataBaseManager.safelyClose(stmt, rs);
+			if (is_Select)
+			{
+				rs = stmt.executeQuery(sql_query);
+				String[] SelectCol = parseSelectQuery(sql_query);
+				int  SelectColLength = SelectCol.length;
+				List = ReturnSelectQuery(rs,SelectColLength,SelectCol);
 			}
+			else
+			{
+				stmt.executeUpdate(sql_query);
 				
+			}
+						
+		} catch (SQLException e) {
+			
+			List=null;
+			System.out.println("ERROR execute_query_Failed - " + e.getMessage());
+		
+		} finally {
+			this.connectionPool.returnConnectionToPool(connection);
+			DataBaseManager.safelyClose(stmt, rs);
 		}
 		
 	
@@ -553,11 +562,8 @@ public class dbActions implements DBActionsInterface{
 	// 		Database manager code
 	///////////////////////////////////////
 	
+
 	
-	/**
-	 * Checks whether the database is initialized or not.
-	 * Returns true if initialized, false otherwise.
-	 */
 	public boolean isDatabaseInitialized() throws SQLException{
 		
 		boolean status = false;
@@ -581,10 +587,7 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 	
-	/**
-	 * Initializes the database. 
-	 * Builds the database from scratch or starts from the last successful point.
-	 */
+
 	public boolean initializeDatabase(String yagoFilesPath) throws SQLException{
 		
 		boolean status = true;
@@ -607,13 +610,7 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 
-	/**
-	 * Builds the music database.
-	 * @param connection
-	 * @param yagoFilesPath - path to the Yago files.
-	 * @return true if succeeded, false otherwise.
-	 * @throws SQLException 
-	 */
+
 	public boolean buildMusicDB(String yagoFilesPath) throws SQLException{
 		
 		Connection connection = null;
@@ -634,13 +631,7 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 	
-	/**
-	 * Updates the music database.
-	 * @param connection
-	 * @param yagoFilesPath - path to the Yago files.
-	 * @return true if succeeded, false otherwise.
-	 * @throws SQLException 
-	 */
+
 	public boolean updateMusicDB(String yagoFilesPath) throws SQLException{
 		
 		Connection connection;
@@ -661,10 +652,7 @@ public class dbActions implements DBActionsInterface{
 	}
 
 
-	/**
-	 * Terminates the connection to the database, including closing all open connections from 
-	 * the connection pool.
-	 */
+	
 	public void terminateConnectionToDB(){
 		
 		boolean status = this.connectionPool.closeConnectionPool();

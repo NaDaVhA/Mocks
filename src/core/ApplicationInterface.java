@@ -183,7 +183,34 @@ public interface ApplicationInterface {
 	
 	public void InitalizeRecommender();
 
+	
+	
+	/**
+	 * @param username_send
+	 * @param username_receive
+	 * @return null if it is not work, String is the massage
+	 */
+	public Pair<Integer, String> receiveMassage(String username_send,String username_receive);
 
+	
+
+	/**
+	 * @param username_send
+	 * @param username_receive
+	 * @return false if it is not work
+	 */
+	public Pair<Integer, Boolean> sendMassage(String username_send,String username_receive,String msg);
+
+
+
+	/**
+	 * @param username_send
+	 * @param username_receive
+	 * @return String[sender name, receiver name, msg] 
+	 * if there is not history it is empty array (you can check its size..) if there was a problem it is null..
+	 * the Integer is as * usual
+	 */
+	public Pair<Integer, ArrayList<String[]>> getHistoryMassages(String username_send,String username_receive);
 
 	
 	
