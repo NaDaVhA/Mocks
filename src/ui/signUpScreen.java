@@ -5,7 +5,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -31,6 +34,7 @@ public class signUpScreen extends Screen{
 	private Label R_password=null;
 	private  Text R_pass=null;
 	private Button signUp=null;
+	private Composite c;
 	
 	public signUpScreen(Display display,Shell shell,ApplicationInterface engine) {
 		// TODO Auto-generated constructor stub
@@ -63,81 +67,112 @@ public class signUpScreen extends Screen{
 		data.right = new FormAttachment (100, 0);
 		headline.setLayoutData(data);
 		
+		 c=new Composite(getShell(), SWT.NONE);
+			c.setLayout(new GridLayout(2, false));
+			
+			FormData data1 = new FormData ();
+			data1.width=300;
+			data1.height=150;
+			data1.top= new FormAttachment (headline, 200);
+			data1.right = new FormAttachment (headline,900);
+			
+			c.setLayoutData(data1);
 		
-		username= new Label(getShell(), SWT.NONE);
+		
+		username= new Label(c, SWT.NONE);
 		username.setAlignment(SWT.CENTER);
 		username.setText("Select Username:");
 		username.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		username.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
+		username.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+		
 		//username.setFont(SWTResourceManager.getFont("David", 12, SWT.BOLD));
-		FormData data1 = new FormData ();
+		/*FormData data1 = new FormData ();
 		data1.width=100;
 		
 		data1.right = new FormAttachment (65, 0);
 		data1.bottom = new FormAttachment (45, 0);
 		username.setLayoutData(data1);
+		*/
 		
-		
-		user=new Text(getShell(), SWT.BORDER);
+		user=new Text(c, SWT.BORDER);
 		user.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));;
 		user.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		GridData g=new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
+		g.widthHint=120;
+		user.setLayoutData(g);
 
-		FormData data2 = new FormData ();
+	/*	FormData data2 = new FormData ();
 		data2.width=110;
 		data2.right = new FormAttachment (78, 0);
 		data2.bottom = new FormAttachment (45, 0);
-		user.setLayoutData(data2);
+		user.setLayoutData(data2);*/
 
 		
 		
-		password= new Label(getShell(), SWT.NONE);
+		password= new Label(c, SWT.NONE);
 		password.setAlignment(SWT.CENTER);
 		password.setText("Select Password:");
 		password.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		FormData data3 = new FormData ();
+		password.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
+		password.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+	/*	FormData data3 = new FormData ();
 		data3.width=100;
 		data3.right = new FormAttachment (65, 2);
 		data3.bottom = new FormAttachment (55, 0);
-		password.setLayoutData(data3);
+		password.setLayoutData(data3);*/
 		
 		
-		pass=new Text(getShell(), SWT.PASSWORD | SWT.BORDER);
+		pass=new Text(c, SWT.PASSWORD | SWT.BORDER);
 		pass.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
 		pass.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-
-		FormData data4 = new FormData ();
+		GridData g1=new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
+		g1.widthHint=120;
+		pass.setLayoutData(g1);
+	/*	FormData data4 = new FormData ();
 		data4.width=110;
 		data4.right = new FormAttachment (78, 0);
 		data4.bottom = new FormAttachment (55, 0);
-		pass.setLayoutData(data4);
+		pass.setLayoutData(data4);*/
 		
-		R_password= new Label(getShell(), SWT.NONE);
+		R_password= new Label(c, SWT.NONE);
 		R_password.setAlignment(SWT.CENTER);
 		R_password.setText("Repeat Password:");
 		R_password.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		FormData data5 = new FormData ();
+		R_password.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
+		R_password.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+		/*FormData data5 = new FormData ();
 		data5.width=100;
 		data5.right = new FormAttachment (65, 2);
 		data5.bottom = new FormAttachment (65, 0);
-		R_password.setLayoutData(data5);
+		R_password.setLayoutData(data5);*/
 		
 		
-		R_pass=new Text(getShell(), SWT.PASSWORD | SWT.BORDER);
+		R_pass=new Text(c, SWT.PASSWORD | SWT.BORDER);
 		R_pass.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
 		R_pass.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-
+		GridData g2=new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
+		g2.widthHint=120;
+		R_pass.setLayoutData(g2);
+		
+		c.pack();
+/*
 		FormData data6 = new FormData ();
 		data6.width=110;
 		data6.right = new FormAttachment (78, 0);
 		data6.bottom = new FormAttachment (65, 0);
-		R_pass.setLayoutData(data6);
+		R_pass.setLayoutData(data6);*/
 		
 		signUp=new Button(getShell(),  SWT.NONE);
 		signUp.setText("Sign Up!");
+
 		FormData data7 = new FormData ();
 		data7.width=110;
 		data7.height=40;
-		data7.right = new FormAttachment (97, 0);
-		data7.bottom = new FormAttachment (98, 0);
+		data7.top=new FormAttachment(headline,450);
+		data7.right = new FormAttachment (headline, 900);
+		//data7.right = new FormAttachment (97, 0);
+		//data7.bottom = new FormAttachment (98, 0);
 		signUp.setLayoutData(data7);
 		
 		
@@ -251,12 +286,11 @@ public class signUpScreen extends Screen{
 					}
 					else{
 						
-						/***/
 						// create a thread to check if user registerd
 						Thread t = new Thread(new CheckUserTaken());
 						openWaiting();
 						t.start();
-						/***/
+						
 					
 					}
 				}
@@ -277,6 +311,7 @@ public class signUpScreen extends Screen{
 		this.user.dispose();
 		this.username.dispose();
 		this.signUp.dispose();
+		this.c.dispose();
 	}
 
 	@Override
@@ -290,6 +325,7 @@ public class signUpScreen extends Screen{
 		this.user.setVisible(false);
 		this.username.setVisible(false);
 		this.signUp.setVisible(false);
+		this.c.setVisible(false);
 		this.getShell().layout();
 	}
 
@@ -304,6 +340,7 @@ public class signUpScreen extends Screen{
 		this.user.setVisible(true);
 		this.username.setVisible(true);
 		this.signUp.setVisible(true);
+		this.c.setVisible(true);
 		this.getShell().layout();
 		
 	}

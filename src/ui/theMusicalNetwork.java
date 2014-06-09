@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -36,7 +37,7 @@ public class theMusicalNetwork {
 	
 	public theMusicalNetwork(Display d,ApplicationInterface engine){ //CTOR
 		display=d;
-		main_shell=new Shell(display,SWT.CLOSE|SWT.MIN|SWT.ON_TOP); //QAQA - THIS disables maximize
+		main_shell=new Shell(display,SWT.CLOSE|SWT.MIN); //QAQA - THIS disables maximize
 		main_shell.setText("The Musical Network");	//the text at the top left of the window
 		//set the shell layout
 		FormLayout formLayout = new FormLayout ();
@@ -50,14 +51,24 @@ public class theMusicalNetwork {
 		//set the bg image
 		
 		String path = new File("").getAbsolutePath();
-		String npath= new File(path+"\\images\\ear23.jpg").getAbsolutePath();
+		String os=System.getProperty("os.name");
+		String npath;
+		if(os.contains("windows")){
+			 npath= new File(path+"\\images\\ear23.jpg").getAbsolutePath();
+		}
+		else{//linux
+			 npath= new File(path+"/images/ear23.jpg").getAbsolutePath();
+		}
+		
 		
 		
 		bg_image=new Image(display,npath);	
+		Rectangle rec= bg_image.getBounds();
 		main_shell.setBackgroundImage(bg_image);
 		
 		//shell.setBackgroundMode(SWT.INHERIT_FORCE);
 		main_shell.setBackgroundMode(SWT.INHERIT_DEFAULT);
+		main_shell.setBounds(rec.x, rec.y, rec.width, rec.height);
 		
 		/*this.addFriendScreen=new addNewFriendScreen(display, shell, "bug!!"); //qaqa
 		this.addSongScreen =new addNewSongScreen(display, shell);

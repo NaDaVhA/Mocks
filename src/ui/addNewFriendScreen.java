@@ -7,7 +7,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -46,12 +49,14 @@ public class addNewFriendScreen extends Screen {
 	
 	private Thread t5,t6,t7;
 	
-	//private mainScreen main_screen;
+	private Composite c=null;
+	private Composite c1=null;
+	private Composite c2=null;
+	private Composite c3=null;
 	
-	public addNewFriendScreen(Display display, Shell shell,ApplicationInterface engine){//,mainScreen main_screen) {
+	public addNewFriendScreen(Display display, Shell shell,ApplicationInterface engine){
 		super(display, shell,engine);	
 		//username=user;
-		//this.main_screen=main_screen;
 	}
 
 	@Override
@@ -70,111 +75,199 @@ public class addNewFriendScreen extends Screen {
 		data1.bottom = new FormAttachment (5, 0);
 		head.setLayoutData(data1);
 		
+		
+		c=new Composite(getShell(), SWT.NONE);
+		FormData data2 = new FormData ();
+		data2.width=500;
+		data2.height=40;
+		data2.top=new FormAttachment (head, 5,SWT.BOTTOM);
+		data2.right = new FormAttachment (head, 400);
+		c.setLayoutData(data2);
+		c.setLayout(new GridLayout(3, false));
+		
 		//search label
-		search_label=new Label(getShell(), SWT.BORDER);
+		search_label=new Label(c, SWT.NONE);
 		search_label.setAlignment(SWT.CENTER);
 		
 		search_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		search_label.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
 		search_label.setText("Search a Friend:");
-		FormData data2 = new FormData ();
-		data2.width=200;
+		search_label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 		
-		data2.right = new FormAttachment (50, 0);
-		data2.bottom = new FormAttachment (15, 0);
-		search_label.setLayoutData(data2);
 		
 		//search text
-		search_text=new Text(getShell(), SWT.BORDER);
+		search_text=new Text(c, SWT.BORDER);
 		search_text.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));;
 		search_text.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		//search_text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+		GridData g=new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
+		g.widthHint=150;
+		search_text.setLayoutData(g);
+		
+		/*******/
+			class searchFriends implements Runnable {
 
+				@Override
+				public void run() {
+					final  Pair<Integer, ArrayList<String>> list_p;
+					if(theMusicalNetwork.qaqa){
+						 list_p=theMusicalNetwork.nadav.getSearchResultsFriends(name_to_search);
+					}
+					else{//true code
+						 list_p=engine.getSearchResultsFriends(name_to_search);
+					}
+					
+					//final  ArrayList<String> list=engine.getSearchResultsFriends(name_to_search);
+					getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							//status_song=status;
+							if(checkConnection(getShell(), list_p.getLeft())){
+								friend_result_list.removeAll();
+								if(list_p.getRight().isEmpty()){
+									PopUpinfo(getShell(), "Search results info", "The search results are empty!");
+								}
+								else{
+									for(String s:list_p.getRight()){
+										friend_result_list.add(s);
+									}
+								}
+							}
+							else{
+								
+								
+							}
+							
+							
+							pool.remove(t5);
+							if(pool.isEmpty()){
+								closeWaiting();
+								showScreen();
+							}
+						}
+					});
+					
+				}
+			}
+			
+			/*******/
+		
+		//search button
+			search_button=new Button(c,SWT.NONE);
+			search_button.setText("Search Friend");
+			search_button.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+			
+			search_button.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected (SelectionEvent e) {
+					System.out.println("qaqa - pressed search friend");
+					friend_name_to_show="";
+					name_to_search=null; //qaqa ?? check search function
+					name_to_search=search_text.getText();
+					
+					System.out.println("qaqa - name to search: "+name_to_search);
+					
+					if(name_to_search.compareTo("")==0){
+						errorPop("Error", "you didnt enter a name to search.\nPlease enter the name.");
+					}
+					else{
+						//friend_result_list.removeAll();
+						friend_status_song.setText("");
+						friend_songs.removeAll();
+						openWaiting();
+						
+						 t5 = new Thread(new searchFriends());
+						 pool.add(t5);
+						 t5.start();
+					}
+				}
+			});
+			
+			
+		c1=new Composite(getShell(), SWT.NONE);
 		FormData data3 = new FormData ();
-		data3.width=200;
-		data3.height=18;
-		data3.right = new FormAttachment (73, 0);
-		data3.bottom = new FormAttachment (15, 0);
-		search_text.setLayoutData(data3);
+		data3.width=500;
+		data3.height=175;
+		data3.top=new FormAttachment (c, 60,SWT.TOP);
+		data3.right = new FormAttachment (c, 0,SWT.RIGHT);
+		c1.setLayoutData(data3);
+		c1.setLayout(new GridLayout(2, false));
+		
+		
 		
 		
 		//friend result label
-		friend_result_label=new Label(getShell(), SWT.BORDER);
+		friend_result_label=new Label(c1, SWT.NONE);
 		friend_result_label.setAlignment(SWT.CENTER);
 		
 		friend_result_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		friend_result_label.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
 		friend_result_label.setText("Search Results:");
-		FormData data4 = new FormData ();
-		data4.width=200;
-		
-		data4.right = new FormAttachment (30, 0);
-		data4.bottom = new FormAttachment (25, 0);
-		friend_result_label.setLayoutData(data4);
-		
+		friend_result_label.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true, true, 1, 1));
+	
 		/*******/
-		class updateFriendShow implements Runnable {
+			class updateFriendShow implements Runnable {
 
-			@Override
-			public void run() {
-				final Pair<Integer, Pair<String, String>> friend_song;
-				final  Pair<Integer, java.util.List<Pair<String, String>>> list_p;
-				
-				if(theMusicalNetwork.qaqa){
-					 friend_song=theMusicalNetwork.nadav.getStatusSong(friend_name_to_show);
-					 list_p= theMusicalNetwork.nadav.getSongList(friend_name_to_show);
-				}
-				else{ //true code
-				 friend_song=engine.getStatusSong(friend_name_to_show); //1.6.14	
-				 list_p= engine.getSongList(friend_name_to_show); //1.6.14
-					
-				}
-				
-				
-				getDisplay().asyncExec(new Runnable() {
+					@Override
 					public void run() {
-						//status_song=status;
-						if(checkConnection(getShell(),friend_song.getLeft())&&checkConnection(getShell(),list_p.getLeft())){
-							friend_status_song.setText(friend_song.getRight().getLeft()+" "+friend_song.getRight().getRight());
-							
-							for(Pair<String, String> s:list_p.getRight()){
-								TableItem item = new TableItem (friend_songs, SWT.NONE);
-								item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-								//item.setText(0, "artist "+s.getLeft());
-								item.setText(0, s.getLeft());
-								//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
-								item.setText(1, s.getRight());
-							}	
+						final Pair<Integer, Pair<String, String>> friend_song;
+						final  Pair<Integer, java.util.List<Pair<String, String>>> list_p;
+						
+						if(theMusicalNetwork.qaqa){
+							 friend_song=theMusicalNetwork.nadav.getStatusSong(friend_name_to_show);
+							 list_p= theMusicalNetwork.nadav.getSongList(friend_name_to_show);
 						}
-						else{
+						else{ //true code
+						 friend_song=engine.getStatusSong(friend_name_to_show); //1.6.14	
+						 list_p= engine.getSongList(friend_name_to_show); //1.6.14
 							
 						}
 						
-						//
-						pool.remove(t6);
-						if(pool.isEmpty()){
-							closeWaiting();
-							showScreen();
-						}
+						
+						getDisplay().asyncExec(new Runnable() {
+							public void run() {
+								//status_song=status;
+								if(checkConnection(getShell(),friend_song.getLeft())&&checkConnection(getShell(),list_p.getLeft())){
+									friend_status_song.setText(friend_song.getRight().getLeft()+" "+friend_song.getRight().getRight());
+									
+									for(Pair<String, String> s:list_p.getRight()){
+										TableItem item = new TableItem (friend_songs, SWT.NONE);
+										item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+										//item.setText(0, "artist "+s.getLeft());
+										item.setText(0, s.getLeft());
+										//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
+										item.setText(1, s.getRight());
+									}	
+								}
+								else{
+									
+								}
+								
+								//
+								pool.remove(t6);
+								if(pool.isEmpty()){
+									closeWaiting();
+									showScreen();
+								}
+							}
+						});
+						
 					}
-				});
+				}
 				
-			}
-		}
-		
-		/*******/
+				/*******/
 		
 		
 		//search list
 		
-		friend_result_list=new List(getShell(), SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
+		friend_result_list=new List(c1, SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
 		
 		friend_result_list.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		FormData data5 = new FormData ();
-		data5.width=300;
-		data5.height=100;
-		data5.right = new FormAttachment (65);
-		data5.bottom = new FormAttachment (42, 0);
-		friend_result_list.setLayoutData(data5);
+		//friend_result_list.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		GridData g1=new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		g1.widthHint=250;
+		
+		friend_result_list.setLayoutData(g1);
+		
 		
 		friend_result_list.addListener(SWT.Selection, new Listener () {
 			@Override
@@ -194,152 +287,78 @@ public class addNewFriendScreen extends Screen {
 			}
 		});		
 		
-	
 		
+		c2=new Composite(getShell(), SWT.NONE);
+		FormData data4 = new FormData ();
+		data4.width=800;
+		data4.height=40;
+		data4.top=new FormAttachment (c1, 5,SWT.BOTTOM);
+		data4.right = new FormAttachment (c1, 125,SWT.RIGHT);
+		c2.setLayoutData(data4);
+		c2.setLayout(new GridLayout(2, false));
 		
-		
-		
-		
-		
-		/*******/
-		class searchFriends implements Runnable {
-
-			@Override
-			public void run() {
-				final  Pair<Integer, ArrayList<String>> list_p;
-				if(theMusicalNetwork.qaqa){
-					 list_p=theMusicalNetwork.nadav.getSearchResultsFriends(name_to_search);
-				}
-				else{//true code
-					 list_p=engine.getSearchResultsFriends(name_to_search);
-				}
-				
-				//final  ArrayList<String> list=engine.getSearchResultsFriends(name_to_search);
-				getDisplay().asyncExec(new Runnable() {
-					public void run() {
-						//status_song=status;
-						if(checkConnection(getShell(), list_p.getLeft())){
-							friend_result_list.removeAll();
-							for(String s:list_p.getRight()){
-								friend_result_list.add(s);
-							}
-						}
-						else{
-							
-							
-						}
-						
-						
-						pool.remove(t5);
-						if(pool.isEmpty()){
-							closeWaiting();
-							showScreen();
-						}
-					}
-				});
-				
-			}
-		}
-		
-		/*******/
-		
-		//search button
-		search_button=new Button(getShell(),SWT.NONE);
-		search_button.setText("Search Friend");
-		FormData data6 = new FormData ();
-		data6.width=115;
-		data6.height=26;
-		data6.right = new FormAttachment (87, 0);
-		data6.bottom = new FormAttachment (15, 0);
-		search_button.setLayoutData(data6); 
-		search_button.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed search friend");
-				friend_name_to_show="";
-				name_to_search=null; //qaqa ?? check search function
-				name_to_search=search_text.getText();
-				
-				System.out.println("qaqa - name to search: "+name_to_search);
-				
-				if(name_to_search.compareTo("")==0){
-					errorPop("Error", "you didnt enter a name to search.\nPlease enter the name.");
-				}
-				else{
-					openWaiting();
-					
-					 t5 = new Thread(new searchFriends());
-					 pool.add(t5);
-					 t5.start();
-				}
-			}
-		});
 		
 		//friend status song label
-		friend_status_label=new Label(getShell(), SWT.BORDER);
+		friend_status_label=new Label(c2, SWT.NONE);
 		friend_status_label.setAlignment(SWT.CENTER);
 		
 		friend_status_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		friend_status_label.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
 		friend_status_label.setText("Friend status song:");
-		FormData data7 = new FormData ();
-		data7.width=200;
+		friend_status_label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
 		
-		data7.right = new FormAttachment (30, 0);
-		data7.bottom = new FormAttachment (50, 0);
-		friend_status_label.setLayoutData(data7);
+		
 		
 		//friend_status_song
-		friend_status_song=new Label(getShell(), SWT.BORDER);
+		friend_status_song=new Label(c2, SWT.BORDER);
 		friend_status_song.setAlignment(SWT.LEFT);
 		
 		friend_status_song.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		friend_status_song.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
+		friend_status_song.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+		GridData g2=new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		g2.widthHint=600;
 		
+		friend_status_song.setLayoutData(g2);
 		//friend_status_song.setText("qaqa");
 		
-		FormData data8 = new FormData ();
-		data8.width=600;
-		
-		data8.right = new FormAttachment (93, 0);
-		data8.bottom = new FormAttachment (50, 0);
-		friend_status_song.setLayoutData(data8);
+		c3=new Composite(getShell(), SWT.NONE);
+		FormData data5 = new FormData ();
+		data5.width=650;
+		data5.height=200;
+		data5.top=new FormAttachment (c2, 5,SWT.BOTTOM);
+		data5.right = new FormAttachment (c2, 0,SWT.RIGHT);
+		c3.setLayoutData(data5);
+		c3.setLayout(new GridLayout(3, false));
 		
 		//songs_list_label
 		
-		songs_list_label=new Label(getShell(), SWT.BORDER);
+		songs_list_label=new Label(c3, SWT.NONE);
 		songs_list_label.setAlignment(SWT.CENTER);
 		
 		songs_list_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		songs_list_label.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
 		songs_list_label.setText("Friend Song List:");
-		FormData data9 = new FormData ();
-		data9.width=200;
-		
-		data9.right = new FormAttachment (30, 0);
-		data9.bottom = new FormAttachment (63, 0);
-		songs_list_label.setLayoutData(data9);
+		songs_list_label.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true, true, 1, 1));
 		
 		//friend song list 
-		friend_songs=new Table (getShell(), SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION);
+		friend_songs=new Table (c3, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION);
 		friend_songs.setLinesVisible (true);
 		friend_songs.setHeaderVisible (true);
 		TableColumn column = new TableColumn (friend_songs, SWT.NONE);
 		column.setText ("Artist");
 		TableColumn column1 = new TableColumn (friend_songs, SWT.NONE);
 		column1.setText ("Song name");
-		column.setWidth(160);
-		column1.setWidth(160);
+		column.setWidth(180);
+		column1.setWidth(180);
 	
-		//for (int i=0; i<12; i++) friend_result_list.add ("Friend resault " + i); //QAQA CHANGE WITH REAL SONGS
+		
 		
 		friend_songs.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		FormData data10 = new FormData ();
-		data10.width=304;
-		data10.height=100;
-		data10.right = new FormAttachment (65);
-		data10.bottom = new FormAttachment (83, 0);
-		friend_songs.setLayoutData(data10);
+		GridData g3=new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		//g3.heightHint=200;
+		g3.widthHint=300;
+		friend_songs.setLayoutData(g3);
 		
 		/*******/
 		class addFriend implements Runnable {
@@ -394,40 +413,39 @@ public class addNewFriendScreen extends Screen {
 		
 		/*******/
 		
-		
 		//add_friend_button
-		add_friend_button=new Button(getShell(),SWT.NONE);
-		add_friend_button.setText("Add Friend");
-		FormData data11 = new FormData ();
-		data11.width=115;
-		data11.height=120;
-		data11.right = new FormAttachment (85, 0);
-		data11.bottom = new FormAttachment (83, 0);
-		add_friend_button.setLayoutData(data11); 
-		add_friend_button.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected (SelectionEvent e) {
-				//System.out.println("qaqa - pressed add friend");
-				System.out.println("qaqa - pressed add friend - "+friend_name_to_show);
+			add_friend_button=new Button(c3,SWT.NONE);
+			add_friend_button.setText("Add Friend");
+			//add_friend_button.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+			GridData g4=new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+			g4.widthHint=50;
+			add_friend_button.setLayoutData(g4);
+			add_friend_button.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected (SelectionEvent e) {
+					//System.out.println("qaqa - pressed add friend");
+					System.out.println("qaqa - pressed add friend - "+friend_name_to_show);
 
-				if(friend_name_to_show.compareTo("")==0){
-					errorPop("Error", "Please selet a friend first.");
+					if(friend_name_to_show.compareTo("")==0){
+						errorPop("Error", "Please selet a friend first.");
+					}
+					else{
+						openWaiting();
+						
+						 t7 = new Thread(new addFriend());
+						 pool.add(t7);
+						 t7.start();
+					}
 				}
-				else{
-					openWaiting();
-					
-					 t7 = new Thread(new addFriend());
-					 pool.add(t7);
-					 t7.start();
-				}
-			}
-		});
+			});
+			
+	
 		
 		//back button
 		back_button=new Button(getShell(),SWT.NONE);
 		back_button.setText("Go back to home screen");
 		FormData data12 = new FormData ();
-		data12.width=150;
+		data12.width=180;
 		data12.height=30;
 		//data12.right = new FormAttachment (87, 0);
 		data12.bottom = new FormAttachment (100, 0);
@@ -460,6 +478,10 @@ public class addNewFriendScreen extends Screen {
 		this.search_label.dispose();
 		this.search_text.dispose();
 		this.songs_list_label.dispose();
+		this.c.dispose();
+		this.c1.dispose();
+		this.c2.dispose();
+		this.c3.dispose();
 		
 	}
 
@@ -478,6 +500,10 @@ public class addNewFriendScreen extends Screen {
 		this.search_label.setVisible(false);
 		this.search_text.setVisible(false);
 		this.songs_list_label.setVisible(false);
+		this.c.setVisible(false);
+		this.c1.setVisible(false);
+		this.c2.setVisible(false);
+		this.c3.setVisible(false);
 		this.getShell().layout();
 		
 	}
@@ -497,6 +523,10 @@ public class addNewFriendScreen extends Screen {
 		this.search_label.setVisible(true);
 		this.search_text.setVisible(true);
 		this.songs_list_label.setVisible(true);
+		this.c.setVisible(true);
+		this.c1.setVisible(true);
+		this.c2.setVisible(true);
+		this.c3.setVisible(true);
 		this.getShell().layout();
 		
 	}

@@ -66,7 +66,7 @@ public class initUpdateScreen extends Screen{
 	//		bar_shell = new Shell(getShell(),SWT.ON_TOP|SWT.MIN);
 	//	}
 	//	else{//init
-			bar_shell = new Shell(getDisplay(),SWT.ON_TOP|SWT.MIN);
+			bar_shell = new Shell(getDisplay(),SWT.MIN);
 	//	}
 		
 		
@@ -74,7 +74,14 @@ public class initUpdateScreen extends Screen{
 			bar_shell.setLayout(layout);
 			
 			String path = new File("").getAbsolutePath();
-			String npath= new File(path+"\\images\\ear23.jpg").getAbsolutePath();
+			String os=System.getProperty("os.name");
+			String npath;
+			if(os.contains("windows")){
+				 npath= new File(path+"\\images\\ear23.jpg").getAbsolutePath();
+			}
+			else{//linux
+				 npath= new File(path+"/images/ear23.jpg").getAbsolutePath();
+			}
 			
 			Image bg1_image=new Image(getDisplay(),npath);	//qaqa put here welcome img
 			bar_shell.setBackgroundImage(bg1_image);

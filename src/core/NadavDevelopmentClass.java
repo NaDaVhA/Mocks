@@ -22,9 +22,9 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 		int i=0;
 		while(i<100000){
 			i++;
-			System.out.println(i);
+			//System.out.println(i);
 		}
-		if((username.compareTo("nadav")==0)&&password.compareTo("as")==0){
+		if((username.compareTo("a")==0)&&password.compareTo("a")==0){
 			return new Pair<Integer, Boolean>(0, true);
 		}
 		return new Pair<Integer, Boolean>(0, false);
@@ -147,7 +147,7 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 			}
 		}
 		
-		initUpdateScreen.setFinished(true);
+		//initUpdateScreen.setFinished(true);
 		return new Pair<Integer, Boolean>(0, true);
 	}
 
@@ -160,12 +160,12 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 			j=0;
 			while(j<10000){
 				j++;
-				System.out.println(j);
+				//System.out.println(j);
 			}
 		}
 		
-		initUpdateScreen.setFinished(true);
-		return new Pair<Integer, Boolean>(0, false);
+		//initUpdateScreen.setFinished(true);
+		return new Pair<Integer, Boolean>(0, true);
 	}
 
 	@Override
@@ -200,7 +200,7 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 			i++;
 			System.out.println(i);
 		}
-		return new Pair<Integer, Boolean>(-1, false);
+		return new Pair<Integer, Boolean>(0, false);
 	}
 
 	@Override
@@ -253,6 +253,12 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 	public void InitalizeRecommender() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Pair<Integer, Boolean> checkInitializationStatus() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	
