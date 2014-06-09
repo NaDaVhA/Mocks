@@ -1099,8 +1099,10 @@ public class DataBaseManager {
 		
 		//Check configuration
 		int dbStatus = checkConfiguration(connection, "creatorCreationTables", "updateOp");
-		if(dbStatus == 1)	
+		if(dbStatus == 1){
+			progressTheMFProgressBar(25);
 			return true;
+		}
 		
 		System.out.println("Finishing the database update proccess. Hang on a while longer!");
 		
@@ -1228,8 +1230,10 @@ public class DataBaseManager {
 
 		//Check configuration
 		int dbStatus = checkConfiguration(connection, "songsTables", "updateOp");
-		if(dbStatus == 1)	
+		if(dbStatus == 1){
+			progressTheMFProgressBar(25);
 			return true;
+		}
 		
 		System.out.println("Updating the songs database. Please wait...");
 		
@@ -1379,8 +1383,10 @@ public class DataBaseManager {
 
 		//Check configuration
 		int dbStatus = checkConfiguration(connection, "artistsTables", "updateOp");
-		if(dbStatus == 1)	
+		if(dbStatus == 1){
+			progressTheMFProgressBar(25);
 			return true;
+		}
 		
 		System.out.println("Updating the artists database...");
 		
