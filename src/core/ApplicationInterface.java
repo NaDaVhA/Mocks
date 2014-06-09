@@ -139,7 +139,7 @@ public interface ApplicationInterface {
 	/**
 	 * for main screen
 	 * @param username
-	 * @return true if signed out
+	 * @return true if signed out.
 	 */
 	public boolean signOutUser(String username);
 	
