@@ -21,11 +21,8 @@ public abstract class Screen {
 	
 	private Display display=null;
 	private Shell shell=null;
-//	private Label waiting=null;
 	protected ApplicationInterface engine;
-	//protected ProgressBar bar=null;
-	//private Composite bar_c=null;
-	
+
 	protected Set<Thread> pool;
 	
 	

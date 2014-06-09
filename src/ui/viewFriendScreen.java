@@ -34,16 +34,11 @@ public class viewFriendScreen extends Screen {
 	private Label status_song_label=null;
 	private Label song_list_label=null;
 	private Label friend_list_label=null;
-	//private Button sign_out=null;
 	private Button add_new_song=null;
 	private Button add_new_friend=null;
-	//private Button change_status_song=null;
 	private Table  songList_t=null;
 	private List friendList=null;
-	
-	
-	//private Button view_friend=null;
-	
+		
 	private Button back_button=null;
 	
 	private Composite c=null;
@@ -591,7 +586,6 @@ private Thread t11,t12,t13,t14,t15;
 		this.songList_t.dispose();
 		this.status_song_label.dispose();
 		this.user_label.dispose();
-		//this.view_friend.dispose();
 		this.back_button.dispose();
 		this.c.dispose();
 		this.c1.dispose();
@@ -609,7 +603,6 @@ private Thread t11,t12,t13,t14,t15;
 		this.songList_t.setVisible(false);
 		this.status_song_label.setVisible(false);
 		this.user_label.setVisible(false);
-		//this.view_friend.setVisible(false);
 		this.back_button.setVisible(false);
 		this.c.setVisible(false);
 		this.c1.setVisible(false);
@@ -628,7 +621,6 @@ private Thread t11,t12,t13,t14,t15;
 		this.songList_t.setVisible(true);
 		this.status_song_label.setVisible(true);
 		this.user_label.setVisible(true);
-	//	this.view_friend.setVisible(true);
 		this.back_button.setVisible(true);
 		this.c.setVisible(true);
 		this.c1.setVisible(true);

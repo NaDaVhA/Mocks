@@ -20,8 +20,7 @@ import core.ApplicationInterface;
 
 public class signUpScreen extends Screen{
 	
-	//private Display display=null;
-	//private Shell shell=null;
+
 	private String username_s;
 	private String password_s;
 	private String password_repeat_s;
@@ -35,6 +34,8 @@ public class signUpScreen extends Screen{
 	private  Text R_pass=null;
 	private Button signUp=null;
 	private Composite c;
+	
+	
 	
 	public signUpScreen(Display display,Shell shell,ApplicationInterface engine) {
 		// TODO Auto-generated constructor stub
@@ -55,7 +56,8 @@ public class signUpScreen extends Screen{
 	@Override
 	public void createScreen() {
 		// TODO Auto-generated method stub
-		//headline
+		
+		//the musical network label
 		headline= new Label(getShell(), SWT.NONE);
 		headline.setAlignment(SWT.CENTER);
 		headline.setText("The Musical Network ");
@@ -67,18 +69,18 @@ public class signUpScreen extends Screen{
 		data.right = new FormAttachment (100, 0);
 		headline.setLayoutData(data);
 		
-		 c=new Composite(getShell(), SWT.NONE);
-			c.setLayout(new GridLayout(2, false));
+		c=new Composite(getShell(), SWT.NONE);
+		c.setLayout(new GridLayout(2, false));
 			
-			FormData data1 = new FormData ();
-			data1.width=300;
-			data1.height=150;
-			data1.top= new FormAttachment (headline, 200);
-			data1.right = new FormAttachment (headline,900);
-			
-			c.setLayoutData(data1);
+		FormData data1 = new FormData ();
+		data1.width=300;
+		data1.height=150;
+		data1.top= new FormAttachment (headline, 200);
+		data1.right = new FormAttachment (headline,900);
+		c.setLayoutData(data1);
 		
 		
+		//user name label
 		username= new Label(c, SWT.NONE);
 		username.setAlignment(SWT.CENTER);
 		username.setText("Select Username:");
@@ -86,15 +88,7 @@ public class signUpScreen extends Screen{
 		username.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
 		username.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 		
-		//username.setFont(SWTResourceManager.getFont("David", 12, SWT.BOLD));
-		/*FormData data1 = new FormData ();
-		data1.width=100;
-		
-		data1.right = new FormAttachment (65, 0);
-		data1.bottom = new FormAttachment (45, 0);
-		username.setLayoutData(data1);
-		*/
-		
+		//user name text		
 		user=new Text(c, SWT.BORDER);
 		user.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));;
 		user.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -102,52 +96,35 @@ public class signUpScreen extends Screen{
 		g.widthHint=120;
 		user.setLayoutData(g);
 
-	/*	FormData data2 = new FormData ();
-		data2.width=110;
-		data2.right = new FormAttachment (78, 0);
-		data2.bottom = new FormAttachment (45, 0);
-		user.setLayoutData(data2);*/
-
 		
-		
+		//password label
 		password= new Label(c, SWT.NONE);
 		password.setAlignment(SWT.CENTER);
 		password.setText("Select Password:");
 		password.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		password.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
 		password.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
-	/*	FormData data3 = new FormData ();
-		data3.width=100;
-		data3.right = new FormAttachment (65, 2);
-		data3.bottom = new FormAttachment (55, 0);
-		password.setLayoutData(data3);*/
+
 		
-		
+		//password text
 		pass=new Text(c, SWT.PASSWORD | SWT.BORDER);
 		pass.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
 		pass.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		GridData g1=new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
 		g1.widthHint=120;
 		pass.setLayoutData(g1);
-	/*	FormData data4 = new FormData ();
-		data4.width=110;
-		data4.right = new FormAttachment (78, 0);
-		data4.bottom = new FormAttachment (55, 0);
-		pass.setLayoutData(data4);*/
+
 		
+		//repeat password label
 		R_password= new Label(c, SWT.NONE);
 		R_password.setAlignment(SWT.CENTER);
 		R_password.setText("Repeat Password:");
 		R_password.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		R_password.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
 		R_password.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
-		/*FormData data5 = new FormData ();
-		data5.width=100;
-		data5.right = new FormAttachment (65, 2);
-		data5.bottom = new FormAttachment (65, 0);
-		R_password.setLayoutData(data5);*/
 		
 		
+		//repeat password text
 		R_pass=new Text(c, SWT.PASSWORD | SWT.BORDER);
 		R_pass.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
 		R_pass.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -156,26 +133,7 @@ public class signUpScreen extends Screen{
 		R_pass.setLayoutData(g2);
 		
 		c.pack();
-/*
-		FormData data6 = new FormData ();
-		data6.width=110;
-		data6.right = new FormAttachment (78, 0);
-		data6.bottom = new FormAttachment (65, 0);
-		R_pass.setLayoutData(data6);*/
-		
-		signUp=new Button(getShell(),  SWT.NONE);
-		signUp.setText("Sign Up!");
 
-		FormData data7 = new FormData ();
-		data7.width=110;
-		data7.height=40;
-		data7.top=new FormAttachment(headline,450);
-		data7.right = new FormAttachment (headline, 900);
-		//data7.right = new FormAttachment (97, 0);
-		//data7.bottom = new FormAttachment (98, 0);
-		signUp.setLayoutData(data7);
-		
-		
 		/*******/
 		class CheckUserTaken implements Runnable {
 
@@ -266,7 +224,16 @@ public class signUpScreen extends Screen{
 		
 		/*******/
 		
-		
+		//sign up button
+		signUp=new Button(getShell(),  SWT.NONE);
+		signUp.setText("Sign Up!");
+
+		FormData data7 = new FormData ();
+		data7.width=110;
+		data7.height=40;
+		data7.top=new FormAttachment(headline,450);
+		data7.right = new FormAttachment (headline, 900);
+		signUp.setLayoutData(data7);
 		signUp.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
@@ -296,6 +263,8 @@ public class signUpScreen extends Screen{
 				}
 			}
 		});
+		
+
 		
 		this.getShell().layout();
 		

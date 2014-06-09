@@ -61,21 +61,23 @@ public class addNewFriendScreen extends Screen {
 
 	@Override
 	public void createScreen(){
-		//headline
-		head=new Label(getShell(), SWT.NONE);
-		head.setAlignment(SWT.CENTER);
 		
+		//add a friend label
+		head=new Label(getShell(), SWT.NONE);
+		head.setAlignment(SWT.CENTER);		
 		head.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		head.setFont(SWTResourceManager.getFont("MV Boli", 16, SWT.BOLD));
 		head.setText("Add a Friend");
+		
 		FormData data1 = new FormData ();
 		data1.width=300;
-		
 		data1.right = new FormAttachment (65, 0);
 		data1.bottom = new FormAttachment (5, 0);
 		head.setLayoutData(data1);
 		
 		
+		
+		//Composite 
 		c=new Composite(getShell(), SWT.NONE);
 		FormData data2 = new FormData ();
 		data2.width=500;
@@ -85,10 +87,11 @@ public class addNewFriendScreen extends Screen {
 		c.setLayoutData(data2);
 		c.setLayout(new GridLayout(3, false));
 		
+		
+		
 		//search label
 		search_label=new Label(c, SWT.NONE);
 		search_label.setAlignment(SWT.CENTER);
-		
 		search_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		search_label.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
 		search_label.setText("Search a Friend:");
@@ -99,7 +102,6 @@ public class addNewFriendScreen extends Screen {
 		search_text=new Text(c, SWT.BORDER);
 		search_text.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));;
 		search_text.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		//search_text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 		GridData g=new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
 		g.widthHint=150;
 		search_text.setLayoutData(g);
@@ -149,40 +151,42 @@ public class addNewFriendScreen extends Screen {
 				}
 			}
 			
-			/*******/
+		/*******/
 		
 		//search button
-			search_button=new Button(c,SWT.NONE);
-			search_button.setText("Search Friend");
-			search_button.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
-			
-			search_button.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected (SelectionEvent e) {
-					System.out.println("qaqa - pressed search friend");
-					friend_name_to_show="";
-					name_to_search=null; //qaqa ?? check search function
-					name_to_search=search_text.getText();
-					
-					System.out.println("qaqa - name to search: "+name_to_search);
-					
-					if(name_to_search.compareTo("")==0){
-						errorPop("Error", "you didnt enter a name to search.\nPlease enter the name.");
-					}
-					else{
-						//friend_result_list.removeAll();
-						friend_status_song.setText("");
-						friend_songs.removeAll();
-						openWaiting();
-						
-						 t5 = new Thread(new searchFriends());
-						 pool.add(t5);
-						 t5.start();
-					}
+		search_button=new Button(c,SWT.NONE);
+		search_button.setText("Search Friend");
+		search_button.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+		
+		search_button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected (SelectionEvent e) {
+				System.out.println("qaqa - pressed search friend");
+				friend_name_to_show="";
+				name_to_search=null; //qaqa ?? check search function
+				name_to_search=search_text.getText();
+				
+				System.out.println("qaqa - name to search: "+name_to_search);
+				
+				if(name_to_search.compareTo("")==0){
+					errorPop("Error", "you didnt enter a name to search.\nPlease enter the name.");
 				}
-			});
+				else{
+					//friend_result_list.removeAll();
+					friend_status_song.setText("");
+					friend_songs.removeAll();
+					openWaiting();
+					
+					 t5 = new Thread(new searchFriends());
+					 pool.add(t5);
+					 t5.start();
+				}
+			}
+		});
 			
-			
+		
+		
+		//Composite	
 		c1=new Composite(getShell(), SWT.NONE);
 		FormData data3 = new FormData ();
 		data3.width=500;
@@ -198,11 +202,11 @@ public class addNewFriendScreen extends Screen {
 		//friend result label
 		friend_result_label=new Label(c1, SWT.NONE);
 		friend_result_label.setAlignment(SWT.CENTER);
-		
 		friend_result_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		friend_result_label.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
 		friend_result_label.setText("Search Results:");
 		friend_result_label.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true, true, 1, 1));
+		
 	
 		/*******/
 			class updateFriendShow implements Runnable {
@@ -257,17 +261,14 @@ public class addNewFriendScreen extends Screen {
 				/*******/
 		
 		
-		//search list
+		//friend result list
 		
 		friend_result_list=new List(c1, SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
-		
 		friend_result_list.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		//friend_result_list.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		
 		GridData g1=new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-		g1.widthHint=250;
-		
+		g1.widthHint=250;		
 		friend_result_list.setLayoutData(g1);
-		
 		
 		friend_result_list.addListener(SWT.Selection, new Listener () {
 			@Override
@@ -288,6 +289,8 @@ public class addNewFriendScreen extends Screen {
 		});		
 		
 		
+		
+		//Composite	
 		c2=new Composite(getShell(), SWT.NONE);
 		FormData data4 = new FormData ();
 		data4.width=800;
@@ -298,10 +301,9 @@ public class addNewFriendScreen extends Screen {
 		c2.setLayout(new GridLayout(2, false));
 		
 		
-		//friend status song label
+		//friend status label
 		friend_status_label=new Label(c2, SWT.NONE);
 		friend_status_label.setAlignment(SWT.CENTER);
-		
 		friend_status_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		friend_status_label.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
 		friend_status_label.setText("Friend status song:");
@@ -309,7 +311,7 @@ public class addNewFriendScreen extends Screen {
 		
 		
 		
-		//friend_status_song
+		//friend status song 
 		friend_status_song=new Label(c2, SWT.BORDER);
 		friend_status_song.setAlignment(SWT.LEFT);
 		
@@ -318,10 +320,10 @@ public class addNewFriendScreen extends Screen {
 		friend_status_song.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 		GridData g2=new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		g2.widthHint=600;
-		
 		friend_status_song.setLayoutData(g2);
-		//friend_status_song.setText("qaqa");
 		
+		
+		//Composite
 		c3=new Composite(getShell(), SWT.NONE);
 		FormData data5 = new FormData ();
 		data5.width=650;
@@ -331,15 +333,16 @@ public class addNewFriendScreen extends Screen {
 		c3.setLayoutData(data5);
 		c3.setLayout(new GridLayout(3, false));
 		
-		//songs_list_label
 		
+		//songs_list_label
 		songs_list_label=new Label(c3, SWT.NONE);
 		songs_list_label.setAlignment(SWT.CENTER);
-		
 		songs_list_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		songs_list_label.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
 		songs_list_label.setText("Friend Song List:");
 		songs_list_label.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true, true, 1, 1));
+		
+		
 		
 		//friend song list 
 		friend_songs=new Table (c3, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION);
@@ -352,8 +355,6 @@ public class addNewFriendScreen extends Screen {
 		column.setWidth(180);
 		column1.setWidth(180);
 	
-		
-		
 		friend_songs.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		GridData g3=new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		//g3.heightHint=200;
@@ -414,30 +415,30 @@ public class addNewFriendScreen extends Screen {
 		/*******/
 		
 		//add_friend_button
-			add_friend_button=new Button(c3,SWT.NONE);
-			add_friend_button.setText("Add Friend");
-			//add_friend_button.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-			GridData g4=new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-			g4.widthHint=50;
-			add_friend_button.setLayoutData(g4);
-			add_friend_button.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected (SelectionEvent e) {
-					//System.out.println("qaqa - pressed add friend");
-					System.out.println("qaqa - pressed add friend - "+friend_name_to_show);
+		add_friend_button=new Button(c3,SWT.NONE);
+		add_friend_button.setText("Add Friend");
+		
+		GridData g4=new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		g4.widthHint=50;
+		add_friend_button.setLayoutData(g4);
+		add_friend_button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected (SelectionEvent e) {
+				//System.out.println("qaqa - pressed add friend");
+				System.out.println("qaqa - pressed add friend - "+friend_name_to_show);
 
-					if(friend_name_to_show.compareTo("")==0){
-						errorPop("Error", "Please selet a friend first.");
-					}
-					else{
-						openWaiting();
-						
-						 t7 = new Thread(new addFriend());
-						 pool.add(t7);
-						 t7.start();
-					}
+				if(friend_name_to_show.compareTo("")==0){
+					errorPop("Error", "Please selet a friend first.");
 				}
-			});
+				else{
+					openWaiting();
+					
+					 t7 = new Thread(new addFriend());
+					 pool.add(t7);
+					 t7.start();
+				}
+			}
+		});
 			
 	
 		

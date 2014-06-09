@@ -68,20 +68,9 @@ public class theMusicalNetwork {
 		
 		//shell.setBackgroundMode(SWT.INHERIT_FORCE);
 		main_shell.setBackgroundMode(SWT.INHERIT_DEFAULT);
-		main_shell.setBounds(rec.x, rec.y, rec.width, rec.height);
-		
-		/*this.addFriendScreen=new addNewFriendScreen(display, shell, "bug!!"); //qaqa
-		this.addSongScreen =new addNewSongScreen(display, shell);
-		this.loginScreen=new logInScreen(display, shell);
-		this.mainScreen=new mainScreen(display, shell, "BUg!!");
-		this.signupScreen= new signUpScreen(display, shell);
-		this.viewFriendScreen=new viewFriendScreen(display, shell);*/
-		
+		main_shell.setBounds(rec.x, rec.y, rec.width, rec.height);	
 				
-		
-		
-		
-		
+
 		//qaqa - to delete
 		this.nadav=new NadavDevelopmentClass();
 		this.engine=engine;

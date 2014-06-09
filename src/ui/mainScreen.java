@@ -47,7 +47,7 @@ public class mainScreen extends Screen{
 	private Table  songList_t=null;
 	private List friendList=null;
 	
-	private Button entertain_me=null;
+	private Button recommend_me=null;
 	private Button view_friend=null;
 	private String friend_name;
 	
@@ -145,9 +145,6 @@ public class mainScreen extends Screen{
 		user_label.setText("Username:  "+this.username); //qaqa 8.6 maybe change to engine.getusername()
 		FormData data1 = new FormData ();
 		data1.width=700;
-		
-		//data1.right = new FormAttachment (35, 0);
-		//data1.bottom = new FormAttachment (5, 0);
 		user_label.setLayoutData(data1);
 		
 		/*******/
@@ -202,12 +199,14 @@ public class mainScreen extends Screen{
 			public void widgetSelected (SelectionEvent e) {
 				System.out.println("qaqa - pressed sign out");
 				//signOutUser in interface qaqa
-				 t5 = new Thread(new signout());
-					pool.add(t5);
-					t5.start();
+				t5 = new Thread(new signout());
+				pool.add(t5);
+				t5.start();
 			}
 		});
 		
+		
+		//Composite
 		c=new Composite(getShell(), SWT.NONE);
 		FormData data3 = new FormData ();
 		data3.width=1000;
@@ -216,17 +215,17 @@ public class mainScreen extends Screen{
 		//data3.right = new FormAttachment (user_label, 10);
 		c.setLayoutData(data3);
 		c.setLayout(new GridLayout(2, false));
-		//status song label
 		
+		
+		
+		//status song label
 		status_song_label=new Label(c, SWT.BORDER);
 		status_song_label.setAlignment(SWT.LEFT);
-		
 		status_song_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		
 		status_song_label.setFont(SWTResourceManager.getFont("MV Boli", 14, SWT.BOLD));
 		status_song_label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 				
-		//change status song button
+		
 		
 		/*******/
 		class changeStatusSong implements Runnable {
@@ -290,10 +289,10 @@ public class mainScreen extends Screen{
 		
 		/*******/
 		
+		//change status song button
 		change_status_song=new Button(c,SWT.PUSH);
 		change_status_song.setText("Change Status Song");
 		status_song_label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
-	
 		change_status_song.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
@@ -311,7 +310,7 @@ public class mainScreen extends Screen{
 		});
 		
 
-		//song list label
+		//Composite
 		c1=new Composite(getShell(), SWT.NONE);
 		FormData data4 = new FormData ();
 		data4.width=300;
@@ -321,6 +320,8 @@ public class mainScreen extends Screen{
 		c1.setLayoutData(data4);
 		c1.setLayout(new GridLayout(2, false));
 		
+		
+		//song list label
 		song_list_label=new Label(c1, SWT.NONE);
 		song_list_label.setAlignment(SWT.CENTER);
 		song_list_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -330,50 +331,49 @@ public class mainScreen extends Screen{
 
 
 		//entertain me button
-			entertain_me=new Button(c1,SWT.PUSH);
-			entertain_me.setText("Recomend Me!");
-			entertain_me.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
-					
-			entertain_me.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected (SelectionEvent e) {
-					System.out.println("qaqa - pressed entertain me");
+		recommend_me=new Button(c1,SWT.PUSH);
+		recommend_me.setText("recommend Me!");
+		recommend_me.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+				
+		recommend_me.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected (SelectionEvent e) {
+				System.out.println("qaqa - pressed recommend_me");
 
-					RecomendationsScreen recomendationsScreen = new RecomendationsScreen(getDisplay(),getShell(),engine);
-					disposeScreen();
-					recomendationsScreen.createScreen();
-				}
-			});
+				RecomendationsScreen recomendationsScreen = new RecomendationsScreen(getDisplay(),getShell(),engine);
+				disposeScreen();
+				recomendationsScreen.createScreen();
+			}
+		});
 			
-			//song list
-			
-				songList_t= new Table (c1, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION);
-				songList_t.setLinesVisible (true);
-				songList_t.setHeaderVisible (true);
-				TableColumn column = new TableColumn (songList_t, SWT.NONE);
-				column.setText ("Artist");
-				TableColumn column1 = new TableColumn (songList_t, SWT.NONE);
-				column1.setText ("Song name");
-				column.setWidth(143);
-				column1.setWidth(143);
-				
-				
-			
-				GridData g=new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
-				g.heightHint=200;
-				songList_t.setLayoutData(g);
-				songList_t.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-				songList_t.addListener(SWT.Selection, new Listener () {
-					@Override
-					public void handleEvent (Event event) {
-						System.out.println(event.item);//qaqa
-						TableItem item=(TableItem)event.item;
-						System.out.println(item.getText(0));//qaqa
-						System.out.println(item.getText(1));//qaqa
-						Pair<String, String> s=new Pair<String, String>(item.getText(0), item.getText(1));
-						song_selcted_table=s;
-					}
-				});
+		
+		
+		//song list
+		songList_t= new Table (c1, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION);
+		songList_t.setLinesVisible (true);
+		songList_t.setHeaderVisible (true);
+		TableColumn column = new TableColumn (songList_t, SWT.NONE);
+		column.setText ("Artist");
+		TableColumn column1 = new TableColumn (songList_t, SWT.NONE);
+		column1.setText ("Song name");
+		column.setWidth(143);
+		column1.setWidth(143);
+		
+		GridData g=new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
+		g.heightHint=200;
+		songList_t.setLayoutData(g);
+		songList_t.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		songList_t.addListener(SWT.Selection, new Listener () {
+			@Override
+			public void handleEvent (Event event) {
+				System.out.println(event.item);//qaqa
+				TableItem item=(TableItem)event.item;
+				System.out.println(item.getText(0));//qaqa
+				System.out.println(item.getText(1));//qaqa
+				Pair<String, String> s=new Pair<String, String>(item.getText(0), item.getText(1));
+				song_selcted_table=s;
+			}
+		});
 				
 				
 		//add new song button
@@ -453,11 +453,11 @@ public class mainScreen extends Screen{
 		
 		/*******/
 		
-		//delete song button
+		
+		//delete song button	
 		delete_song=new Button(c1,SWT.PUSH);
 		delete_song.setText("Delete Song");
 		delete_song.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
-		
 		delete_song.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
@@ -473,6 +473,8 @@ public class mainScreen extends Screen{
 			}  //qaqa what to do if the song we are deleting is the status song
 		});
 		
+		
+		//Composite
 		c2=new Composite(getShell(), SWT.NONE);
 		FormData data5 = new FormData ();
 		data5.width=300;
@@ -481,8 +483,9 @@ public class mainScreen extends Screen{
 		data5.left = new FormAttachment (c1, 200);
 		c2.setLayoutData(data5);
 		c2.setLayout(new GridLayout(2, false));
-		//friend list label
 		
+		
+		//friend list label
 		friend_list_label=new Label(c2, SWT.NONE);
 		friend_list_label.setAlignment(SWT.CENTER);
 		friend_list_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -494,8 +497,7 @@ public class mainScreen extends Screen{
 		//view friend button
 		view_friend=new Button(c2,SWT.NONE);
 		view_friend.setText("View friend");
-		view_friend.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
-			
+		view_friend.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));		
 		view_friend.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
@@ -513,16 +515,13 @@ public class mainScreen extends Screen{
 		});
 		
 		
-		//friend list
 		
+		//friend list	
 		friendList=new List(c2, SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
+		friendList.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		GridData g1=new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
 		g1.heightHint=200;
 		friendList.setLayoutData(g1);
-		
-		
-		friendList.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		
 		
 		friendList.addListener(SWT.Selection, new Listener () {
 			@Override
@@ -534,6 +533,8 @@ public class mainScreen extends Screen{
 					}
 			}
 		});
+		
+		
 		
 		//add new friend button
 		add_new_friend=new Button(c2,SWT.PUSH);
@@ -610,6 +611,8 @@ public class mainScreen extends Screen{
 	}
 	
 	/*******/
+	
+	
 		//delete friend button
 		delete_friend=new Button(c2,SWT.PUSH);
 			delete_friend.setText("Delete Friend");
@@ -632,13 +635,9 @@ public class mainScreen extends Screen{
 			});
 				
 			
+			
 		
 		/*******/
-	
-		
-		
-		
-		
 		class getSongList implements Runnable {
 
 			@Override
@@ -716,29 +715,7 @@ public class mainScreen extends Screen{
 		t2 = new Thread(new getSongList());
 		pool.add(t2);
 		t2.start();
-		
-		/*for (int i=0; i<128; i++) {
-			TableItem item = new TableItem (songList_t, SWT.NONE);
-			item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-			item.setText(0, "artist "+i);
-			item.setText(1, "songggggggggggggggggggggggggggggggggggg "+i);
-		}
-		songList_t.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		FormData data9 = new FormData ();
-		data9.width=250;
-		data9.height=200;
-		data9.right = new FormAttachment (40, 0);
-		data9.bottom = new FormAttachment (83, 0);
-		songList_t.setLayoutData(data9);
-		
-		column.setWidth(125);
-		column1.setWidth(125); */
-		
-		//songList_t.getColumn (0).pack ();
-		//songList_t.getColumn (1).pack ();
-		
-	
-		
+				
 		
 		class getFriendList implements Runnable {
 
@@ -819,7 +796,7 @@ public class mainScreen extends Screen{
 		this.status_song_label.dispose();
 		this.user_label.dispose();
 		this.view_friend.dispose();
-		this.entertain_me.dispose();
+		this.recommend_me.dispose();
 		//this.recommendBtn.dispose();
 		this.delete_friend.dispose();
 		this.delete_song.dispose();
@@ -844,7 +821,7 @@ public class mainScreen extends Screen{
 		this.status_song_label.setVisible(false);
 		this.user_label.setVisible(false);
 		this.view_friend.setVisible(false);
-		this.entertain_me.setVisible(false);
+		this.recommend_me.setVisible(false);
 		this.delete_friend.setVisible(false);
 		this.delete_song.setVisible(false);
 		this.c.setVisible(false);
@@ -869,7 +846,7 @@ public class mainScreen extends Screen{
 		this.status_song_label.setVisible(true);
 		this.user_label.setVisible(true);
 		this.view_friend.setVisible(true);
-		this.entertain_me.setVisible(true);
+		this.recommend_me.setVisible(true);
 		this.delete_friend.setVisible(true);
 		this.delete_song.setVisible(true);
 		this.c.setVisible(true);
