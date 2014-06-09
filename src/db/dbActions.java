@@ -387,6 +387,34 @@ public class dbActions implements DBActionsInterface{
 	}
 
 
+	
+	@Override
+	public Boolean send_massage(int username_send_id, int username_receive_id,
+			String msg) throws SQLException {
+		
+		String msg_c = ConvertStringCharToLegal(msg);
+		String sql_query ="INSERT INTO `users_massages` " +
+				"(`user_sender_id`, `user_receiver_id` , `massage_cont`) VALUES ('"+username_send_id+"', '"+username_receive_id+"', '"+msg_c+"');";
+		if (executeQuery(sql_query,false)==null)
+			return false; // true for  query is_select
+		
+		return true;
+	}
+
+	
+	@Override
+	public ArrayList<String[]> get_history_massage(int username_send_id,
+			int username_receive_id,String sender_name, String receiver_name ) throws SQLException {
+		
+		String sql_query ="Select user_sender_id, user_receiver_id, massage_cont " + 
+				"From users_massages " +
+				"Where (users_massages.user_sender_id =" +username_send_id+ " OR users_massages.user_sender_id = " + username_receive_id +") AND " +
+				 "(users_massages.user_receiver_id =" +username_send_id+ " OR users_massages.user_receiver_id = " + username_receive_id +") Order by massages_id";
+		ArrayList<String[]> history_temp =  executeQuery(sql_query,true);
+		return ConvertHistoryToUsersName(history_temp, username_send_id,username_receive_id, sender_name,receiver_name );
+	}
+	
+
 
 	@Override
 	public boolean disconnectUser(int userID) {
@@ -689,6 +717,35 @@ public class dbActions implements DBActionsInterface{
 		return song_id;
 		
 	}
+	
+
+
+	static private  ArrayList<String[]> ConvertHistoryToUsersName(ArrayList<String[]> history_temp,int username_send_id,
+			int username_receive_id,String sender_name, String receiver_name ) {
+		
+		if (history_temp == null || history_temp.size() == 0)
+			return history_temp;
+		
+		for (String[] s: history_temp)
+		{
+			int i = Integer.parseInt(s[0]);
+			
+			if ( i == username_send_id )
+			{
+				s[0] = sender_name;
+				s[1] = receiver_name;
+			}
+				
+			else if ( i == username_receive_id )
+			{
+				s[0] = receiver_name;
+				s[1] = sender_name;
+			}
+		}
+		return history_temp;
+		
+	}
+	
 	
 	
 }
