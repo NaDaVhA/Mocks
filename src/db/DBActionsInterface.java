@@ -12,7 +12,12 @@ public interface DBActionsInterface {
 	/////////////////////////////
 	
 	
-	//[song_name, song_id]
+	
+	/**
+	 * 
+	 * @return [song_name, song_id]
+	 * @throws SQLException
+	 */
 	public ArrayList<String[]> getSongsList() throws SQLException;
 	
 	//[song_name, artist_name]
@@ -83,19 +88,39 @@ public interface DBActionsInterface {
 	
 	public boolean removeSongFromUser(int userID, int songID) throws SQLException;
 	
-	//gets
+	
+	
+	/////////////////////////////
+	//	Users - Getters	
+	/////////////////////////////
 
-	//[user_id, user_name, status_song_id]
+	
+	
+	/**
+	 * Returns all users.
+	 * @return [user_id, user_name, status_song_id]
+	 * @throws SQLException
+	 */
 	public ArrayList<String[]> getUsersList() throws SQLException;
 			
-	//[user_name]
+
+	/**
+	 * @param userID
+	 * @return [user_name]
+	 * @throws SQLException
+	 */
 	public String[] getUserName(int userID) throws SQLException;
 		
 	public int getUserId(String username) throws SQLException;
 	
 	public String getUserPassword(int userID) throws SQLException;
 	
-	//[user_name]
+	/**
+	 * 
+	 * @param userID
+	 * @return [user_name]
+	 * @throws SQLException
+	 */
 	public ArrayList<String[]> getUserFreindsList(int userID) throws SQLException;
 	
 	
@@ -106,14 +131,49 @@ public interface DBActionsInterface {
 
 	
 	
+	/**
+	 * Checks whether the database is initialized or not.
+	 * Returns true if initialized, false otherwise.
+	 * @return
+	 * @throws SQLException
+	 */
 	public boolean isDatabaseInitialized() throws SQLException;
 	
+	
+	/**
+	 * Initializes the database. 
+	 * Builds the database from scratch or starts from the last successful point.
+	 * @param yagoFilesPath
+	 * @return
+	 * @throws SQLException
+	 */
 	public boolean initializeDatabase(String yagoFilesPath) throws SQLException;
 
+	
+	/**
+	 * Builds the music database.
+	 * @param connection
+	 * @param yagoFilesPath - path to the Yago files.
+	 * @return true if succeeded, false otherwise.
+	 * @throws SQLException 
+	 */
 	public boolean buildMusicDB(String yagoFilesPath) throws SQLException;
 	
+	
+	/**
+	 * Updates the music database.
+	 * @param connection
+	 * @param yagoFilesPath - path to the Yago files.
+	 * @return true if succeeded, false otherwise.
+	 * @throws SQLException 
+	 */
 	public boolean updateMusicDB(String yagoFilesPath) throws SQLException;
 	
+	
+	/**
+	 * Terminates the connection to the database, including closing all open connections from 
+	 * the connection pool.
+	 */
 	public void terminateConnectionToDB();
 
 

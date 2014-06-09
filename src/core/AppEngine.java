@@ -37,10 +37,6 @@ public class AppEngine implements ApplicationInterface{
 	
 	
 	
-	/**
-	 * Checks database status.
-	 * @return true if database is initialized, false otherwise.
-	 */
 	public Pair<Integer, Boolean> checkInitializationStatus(){
 		
 		boolean status = false;
@@ -48,7 +44,8 @@ public class AppEngine implements ApplicationInterface{
 		try {
 			status = this.dbActionRunner.isDatabaseInitialized();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			// Connection is lost.
+			System.out.println("checkInitializationStatus: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, Boolean>(-1, false);
 		}
@@ -58,11 +55,6 @@ public class AppEngine implements ApplicationInterface{
 	}
 	
 	
-	
-	/**
-	 * First, checks whether database is initialized. If needed - initializes application's database.
-	 * @return Pair<0,true> if succeeded, Pair<0,false> if not and Pair<-1,something>.
-	 */
 	public Pair<Integer, Boolean> initializeApplication(){
 		
 		boolean status = true;
@@ -73,6 +65,7 @@ public class AppEngine implements ApplicationInterface{
 			status = this.dbActionRunner.initializeDatabase(yagoFilesPath);
 		} catch (SQLException e) {
 			// Connection is lost.
+			System.out.println("checkInitializationStatus: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, Boolean>(-1, false);
 		}
@@ -85,10 +78,6 @@ public class AppEngine implements ApplicationInterface{
 	}
 	
 	
-	/**
-	 * Terminates connection to database.
-	 * Closes all open (and valid) connections from the connection pool.
-	 */
 	public void terminateDBConnection(){
 		
 		this.dbActionRunner.terminateConnectionToDB();
@@ -102,10 +91,7 @@ public class AppEngine implements ApplicationInterface{
 	///////////////////////////////////////
 	
 	
-	/**
-	 * Updates the music database.
-	 * @return true if succeeded, false otherwise.
-	 */
+
 	public Pair<Integer, Boolean> updateMusicDatabase(){
 		
 		boolean status = true;
@@ -116,6 +102,7 @@ public class AppEngine implements ApplicationInterface{
 			status = this.dbActionRunner.updateMusicDB(yagoFilesPath);
 		} catch (SQLException e) {
 			// Connection is lost.
+			System.out.println("updateMusicDatabase: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, Boolean>(-1, false);
 		}
@@ -145,6 +132,7 @@ public class AppEngine implements ApplicationInterface{
 			status = initializeUserInstance(username);
 		} catch (SQLException e) {
 			// Connection is lost.
+			System.out.println("isUserRegisterd: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, Boolean>(-1, status);
 		}
@@ -164,6 +152,7 @@ public class AppEngine implements ApplicationInterface{
 			return new Pair<Integer, Boolean>(0, status);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			System.out.println("isUserRegisterd: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, Boolean>(-1, status);
 		}
@@ -186,6 +175,7 @@ public class AppEngine implements ApplicationInterface{
 		
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			System.out.println("isUserRegisterd: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, Boolean>(-1, stat);
 
@@ -219,6 +209,7 @@ public class AppEngine implements ApplicationInterface{
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			System.out.println("isUserRegisterd: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, Pair<String,String>>(-1, null);
 
@@ -257,6 +248,7 @@ public class AppEngine implements ApplicationInterface{
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			System.out.println("isUserRegisterd: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, Boolean>(-1, stat);
 
@@ -285,6 +277,7 @@ public class AppEngine implements ApplicationInterface{
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			System.out.println("isUserRegisterd: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, List<Pair<String,String>>>(-1, null);
 
@@ -325,6 +318,7 @@ public class AppEngine implements ApplicationInterface{
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			System.out.println("isUserRegisterd: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, ArrayList<String>>(-1, null);
 
@@ -353,6 +347,7 @@ public class AppEngine implements ApplicationInterface{
 			return new Pair<Integer, ArrayList<String>>(0, result);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			System.out.println("isUserRegisterd: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, ArrayList<String>>(-1, null);
 		}
@@ -381,6 +376,7 @@ public class AppEngine implements ApplicationInterface{
 		
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			System.out.println("isUserRegisterd: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, Boolean>(-1, stat);
 		}
@@ -399,6 +395,7 @@ public class AppEngine implements ApplicationInterface{
 			result = this.dbActionRunner.getArtistList(artist_name);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			System.out.println("isUserRegisterd: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, ArrayList<Pair<String,String>>>(-1, null);
 		}
@@ -421,6 +418,7 @@ public class AppEngine implements ApplicationInterface{
 			result = this.dbActionRunner.getSongsArtistList(song_name);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			System.out.println("isUserRegisterd: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, ArrayList<Pair<String,String>>>(-1, null);
 		}
@@ -444,6 +442,7 @@ public class AppEngine implements ApplicationInterface{
 			stat = this.dbActionRunner.addSongToUser(user_name,song,artist);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			System.out.println("isUserRegisterd: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, Boolean>(-1, stat);
 
@@ -492,6 +491,7 @@ public class AppEngine implements ApplicationInterface{
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			System.out.println("isUserRegisterd: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, Boolean>(-1, status);
 		}
@@ -523,6 +523,7 @@ public class AppEngine implements ApplicationInterface{
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			System.out.println("isUserRegisterd: Connection exception.");
 			e.printStackTrace();
 			return new Pair<Integer, Boolean>(-1, status);
 		}
@@ -537,6 +538,36 @@ public class AppEngine implements ApplicationInterface{
 	
 	
 	
+	//////////////////////////////////
+	//			Messaging
+	//////////////////////////////////
+	
+
+	@Override
+	public Pair<Integer, String> receiveMassage(String username_send,
+			String username_receive) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public Pair<Integer, Boolean> sendMassage(String username_send,
+			String username_receive, String msg) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public Pair<Integer, ArrayList<String[]>> getHistoryMassages(
+			String username_send, String username_receive) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 	
 	
@@ -639,6 +670,7 @@ public class AppEngine implements ApplicationInterface{
 		return List;
 		
 	}
+
 
 
 
