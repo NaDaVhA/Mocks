@@ -577,7 +577,7 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 					//status_song=status;
 					if(checkConnection(getShell(), h.getLeft())){
 						if(!(h.getRight()==null)){//no problem
-							
+							messages_table.removeAll();
 							for(String[] node:h.getRight()){
 								TableItem item = new TableItem (messages_table, SWT.NONE);
 								item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -683,6 +683,9 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 							pool.remove(t16);
 							//PopUpinfo(getShell(),"Add Friend", "The friend was added to your friend list successfully!!");
 							//qaqa update table
+							t17 = new Thread(new msgHistory());
+							pool.add(t17);
+							t17.start();
 							if(pool.isEmpty()){
 								closeWaiting();
 								showScreen();
