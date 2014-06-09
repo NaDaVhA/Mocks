@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 public class dbActions implements DBActionsInterface{
 
-	private boolean qaqa = false;
 	private ConnectionPool connectionPool;
 
 	
@@ -22,15 +21,12 @@ public class dbActions implements DBActionsInterface{
 	
 
 
-	/**
-	 * Returns a list of all the songs in the database.
-	 * @return 
-	 */
+	@Override
 	public ArrayList<String[]> getSongsList() throws SQLException{
 		
 		String sql_query ="Select song_name, song_id " + 
 				"From songs";
-		return executeQuery(sql_query,true); // true for  query is_select 
+		return executeQuery(sql_query,true); 
 			
 	}
 	
@@ -50,7 +46,7 @@ public class dbActions implements DBActionsInterface{
 		
 	}
 	
-	
+	@Override
 	public int getSongID(String song_name) throws SQLException
 	{
 		String song_name_c = ConvertStringCharToLegal(song_name);
@@ -63,6 +59,7 @@ public class dbActions implements DBActionsInterface{
 		return checkID(result);
 	}
 	
+	@Override
 	public ArrayList<String[]> getSongsArtistList() throws SQLException{
 	
 		String sql_query ="Select song_name, artist_name " + 
@@ -73,6 +70,7 @@ public class dbActions implements DBActionsInterface{
 			
 	}
 	
+	@Override
 	public ArrayList<String[]> getSongsArtistList(String songname) throws SQLException{
 		
 		String song_name_c =  ConvertStringCharToLegal(songname);
@@ -84,6 +82,7 @@ public class dbActions implements DBActionsInterface{
 			
 	}
 	
+	@Override
 	public ArrayList<String[]> getArtistList(String artist_name) throws SQLException
 	{
 		String artist_name_c =  ConvertStringCharToLegal(artist_name);
@@ -95,17 +94,16 @@ public class dbActions implements DBActionsInterface{
 		
 	}
 	
-
+	@Override
 	public ArrayList<String[]> getUsersList() throws SQLException{
 		
 		String sql_query ="Select user_id, user_name, status_song_id " + 
 				"From users ";	
-		return executeQuery(sql_query,true); // true for  query is_select
+		return executeQuery(sql_query,true); 
 		
 	}
 	
-	
-	//Users DB// need to check
+	@Override
 	public boolean addSongToUser(String user_name, String song_name,String artist_name) throws SQLException{
 		
 		boolean status = false;
@@ -126,18 +124,18 @@ public class dbActions implements DBActionsInterface{
 				"(`user_id`, `song_id`, `artist_id` ) VALUES ('"+user_id+"', '"+song_id+"', '"+artist_id+"');";
 			
 		if (executeQuery(sql_query,false)==null)
-			return false; // true for  query is_select
+			return false; 
 	
 		return true;
 	}
 	
-	// need to check 
+	@Override
 	public boolean addArtistToUser(String user_id, String artist_id) throws SQLException{
 		String sql_query ="INSERT INTO `user_artist` " +
 				"(`user_id`, `artist_id`) VALUES ('"+user_id+"', '"+artist_id+"');";
 		
 		if (executeQuery(sql_query,false)==null)
-			return false; // true for  query is_select
+			return false; 
 	
 		return true;
 		
@@ -148,7 +146,7 @@ public class dbActions implements DBActionsInterface{
 		String sql_query ="DELETE FROM users_friends " + 
 				"Where users_friends.user_id =" + userID + " And users_friends.user_friend_id = "+ userFriendID;
 		if (executeQuery(sql_query,false)==null)
-			return false; // true for  query is_select
+			return false;
 		
 		return true;
 	}
@@ -159,14 +157,13 @@ public class dbActions implements DBActionsInterface{
 		String sql_query ="DELETE FROM user_songs " + 
 				"Where user_songs.user_id =" + userID + " And user_songs.song_id = "+ songID;
 		if (executeQuery(sql_query,false)==null)
-			return false; // true for  query is_select
+			return false;
 		
 		return true;
 	}
 	
 	
-	//{null} if there is not match
-	// need to check 
+	@Override
 	public String[] getUserName(int userID) throws SQLException {
 
 		
@@ -213,7 +210,6 @@ public class dbActions implements DBActionsInterface{
 
 	
 	@Override
-	//need to check
 	public ArrayList<String[]> getUserFreindsList(int userID) throws SQLException
 	{
 		String StringUserID= ConvertIntegerToString(userID);
@@ -232,7 +228,7 @@ public class dbActions implements DBActionsInterface{
 				String sql_query ="INSERT INTO `users_friends` " +
 						"(`user_id`, `user_friend_id`) VALUES ('"+userID+"', '"+userFreindID+"');";
 				if (executeQuery(sql_query,false)==null)
-					return false; // true for  query is_select
+					return false;
 				
 				System.out.println("aaa\n");
 			
@@ -250,9 +246,6 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 	
-	
-	//needcheck
-	//PORBLEM:  false on not - matching and also failurQuery..
 	@Override
 	public boolean usernameExists(String username) throws SQLException {
 		 
@@ -283,13 +276,12 @@ public class dbActions implements DBActionsInterface{
 		"(`user_name`, `password`) VALUES ('"+userName+"', '"+password+"');";
 			
 		if (executeQuery(sql_query,false)==null)
-			return false; // true for  query is_select
+			return false; 
 	
 		return true;
 	}
 		
-	//needcheck
-	//PORBLEM:  false on not - matching and also failurQuery..
+	//mira
 	@Override
 	public boolean authenticateUser(String username, String password) throws SQLException{
 		
@@ -306,9 +298,6 @@ public class dbActions implements DBActionsInterface{
 			e.printStackTrace();
 			throw e;
 		}
-		
-		System.out.println("authenticateUser: DID IT!!!");
-		
 		if (result == null)
 		{
 			return false;
@@ -348,7 +337,6 @@ public class dbActions implements DBActionsInterface{
 		
 	}
 
-	//if user isnt exist return also null
 	@Override
 	public String[] getUserStatusSong(int userID) throws SQLException {
 		String StringUserID= ConvertIntegerToString(userID);
@@ -380,7 +368,7 @@ public class dbActions implements DBActionsInterface{
 				" set status_song_id = " + songID + ", status_artist_id =" + artistID
 				+ " where users.user_id =" + userID;
 		if (executeQuery(sql_query,false)==null)
-			return false; // true for  query is_select
+			return false;
 		
 	
 		return true;
@@ -396,7 +384,7 @@ public class dbActions implements DBActionsInterface{
 		String sql_query ="INSERT INTO `users_massages` " +
 				"(`user_sender_id`, `user_receiver_id` , `massage_cont`) VALUES ('"+username_send_id+"', '"+username_receive_id+"', '"+msg_c+"');";
 		if (executeQuery(sql_query,false)==null)
-			return false; // true for  query is_select
+			return false; 
 		
 		return true;
 	}
@@ -414,21 +402,7 @@ public class dbActions implements DBActionsInterface{
 		return ConvertHistoryToUsersName(history_temp, username_send_id,username_receive_id, sender_name,receiver_name );
 	}
 	
-
-
-	@Override
-	public boolean disconnectUser(int userID) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	
-	/**
-	 * This method gets the userID corresponding to the given userName.
-	 * @param userName
-	 * @return userID if exists, 0 if no such user exists, -1 if a problem occur.
-	 * @throws SQLException 
-	 */
 	@Override
 	public int getUserId(String username) throws SQLException {
 		
@@ -442,7 +416,6 @@ public class dbActions implements DBActionsInterface{
 	}
 		
 	
-	//userID not exists  =  return null and also error
 	@Override
 	public String getUserPassword(int userID) throws SQLException {
 		
@@ -471,12 +444,6 @@ public class dbActions implements DBActionsInterface{
 	//////////////////////////////////////////////
 	// 		General queries generic methods
 	//////////////////////////////////////////////
-
-
-    /*
-     *general for sql query 
-     * 
-     */
 	
 	
 	private String ConvertIntegerToString(int num)
@@ -485,7 +452,12 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 	
-	//split columns of select
+
+	/**
+	 * split the return columns of db
+	 * @param Query
+	 * @return  to String[col1,col2..]
+	 */
 	private String[] parseSelectQuery(String Query)
 	{
 			String SelectColtemp = Query.substring(Query.indexOf("Select") +7, Query.indexOf(" From"));
@@ -494,9 +466,13 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 	
-	//mira
-	//check what to do if there is not an add!!
-	//return list by number of columns : if num col of select is 3 so list (a1,a2,a3,b1,b2,b3...) 
+/**
+ * 
+ * @param rs
+ * @param NumOfColInResult
+ * @param SelectCol
+ * @return Array list that consist of an attribute of select cols in an String[]  
+ */
 	private ArrayList<String[]> ReturnSelectQuery(ResultSet rs , int NumOfColInResult , String[] SelectCol)
 	{
 		
@@ -522,10 +498,7 @@ public class dbActions implements DBActionsInterface{
 	}
 	
 	
-	
-	/*( without select "*") 
-	 *   null is error, else true
-	 * */ 
+
 	private  ArrayList<String[]> executeQuery(String sql_query,boolean is_Select) throws SQLException
 	{
 		System.out.println(sql_query);
@@ -720,7 +693,7 @@ public class dbActions implements DBActionsInterface{
 	
 
 
-	static private  ArrayList<String[]> ConvertHistoryToUsersName(ArrayList<String[]> history_temp,int username_send_id,
+	private  ArrayList<String[]> ConvertHistoryToUsersName(ArrayList<String[]> history_temp,int username_send_id,
 			int username_receive_id,String sender_name, String receiver_name ) {
 		
 		if (history_temp == null || history_temp.size() == 0)

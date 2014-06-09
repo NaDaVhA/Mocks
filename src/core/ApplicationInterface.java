@@ -43,14 +43,15 @@ public interface ApplicationInterface {
 	
 	
 	/**
-	 *  for log in screen
+	 *  for log in screen initialize user
 	 * @param username - string representing the username
 	 * @param password - string representing the password
-	 * @return true iff its an authentic user
+	 * @return true if its an authentic user
 	 */
 	public Pair<Integer, Boolean> isUserRegisterd(String username,String password);
 	
 	/**
+	 * 
 	 * for sign up screen
 	 * @param username
 	 * @return true iff username is already in use
@@ -66,8 +67,11 @@ public interface ApplicationInterface {
 	 */
 	public Pair<Integer, Boolean> signUpUser(String username, String password);
 	
-	
-	//username of a friend
+	/**
+	 * 
+	 * @param username
+	 * @return user status song
+	 */
 	public Pair<Integer, Pair<String, String>> getStatusSong(String username); 
 	
 	/**
@@ -81,8 +85,7 @@ public interface ApplicationInterface {
 	
 	/**
 	 * 
-	 * @param username
-	 * @param song
+	 * @param Pair<artist_name,song_name>
 	 * @return true if the change succeeded
 	 */
 	public Pair<Integer, Boolean> changeStatusSong(Pair<String,String> song); //qaqa
@@ -110,31 +113,33 @@ public interface ApplicationInterface {
 	 * @param username
 	 * @return the song list of the user
 	 */
-	
-	//username of a friend
 	public Pair<Integer, List<Pair<String, String>>> getSongList(String username);
 	
-	
+	/**
+	 * 
+	 * @param
+	 * @return song list of current user
+	 */
 	public List<Pair<String,String>> getSongList();
 	
 	/**
-	 * for main screen
+	 * 
 	 * @param 
-	 * @return
+	 * @return friends list of a current user
 	 */
 	public ArrayList<String> getFriendList();
 	
 	/**
 	 * for main screen
 	 * @param username
-	 * @return
+	 * @return friends list 
 	 */
 	public Pair<Integer, ArrayList<String>> getFriendList(String username);
 	
 	/**
 	 * for main screen
 	 * @param username
-	 * @return true iff signed out
+	 * @return true if signed out
 	 */
 	public boolean signOutUser(String username);
 	
