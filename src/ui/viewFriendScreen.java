@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import utilities.Pair;
@@ -41,15 +42,21 @@ public class viewFriendScreen extends Screen {
 		
 	private Button back_button=null;
 	
+	private Table  messages_table=null;
+	private Text message_text=null;
+	private Button send_msg_button=null;
+	
+	private String msg;
 	
 	
 	private Composite c=null;
 	private Composite c1=null;
 	private Composite c2=null;
+	private Composite c3=null;
 	
 	
 	
-private Thread t11,t12,t13,t14,t15;
+private Thread t11,t12,t13,t14,t15,t16,t17;
 	
 	//QAQA add here the rest
 	private Pair<String, String> song_selcted_table=null;
@@ -143,7 +150,7 @@ private Thread t11,t12,t13,t14,t15;
 		FormData data3 = new FormData ();
 		data3.width=900;
 		data3.height=40;
-		data3.top=new FormAttachment (user_label, 45);
+		data3.top=new FormAttachment (user_label, 15);
 		//data3.right = new FormAttachment (user_label, 10);
 		c.setLayoutData(data3);
 		c.setLayout(new GridLayout(1, false));
@@ -169,7 +176,7 @@ private Thread t11,t12,t13,t14,t15;
 		FormData data4 = new FormData ();
 		data4.width=300;
 		data4.height=300;
-		data4.top=new FormAttachment (user_label, 145);
+		data4.top=new FormAttachment (user_label, 65);
 		data4.right = new FormAttachment (user_label, 400);
 		c1.setLayoutData(data4);
 		c1.setLayout(new GridLayout(2, false));
@@ -269,7 +276,6 @@ private Thread t11,t12,t13,t14,t15;
 			songList_t.setLayoutData(g);
 			
 			
-			songList_t.setLayoutData(g);
 			songList_t.addListener(SWT.Selection, new Listener () {
 				@Override
 				public void handleEvent (Event event) {
@@ -543,6 +549,194 @@ private Thread t11,t12,t13,t14,t15;
 		}
 	});
 		
+	
+	//Composite
+	c3=new Composite(getShell(), SWT.NONE);
+	FormData data6 = new FormData ();
+	data6.width=800;
+	data6.height=130;
+	data6.top=new FormAttachment (c2, 0,SWT.BOTTOM);
+	data6.right = new FormAttachment (c2, 0,SWT.RIGHT);
+	c3.setLayoutData(data6);
+	c3.setLayout(new GridLayout(2, false));
+	
+	class msgHistory implements Runnable {
+
+		@Override
+		public void run() {
+			final Pair<Integer, ArrayList<String[]>> h;
+			if(theMusicalNetwork.qaqa){
+				h=theMusicalNetwork.nadav.getHistoryMassages("a",friend_user_name);//String username_send,String username_receive,String msg
+			}
+			else{
+				h=engine.getHistoryMassages(engine.getUsername(),friend_user_name);
+			}
+			
+			getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					//status_song=status;
+					if(checkConnection(getShell(), h.getLeft())){
+						if(!(h.getRight()==null)){//no problem
+							messages_table.removeAll();
+							for(String[] node:h.getRight()){
+								TableItem item = new TableItem (messages_table, SWT.NONE);
+								item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+															
+								item.setText(0, node[0]);
+								item.setText(1, node[2]);
+							}
+							
+							closeWaiting();
+							showScreen();
+							
+							pool.remove(t17);
+						}
+						else{//problem
+							
+							pool.remove(t17);
+							//PopUpinfo(getShell(),"Add Friend", "The friend was added to your friend list successfully!!");
+							errorPop("Error", "Failed to get message history");
+							//qaqa update table
+							if(pool.isEmpty()){
+								closeWaiting();
+								showScreen();
+							}
+							
+						}
+					}
+					else{
+						//stay in screen 
+						pool.remove(t17);
+						if(pool.isEmpty()){
+							closeWaiting();
+							showScreen();
+							
+						}
+					}
+					
+					
+					
+				}
+			});
+			
+		}
+	}
+	
+	/*******/
+	
+	
+	messages_table= new Table (c3, SWT.NO_FOCUS|SWT.HIDE_SELECTION | SWT.BORDER | SWT.FULL_SELECTION);
+	messages_table.setLinesVisible (true);
+	messages_table.setHeaderVisible (true);
+	TableColumn column2 = new TableColumn (messages_table, SWT.NONE);
+	column2.setText ("Sent from:");
+	TableColumn column3 = new TableColumn (messages_table, SWT.NONE);
+	column3.setText ("Message");
+	column2.setWidth(243);
+	column3.setWidth(543);
+	messages_table.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+	GridData g2=new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
+	g2.heightHint=70;
+	messages_table.setLayoutData(g2);
+	
+	
+	t17 = new Thread(new msgHistory());
+	pool.add(t17);
+	t17.start();
+	
+	
+	message_text=new Text(c3, SWT.BORDER);
+	message_text.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));;
+	message_text.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+	
+	GridData g3=new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
+	g3.widthHint=400;
+	message_text.setLayoutData(g3);
+	
+	
+	
+	/*******/
+	class sendMessage implements Runnable {
+
+		@Override
+		public void run() {
+			final Pair<Integer,Boolean> send;
+			if(theMusicalNetwork.qaqa){
+				send=theMusicalNetwork.nadav.sendMassage("a",friend_user_name,msg);//String username_send,String username_receive,String msg
+			}
+			else{
+				send=engine.sendMassage(engine.getUsername(),friend_user_name,msg);
+			}
+			
+			getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					//status_song=status;
+					if(checkConnection(getShell(), send.getLeft())){
+						if(!send.getRight()){
+							closeWaiting();
+							showScreen();
+							errorPop("Error", "Failed to send the message.");	
+							pool.remove(t16);
+						}
+						else{
+							
+							pool.remove(t16);
+							//PopUpinfo(getShell(),"Add Friend", "The friend was added to your friend list successfully!!");
+							//qaqa update table
+							t17 = new Thread(new msgHistory());
+							pool.add(t17);
+							t17.start();
+							if(pool.isEmpty()){
+								closeWaiting();
+								showScreen();
+							}
+							
+						}
+					}
+					else{
+						//stay in screen 
+						pool.remove(t16);
+						if(pool.isEmpty()){
+							closeWaiting();
+							showScreen();
+							
+						}
+					}
+					
+					
+					
+				}
+			});
+			
+		}
+	}
+	
+	/*******/
+	
+	send_msg_button=new Button(c3,  SWT.PUSH);
+	send_msg_button.setText("Send");
+	GridData g4=new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+	g4.widthHint=120;
+	//g.verticalSpan=2;
+	send_msg_button.setLayoutData(g4);
+	send_msg_button.addSelectionListener(new SelectionAdapter() {
+		@Override
+		public void widgetSelected (SelectionEvent e) {
+			
+			System.out.println("qaqa - pressed send_msg_button"); //qaqa
+			msg=message_text.getText();
+			if(msg.isEmpty()){
+				errorPop("Error", "The message field is empty.\nPlease write a message and try again.");
+			}
+			else{
+				//call thred
+				t16 = new Thread(new sendMessage());
+				pool.add(t16);
+				t16.start();
+			}
+
+		}
+	});
 	
 		
 		

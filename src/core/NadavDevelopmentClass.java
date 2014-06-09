@@ -64,7 +64,7 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 		if(username.compareTo("friend 4")==0){
 			return new Pair<Integer, Pair<String, String>>(-1, new Pair<String, String>("song artist", "song title"));
 		}
-		return new Pair<Integer, Pair<String, String>>(0, new Pair<String, String>("", ""));
+		return new Pair<Integer, Pair<String, String>>(-1, new Pair<String, String>("", ""));
 	}
 
 
@@ -210,7 +210,7 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 		for(int i=0;i<10;i++){
 			l.add(new Pair<String, String>("artist user "+i, "song user "+i));
 		}
-		return new Pair<Integer, List<Pair<String, String>>>(0,l);
+		return new Pair<Integer, List<Pair<String, String>>>(-1,l);
 	
 	}
 
@@ -233,7 +233,10 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 		for(int i=0;i<10;i++){
 			l.add("friend "+i);
 		}
-		return new Pair<Integer, ArrayList<String>>(0, l);
+		if(friend_name.compareTo("friend 4")==0){
+			return new Pair<Integer, ArrayList<String>>(-1, l);
+		}
+		return new Pair<Integer, ArrayList<String>>(-1, l);
 	}
 
 	@Override
@@ -257,6 +260,24 @@ public class NadavDevelopmentClass implements ApplicationInterface {
 
 	@Override
 	public Pair<Integer, Boolean> checkInitializationStatus() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+	
+
+
+	@Override
+	public Pair<Integer, Boolean> sendMassage(String username_send,
+			String username_receive, String msg) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Pair<Integer, ArrayList<String[]>> getHistoryMassages(
+			String username_send, String username_receive) {
 		// TODO Auto-generated method stub
 		return null;
 	}
