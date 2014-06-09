@@ -33,6 +33,8 @@ public class initUpdateScreen extends Screen{
 	
 	private String type;
 	
+	private boolean init;
+	
 	
 	public initUpdateScreen(Display display,Shell shell,ApplicationInterface app,String type) {
 		super(display, shell, app);
@@ -41,6 +43,7 @@ public class initUpdateScreen extends Screen{
 		finished=false;
 		b=false;
 		zookini=null;
+		init=false;
 	}
 	
 	public static void updateProgressBar(){
@@ -118,6 +121,7 @@ public class initUpdateScreen extends Screen{
 
 		@Override
 		public void run() {
+			zookini= getApp().checkInitializationStatus();
 			zookini = getApp().initializeApplication();
 			
 			getDisplay().asyncExec(new Runnable() {
@@ -164,8 +168,24 @@ public class initUpdateScreen extends Screen{
 					t.start();
 				}
 				else{
-					Thread t = new Thread(new initApp());
-					t.start();	
+					//zookini1=getApp().checkInitializationStatus();
+					//if(zookini1.getLeft()==-1){//no connection
+					//	errorPop("Connection Problem", "you have no Connection to db\nPlease reconnect and try again.");
+					//	getDisplay().dispose();
+					//	System.exit(0);
+					//}
+				//	else{//we have connection
+					//	if(zookini1.getRight()){ //db already initilized
+					//		init=true;
+					//		return;
+					//	}
+					//	else{
+							Thread t = new Thread(new initApp());
+							t.start();
+					//	}
+						
+					//}
+						
 				}
 								
 				//
@@ -256,6 +276,7 @@ public class initUpdateScreen extends Screen{
 				}
 			}
 		}.start();
+		
 		
 		getShell().setVisible(false);
 		

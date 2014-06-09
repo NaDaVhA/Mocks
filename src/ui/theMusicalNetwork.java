@@ -11,6 +11,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import utilities.Pair;
 import core.AppEngine;
 import core.ApplicationInterface;
 import core.NadavDevelopmentClass;
@@ -27,7 +28,8 @@ public class theMusicalNetwork {
 	private Image bg_image=null;
 	
 	private ApplicationInterface engine;
-	
+	private Pair<Integer, Boolean> zookini1=null;
+	private boolean init=false;
 	
 	public static NadavDevelopmentClass nadav;  //qaqa this  design is not good
 	public static boolean qaqa=false;
@@ -79,6 +81,32 @@ public class theMusicalNetwork {
 
 
 public void runApp(){	
+	
+	zookini1=engine.checkInitializationStatus();
+	System.out.println(zookini1.getLeft());
+	System.out.println(zookini1.getRight());
+	
+	if(zookini1.getLeft()==-1){//no connection
+		MessageBox messageBox =   new MessageBox(main_shell, SWT.OK| SWT.ICON_ERROR);
+		messageBox.setText("Connection Problem");
+		messageBox.setMessage("you have no Connection to db\nPlease reconnect and try again.");
+		messageBox.open();
+		display.dispose();
+		System.exit(0);
+	}
+	else{//we have connection
+		if(zookini1.getRight()){ //db already initilized
+			init=true;
+			
+		}
+		else{
+			init=false;
+			
+		}
+		
+	}
+
+	if(!init){
 		if(qaqa){
 			initUpdateScreen init=new initUpdateScreen(display,main_shell, nadav,"init");
 			init.createScreen();
@@ -90,14 +118,14 @@ public void runApp(){
 			
 		}
 		
+	}
 		
+	logInScreen logIn=new logInScreen(display,main_shell,engine);
+	logIn.createScreen();
 		
-		logInScreen logIn=new logInScreen(display,main_shell,engine);
-		logIn.createScreen();
+	main_shell.setVisible(true);
 		
-		main_shell.setVisible(true);
-		
-		while (!main_shell.isDisposed()) {
+	while (!main_shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
@@ -106,6 +134,8 @@ public void runApp(){
 		
 
   }
+
+
 	
 	
 	
