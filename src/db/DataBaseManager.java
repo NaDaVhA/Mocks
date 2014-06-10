@@ -524,7 +524,7 @@ public class DataBaseManager {
 
 		//Yago files' paths
 		String yagoFactsFile = pathToYagoFiles + "yagoFacts.tsv";
-		String YagoTransitiveTypeFile = pathToYagoFiles + "YagoTransitiveType.tsv";
+		String YagoTransitiveTypeFile = pathToYagoFiles + "yagoTransitiveType.tsv";
 		
 		//Prepare data
 		System.out.println("Extracting data from Yago. Please wait.");
@@ -1028,7 +1028,7 @@ public class DataBaseManager {
 
 		//Yago files' paths
 		String yagoFactsFile = pathToYagoFiles + "yagoFacts.tsv";
-		String YagoTransitiveTypeFile = pathToYagoFiles + "YagoTransitiveType.tsv";
+		String YagoTransitiveTypeFile = pathToYagoFiles + "yagoTransitiveType.tsv";
 		
 		//Prepare data
 		

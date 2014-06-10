@@ -102,12 +102,12 @@ public class AppEngine implements ApplicationInterface{
 		
 		boolean verified = true;
 		
-		String[] files = {yagoFilesPath + "yagoFacts.tsv", yagoFilesPath + "YagoTransitiveType.tsv"};
+		String[] files = {yagoFilesPath + "yagoFacts.tsv", yagoFilesPath + "yagoTransitiveType.tsv"};
 		
 		for(String file : files){
 			File f = new File(file);
 			if(!f.exists()){
-				System.out.println("checkInitializationStatus: Error in given path: " + file);
+				System.out.println("verifyYagoFiles: Error in given path: " + file);
 				verified = false;
 				break;
 			}
