@@ -350,7 +350,7 @@ public class AppEngine implements ApplicationInterface{
 	}
 
 	
-	//mira
+	
 	
 	@Override
 	public  Pair<Integer, ArrayList<String>> getSearchResultsFriends(String friend_name) {
@@ -368,7 +368,7 @@ public class AppEngine implements ApplicationInterface{
 	}
 	
 
-	//mira-
+	
 	@Override
 	public Pair<Integer, Boolean> addFriend(String username) {
 		
@@ -486,7 +486,7 @@ public class AppEngine implements ApplicationInterface{
 	}
 
 
-//if user friend is not exist or a problem in dbAction than return false
+
 	@Override
 	public Pair<Integer, Boolean> removeFriendFromUser(String friendusername) {
 		
@@ -624,8 +624,8 @@ public class AppEngine implements ApplicationInterface{
 	//////////////////////////////////
 	
 	/**
-	 * 
-	 * @return
+	 * initialize the instance of user
+	 * @return true if succeed, else false
 	 * @throws SQLException 
 	 */
 	private boolean initializeUserInstance(String username) throws SQLException{
@@ -680,6 +680,7 @@ public class AppEngine implements ApplicationInterface{
 	 * Converts array to pair...
 	 * @param str
 	 * @return Pair<artist_name,song_name> or Pair<null,artist_name>
+	 * 
 	 */
 	private Pair<String,String> ConvertArrayToPair(String[] str)
 	{
@@ -693,6 +694,7 @@ public class AppEngine implements ApplicationInterface{
 		
 	}
 	
+	// convert string[] to pair in the arrayList
 	private ArrayList<Pair<String,String>> ConvertListArrayToListPair(ArrayList<String[]> arraylst)
 	{
 		ArrayList<Pair<String,String>> pairList = new ArrayList<Pair<String,String>>();
@@ -703,6 +705,7 @@ public class AppEngine implements ApplicationInterface{
 		return pairList;
 	}
 	
+	// Extract string[0] to srting in the arrayList
 	private ArrayList<String> ConvertListArrayToList(ArrayList<String[]> arraylst)
 	{
 		ArrayList<String> List = new ArrayList<String>();
