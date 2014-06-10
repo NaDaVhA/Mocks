@@ -512,6 +512,7 @@ public class DataBaseManager {
 	 */
 	public static boolean buildMusicDatabase(Connection connection, String pathToYagoFiles) throws SQLException{
 		
+		
 		//Check database status
 		int dbStatus = checkConfiguration(connection, "status", "general");
 		if(dbStatus == 1)
@@ -1074,7 +1075,7 @@ public class DataBaseManager {
 		if(!status)
 			return checkConnectionValidity(connection, status);
 	
-		//Initialize configuration table - update values !!!  QAQA 
+		//Initialize configuration table - update values of update tupple to 0.
 		status = initializeConfigurationTuple(connection, "updateOp");
 		if(!status)
 			return checkConnectionValidity(connection, status);
@@ -1099,8 +1100,10 @@ public class DataBaseManager {
 		
 		//Check configuration
 		int dbStatus = checkConfiguration(connection, "creatorCreationTables", "updateOp");
-		if(dbStatus == 1)	
+		if(dbStatus == 1){
+			progressTheMFProgressBar(25);
 			return true;
+		}
 		
 		System.out.println("Finishing the database update proccess. Hang on a while longer!");
 		
@@ -1228,8 +1231,10 @@ public class DataBaseManager {
 
 		//Check configuration
 		int dbStatus = checkConfiguration(connection, "songsTables", "updateOp");
-		if(dbStatus == 1)	
+		if(dbStatus == 1){
+			progressTheMFProgressBar(25);
 			return true;
+		}
 		
 		System.out.println("Updating the songs database. Please wait...");
 		
@@ -1379,8 +1384,10 @@ public class DataBaseManager {
 
 		//Check configuration
 		int dbStatus = checkConfiguration(connection, "artistsTables", "updateOp");
-		if(dbStatus == 1)	
+		if(dbStatus == 1){
+			progressTheMFProgressBar(25);
 			return true;
+		}
 		
 		System.out.println("Updating the artists database...");
 		
@@ -1574,14 +1581,13 @@ public class DataBaseManager {
 	 */
 	private static boolean initializeConfigurationTuple(Connection connection, String tuple){
 		
-		String[] statement = new String[2]; 
+		//String[] statement = new String[2]; 
+		//statement[0] = "DELETE FROM configuration WHERE operation LIKE 'updateOp'";
+		//statement[1] = "INSERT INTO `configuration` (`operation`) VALUES ('" + tuple + "')";
+		//status = executeTransaction(connection, statement);
 
-		statement[0] = "DELETE FROM configuration WHERE operation LIKE 'updateOp'";
-		statement[1] = "INSERT INTO `configuration` (`operation`) VALUES ('" + tuple + "')";
-		
-		boolean status = true;
-
-		status = executeTransaction(connection, statement);
+		String statementToExecute = "UPDATE `configuration` SET `status`=0, `artists`=0, `categories_of_artists`=0, `artist_category`=0, `songs`=0, `categories_of_songs`=0, `song_category`=0, `artist_song`=0, `artist_song_additions`=0, `artistsTables`=0, `songsTables`=0, `creatorCreationTables`=0, `artists_temp`=0, `artists_temp_after_singers`=0, `artist_category_temp`=0, `song_category_temp`=0, `song_category_distinct`=0, `artist_song_temp`=0, `artist_song_temp_distinct`=0, `unknown_song_id`=0, `update_artist_song_id`=0, `update_artists_temp`=0, `update_artists_distinct`=0, `update_artists_categories_distinct`=0, `update_artist_category_temp`=0, `update_artist_category_id_temp`=0, `update_song_category_distinct`=0, `update_song_category_temp`=0, `update_categories_of_songs_distinct`=0, `update_song_category_id`=0, `update_artist_song_temp`=0, `update_artist_song_distinct`=0, `update_artist_song_id_update`=0 WHERE `operation`='updateOp'";
+		boolean status = executeStatement(connection, statementToExecute);
 		
 		return status;
 	}
