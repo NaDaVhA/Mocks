@@ -218,12 +218,12 @@ CREATE TABLE `users_massages` (
   INDEX `user_receiver_id_users_massages_idx` (`user_receiver_id` ASC),
   CONSTRAINT `user_sender_id_users_massages`
     FOREIGN KEY (`user_sender_id`)
-    REFERENCES `test_2`.`users` (`user_id`)
+    REFERENCES `users` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `user_receiver_id_users_massages`
     FOREIGN KEY (`user_receiver_id`)
-    REFERENCES `test_2`.`users` (`user_id`)
+    REFERENCES `users` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
