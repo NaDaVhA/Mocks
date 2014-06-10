@@ -316,6 +316,9 @@ public interface DBActionsInterface {
 	 * the connection pool.
 	 */
 	public void terminateConnectionToDB();
+	
+	//
+	
 
 	public Boolean send_massage(int username_send_id, int username_receive_id,
 			String msg) throws SQLException;
