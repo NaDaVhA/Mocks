@@ -7,23 +7,19 @@ import java.util.ArrayList;
 public interface DBActionsInterface {
 
 	
+	
 	/////////////////////////////
 	// 		Music Database 	
 	/////////////////////////////
 	
-	
-	
 	/**
-	 * search songsList of a current user
-	 * @param
-	 * @return ArrayList<String[song_name, song_id]>,
-	 * @return ArrayList.size()== 0 if db does not contain user_songs , null if there is a problem in db execution
-	 * @throws SQLException
+	 * general queries on db
 	 */
-	public ArrayList<String[]> getSongsList() throws SQLException;
+	
+	
 	
 	/**
-	 * search songsArtistList of a current user
+	 * search songsArtistList in db
 	 * @param
 	 * @return ArrayList<String[song_name, artist_name]>
 	 * @return ArrayList.size()== 0 if db does not contain user_songs , null if there is a problem in db execution
@@ -31,8 +27,18 @@ public interface DBActionsInterface {
 	 */
 	public ArrayList<String[]> getSongsArtistList() throws SQLException;
 	
+	
 	/**
-	 * search BandsList of a current user
+	 * search songsList in db
+	 * @param
+	 * @return ArrayList<String[song_name, song_id]>,
+	 * @return ArrayList.size()== 0 if db does not contain user_songs , null if there is a problem in db execution
+	 * @throws SQLException
+	 */
+	public ArrayList<String[]> getSongsList() throws SQLException;
+
+	/**
+	 * search BandsList in db
 	 * @param
 	 * @return ArrayList<String[artist_id, artist_name]>
 	 * @return ArrayList.size()== 0 if db does not contain user_bands , null if there is a problem in db execution
@@ -41,13 +47,18 @@ public interface DBActionsInterface {
 	public ArrayList<String[]> getBandsList() throws SQLException;
 
 	/**
-	 * search SingersList of a current user
+	 * search SingersList in db
 	 * @param
 	 * @return ArrayList<String[artist_id, artist_name]>
 	 * @return ArrayList.size()== 0 if db does not contain user_singers , null if there is a problem in db execution
 	 * @throws SQLException
 	 */
 	public ArrayList<String[]> getSingersList() throws SQLException;
+	
+	
+	/**
+	 * search ID in db
+	 */
 	
 	/**
 	 * search ID of a the song_name
@@ -57,6 +68,28 @@ public interface DBActionsInterface {
 	 */
 	public int getSongID(String song_name) throws SQLException;
 	
+	
+	/**
+	 * search the ID of the artist_name
+	 * @param artist_name
+	 * @return int artist_id, 0 if db does not contain artist_name string, -1 if there is a problem in db execution
+	 * @throws SQLException
+	 */
+	public int getArtistID(String artist_name) throws SQLException;
+
+
+	/**
+	 *  search the ID of the username
+	 * @param username
+	 * @return int artist_id, 0 if db does not contain username string, -1 if there is a problem in db execution
+	 * @throws SQLException
+	 */
+	public int getUserId(String username) throws SQLException;
+
+	/**
+	 * general searches in db
+	 */
+
 	
 	/**
 	 * search friends name that contains the letters of Freindname
@@ -84,6 +117,11 @@ public interface DBActionsInterface {
 	 * @throws SQLException
 	 */
 	public ArrayList<String[]> getSongsArtistList(String songname) throws SQLException;
+	
+	
+/////////////////////////////
+// 		Users Database 	
+/////////////////////////////
 	
 	/**
 	 * register in db a new user
@@ -140,21 +178,6 @@ public interface DBActionsInterface {
 	 * @throws SQLException
 	 */
 	public String[] getUserStatusSong(int userID) throws SQLException;
-	
-	
-	/**
-	 * search the ID of the artist_name
-	 * @param artist_name
-	 * @return int artist_id, 0 if db does not contain artist_name string, -1 if there is a problem in db execution
-	 * @throws SQLException
-	 */
-	public int getArtistID(String artist_name) throws SQLException;
-	
-	
-	
-	/////////////////////////////
-	// 		Users Database 	
-	/////////////////////////////
 	
 	
 	
@@ -215,12 +238,32 @@ public interface DBActionsInterface {
 	
 	
 	
-	/////////////////////////////
-	//	Users - Getters	
-	/////////////////////////////
+	/**
+	 * insert a massage text to db between sender and receiver  
+	 * @param username_send_id
+	 * @param username_receive_id
+	 * @param msg
+	 * @return true if succeeded, false otherwise.
+	 * @throws SQLException
+	 */
+		public Boolean send_massage(int username_send_id, int username_receive_id,
+				String msg) throws SQLException;
 
 	
-	
+	/**
+	 * get history massages between two users
+	 * @param username_send_id
+	 * @param username_receive_id
+	 * @param sender_name
+	 * @param receiver_name
+	 * @return ArrayList<String[user_sender, user_receiver, massage]>
+	 * @return ArrayList.size()== 0 if db does not contain history massage, null if there is a problem in db execution
+	 * @throws SQLException
+	 */
+	public ArrayList<String[]> get_history_massage(int username_send_id,
+			int username_receive_id,String sender_name, String receiver_name ) throws SQLException;
+
+
 	/**
 	 * search for all users in db
 	 * @param
@@ -238,14 +281,6 @@ public interface DBActionsInterface {
 	 * @throws SQLException
 	 */
 	public String[] getUserName(int userID) throws SQLException;
-	
-	/**
-	 *  search the ID of the username
-	 * @param username
-	 * @return int artist_id, 0 if db does not contain username string, -1 if there is a problem in db execution
-	 * @throws SQLException
-	 */
-	public int getUserId(String username) throws SQLException;
 	
 	/**
 	 * search a password that match to userID
@@ -316,15 +351,6 @@ public interface DBActionsInterface {
 	 * the connection pool.
 	 */
 	public void terminateConnectionToDB();
-	
-	//
-	
-
-	public Boolean send_massage(int username_send_id, int username_receive_id,
-			String msg) throws SQLException;
-
-	public ArrayList<String[]> get_history_massage(int username_send_id,
-			int username_receive_id,String sender_name, String receiver_name ) throws SQLException;
 
 
 	
