@@ -61,7 +61,7 @@ public class signUpScreen extends Screen{
 		headline= new Label(getShell(), SWT.NONE);
 		headline.setAlignment(SWT.CENTER);
 		headline.setText("The Musical Network ");
-		headline.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE)); //change color to white
+		headline.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE)); 
 		headline.setFont(SWTResourceManager.getFont("MV Boli", 32, SWT.BOLD));
 
 		FormData data = new FormData ();
@@ -139,61 +139,46 @@ public class signUpScreen extends Screen{
 
 			@Override
 			public void run() {
-				//final boolean isUserTaken=theMusicalNetwork.nadav.isUsernameTaken(signUpScreen.this.username_s);
 				final Pair<Integer,Boolean> isUserTaken;
-				if(theMusicalNetwork.qaqa){
-					isUserTaken=theMusicalNetwork.nadav.isUsernameTaken(signUpScreen.this.username_s);
-				}
-				else{
-					isUserTaken=engine.isUsernameTaken(signUpScreen.this.username_s);
-				}
-				//final boolean isUserTaken=engine.isUsernameTaken(signUpScreen.this.username_s);
+				isUserTaken=engine.isUsernameTaken(signUpScreen.this.username_s);
+
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						if(checkConnection(getShell(), isUserTaken.getLeft())){ //no problem
-							if(isUserTaken.getRight()){ //QAQA  - PUT REAL FUNCTION HERE 
-								closeWaiting();
-								showScreen();
+							if(isUserTaken.getRight()){ 
+								getShell().layout();
 								errorPop("Sign up Error", "Username already taken");
 							}
-							else{//username is not taken and pass is ok..  sign up the user
-								//QAQA-in interface signUpUser
+							else{
+								
 								/*******/
 								class SignUpUser implements Runnable {
 
 									@Override
 									public void run() {
 										final Pair<Integer,Boolean> signUpUser;
-										//final boolean signUpUser=theMusicalNetwork.nadav.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
-										if(theMusicalNetwork.qaqa){
-											signUpUser=theMusicalNetwork.nadav.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
-										}
-										else{
-											signUpUser=engine.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
-										}
-										//final boolean signUpUser=engine.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
+										signUpUser=engine.signUpUser(signUpScreen.this.username_s,signUpScreen.this.password_s);
+
 										getDisplay().asyncExec(new Runnable() {
 											public void run() {
 												if(checkConnection(getShell(), signUpUser.getLeft())){
-													if(!signUpUser.getRight()){ //QAQA  - PUT REAL FUNCTION HERE 
-														closeWaiting();
-														showScreen();
+													if(!signUpUser.getRight()){  
+													
+														getShell().layout();
 														errorPop("Sign up Error", "Failed to Sign up..");
 													}
 													else{//Sign up success.. go to main screen
-														PopUpinfo(getShell(),"Sign up", "sign up succes!");
-														closeWaiting();
+														PopUpinfo(getShell(),"Sign up info", "You have signed up successfully!");
+													
 														disposeScreen();
 														logInScreen log=new logInScreen(getDisplay(), getShell(), engine);
 														log.createScreen();
-														//mainScreen main_screen=new mainScreen(getDisplay(), getShell(),engine,signUpScreen.this.username_s);
-														//main_screen.createScreen();
-														//else{...}
+														
 													}
 												}
 												else{
-													closeWaiting();
-													showScreen();
+
+													getShell().layout();
 												}
 												
 											}
@@ -212,8 +197,7 @@ public class signUpScreen extends Screen{
 							}
 						}
 						else{ //problem and want to continue
-							closeWaiting();
-							showScreen();
+							getShell().layout();
 						}
 						
 					}
@@ -237,13 +221,11 @@ public class signUpScreen extends Screen{
 		signUp.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed sign up"); //qaqa
+
 				setUsername(user.getText());
 				setPassword(pass.getText());
 				setPasswordRepeat(R_pass.getText());
-				//System.out.println("qaqa - username: "+signUpScreen.this.username_s); //qaqa
-				//System.out.println("qaqa - pass: "+signUpScreen.this.password_s); //qaqa
-				//System.out.println("qaqa - pass repeat: "+signUpScreen.this.password_repeat_s); //qaqa
+
 				if(signUpScreen.this.password_s.compareTo(signUpScreen.this.password_repeat_s)!=0){
 					errorPop("Sign up Error", "Passwords doesnt match.\nPlease try again.");
 				}
@@ -252,13 +234,11 @@ public class signUpScreen extends Screen{
 						errorPop("Sign up Error", "One or more of the passwords fields are empty.\nPlease try again.");
 					}
 					else{
-						
-						// create a thread to check if user registerd
+
 						Thread t = new Thread(new CheckUserTaken());
-						openWaiting();
+						getShell().layout();
 						t.start();
-						
-					
+
 					}
 				}
 			}
@@ -282,37 +262,5 @@ public class signUpScreen extends Screen{
 		this.signUp.dispose();
 		this.c.dispose();
 	}
-
-	@Override
-	protected void hideScreen() {
-		// TODO Auto-generated method stub
-		this.headline.setVisible(false);
-		this.pass.setVisible(false);
-		this.password.setVisible(false);
-		this.R_pass.setVisible(false);
-		this.R_password.setVisible(false);
-		this.user.setVisible(false);
-		this.username.setVisible(false);
-		this.signUp.setVisible(false);
-		this.c.setVisible(false);
-		this.getShell().layout();
-	}
-
-	@Override
-	protected void showScreen() {
-		// TODO Auto-generated method stub
-		this.headline.setVisible(true);
-		this.pass.setVisible(true);
-		this.password.setVisible(true);
-		this.R_pass.setVisible(true);
-		this.R_password.setVisible(true);
-		this.user.setVisible(true);
-		this.username.setVisible(true);
-		this.signUp.setVisible(true);
-		this.c.setVisible(true);
-		this.getShell().layout();
-		
-	}
-
 	
 }

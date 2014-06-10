@@ -41,44 +41,28 @@ public class RecomendationsScreen extends Screen {
 	private Table  songList_t=null;
 	private List friendList=null;	
 	private Button back_button=null;
-	
 	private Pair<String, String> song_selcted_table=null;
 	private String friend_name_selected;
 	private Thread t13,t14,t15;
-	
-	
-
 	private Composite c1=null;
 	private Composite c2=null;
 	
-////////////////////////////////////////////////////////////////
 	private java.util.List<String> recommendedFriends = null;
 	private java.util.List<Pair<String, String>> recommendedSongs = null;
 	private String loggedInUserName;
-	//private Pair<String,String> chosenSong;
-	//private String chosenFriend;
-	
-	
-	
-	
-	//private Thread thread1;
-	//private Thread addFriendThread;
+
+
 
 	public RecomendationsScreen(Display display, Shell shell, ApplicationInterface engine) {
 		super(display, shell, engine);
 		// Get Logged In Username
 		loggedInUserName = engine.getUsername();
-
-
-		
-		
-		System.out.println("RecomendationsScreen-constructor()");
 	}
 
 	@Override
 	public void createScreen() {
 
-		//username label
+		//user name label
 		head=new Label(getShell(), SWT.NONE);
 		head.setAlignment(SWT.RIGHT);
 		
@@ -87,8 +71,6 @@ public class RecomendationsScreen extends Screen {
 		head.setText("recommended songs and friends");
 		FormData data1 = new FormData ();
 		data1.width=700;
-		//data1.right=new FormAttachment (20);
-	
 		head.setLayoutData(data1);
 		
 
@@ -103,9 +85,7 @@ public class RecomendationsScreen extends Screen {
 		c1.setLayoutData(data4);
 		c1.setLayout(new GridLayout(2, false));
 		
-		
-		
-		
+
 
 		//song list label
 		
@@ -117,7 +97,6 @@ public class RecomendationsScreen extends Screen {
 		song_list_label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 2, 1));
 	
 		
-
 
 		
 		//song list
@@ -141,10 +120,7 @@ public class RecomendationsScreen extends Screen {
 			songList_t.addListener(SWT.Selection, new Listener () {
 				@Override
 				public void handleEvent (Event event) {
-					System.out.println(event.item);//qaqa
 					TableItem item=(TableItem)event.item;
-					System.out.println(item.getText(0));//qaqa
-					System.out.println(item.getText(1));//qaqa
 					Pair<String, String> s=new Pair<String, String>(item.getText(0), item.getText(1));
 					song_selcted_table=s;
 				}
@@ -158,21 +134,14 @@ public class RecomendationsScreen extends Screen {
 				@Override
 				public void run() {
 					final Pair<Integer,Boolean> b;
-					if(theMusicalNetwork.qaqa){
-						b=theMusicalNetwork.nadav.addSong(song_selcted_table.getRight(),song_selcted_table.getLeft());
-					}
-					else{//true code
-						b=engine.addSong(song_selcted_table.getRight(),song_selcted_table.getLeft());
-					}
-					
+					b=engine.addSong(song_selcted_table.getRight(),song_selcted_table.getLeft());
+
 					getDisplay().asyncExec(new Runnable() {
 						public void run() {
-							System.out.println("LL "+b.getRight());
 							if(checkConnection(getShell(),b.getLeft())){
 								if(!b.getRight()){
-									closeWaiting();
-									showScreen();
-									errorPop("Error", "Failed to add song.");	
+									getShell().layout();
+									errorPop("Add song error", "Failed to add song.");	
 									pool.remove(t14);
 								}
 								else{
@@ -180,20 +149,17 @@ public class RecomendationsScreen extends Screen {
 									pool.remove(t14);
 									PopUpinfo(getShell(),"Added Song", "The song was added to your song list successfully!");
 									if(pool.isEmpty()){
-										closeWaiting();
-										showScreen();
+										getShell().layout();
 									}
 									
 								}	
 							}
 							
 							else{//want to cont.
-								//stay in screen
-								//popSync=false;
+
 								pool.remove(t14);
 								if(pool.isEmpty()){
-									closeWaiting();
-									showScreen();
+									getShell().layout();
 									
 								}
 							}
@@ -217,10 +183,7 @@ public class RecomendationsScreen extends Screen {
 					@Override
 					public void widgetSelected (SelectionEvent e) {
 						System.out.println("qaqa - pressed add song");
-						//disposeScreen();
-						//hideScreen();
-						//addNewSongScreen newSong=new addNewSongScreen(getDisplay(), getShell(),engine);
-						//newSong.createScreen();
+
 						if(song_selcted_table==null){
 							errorPop("Error", "Please select a song first");
 						}
@@ -232,14 +195,16 @@ public class RecomendationsScreen extends Screen {
 					}
 				});
 				
-				c2=new Composite(getShell(), SWT.NONE);
-				FormData data5 = new FormData ();
-				data5.width=300;
-				data5.height=300;
-				data5.top=new FormAttachment (c1, 0,SWT.TOP);
-				data5.left = new FormAttachment (c1, 200);
-				c2.setLayoutData(data5);
-				c2.setLayout(new GridLayout(2, false));
+				
+		//Composite	
+		c2=new Composite(getShell(), SWT.NONE);
+		FormData data5 = new FormData ();
+		data5.width=300;
+		data5.height=300;
+		data5.top=new FormAttachment (c1, 0,SWT.TOP);
+		data5.left = new FormAttachment (c1, 200);
+		c2.setLayoutData(data5);
+		c2.setLayout(new GridLayout(2, false));
 		
 
 		
@@ -247,7 +212,6 @@ public class RecomendationsScreen extends Screen {
 		
 		
 		//friend list label
-		
 		friend_list_label=new Label(c2, SWT.NONE);
 		friend_list_label.setAlignment(SWT.CENTER);
 		friend_list_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -259,7 +223,6 @@ public class RecomendationsScreen extends Screen {
 	
 		
 		//friend list
-		
 		friendList=new List(c2, SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
 		friendList.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		GridData g1=new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
@@ -269,11 +232,9 @@ public class RecomendationsScreen extends Screen {
 		friendList.addListener(SWT.Selection, new Listener () {
 			@Override
 			public void handleEvent (Event event) {
-				//System.out.println(event.data);//qaqa
 				int[] selection = friendList.getSelectionIndices();
 				
 				for (int i=0; i<selection.length; i++) {
-					System.out.println(friendList.getItem(selection[i])); //qaqa
 						friend_name_selected=friendList.getItem(selection[i]);
 					}
 				
@@ -286,21 +247,15 @@ public class RecomendationsScreen extends Screen {
 		@Override
 		public void run() {
 			final Pair<Integer,Boolean> add;
-			if(theMusicalNetwork.qaqa){
-				add=theMusicalNetwork.nadav.addFriend(friend_name_selected);
-			}
-			else{
-				add=engine.addFriend(friend_name_selected);
-			}
+			add=engine.addFriend(friend_name_selected);
 	
 			getDisplay().asyncExec(new Runnable() {
 				public void run() {
-					//status_song=status;
+
 					if(checkConnection(getShell(), add.getLeft())){
 						if(!add.getRight()){
-							closeWaiting();
-							showScreen();
-							errorPop("Error", "Failed to add friend.");	
+							getShell().layout();
+							errorPop("Add friend error", "Failed to add friend.");	
 							pool.remove(t15);
 						}
 						else{
@@ -308,8 +263,8 @@ public class RecomendationsScreen extends Screen {
 							pool.remove(t15);
 							PopUpinfo(getShell(),"Add Friend", "The friend was added to your friend list successfully!!");
 							if(pool.isEmpty()){
-								closeWaiting();
-								showScreen();
+
+								getShell().layout();
 								
 							}
 							
@@ -318,9 +273,7 @@ public class RecomendationsScreen extends Screen {
 					else{
 						pool.remove(t15);
 						if(pool.isEmpty()){
-							closeWaiting();
-							showScreen();
-							//PopUpinfo(getShell(),"added Friend", "qaqa-succes!!!");
+							getShell().layout();
 						}
 					}
 					
@@ -345,7 +298,6 @@ public class RecomendationsScreen extends Screen {
 	add_new_friend.addSelectionListener(new SelectionAdapter() {
 		@Override
 		public void widgetSelected (SelectionEvent e) {
-			System.out.println("qaqa - pressed add_new_friend");
 			 t15 = new Thread(new addFriend());
 				pool.add(t15);	
 				t15.start();
@@ -361,22 +313,14 @@ public class RecomendationsScreen extends Screen {
 			FormData data13 = new FormData ();
 			data13.width=180;
 			data13.height=30;
-			//data12.right = new FormAttachment (87, 0);
 			data13.top = new FormAttachment (head, 525);
 			back_button.setLayoutData(data13); 
 			back_button.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected (SelectionEvent e) {
-					System.out.println("qaqa - pressed back home");
 					disposeScreen();
-					if(theMusicalNetwork.qaqa){
-					mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,theMusicalNetwork.nadav.getUsername()); //QAQA ADD USERNAME
-					mainScreen.createScreen();
-					}
-					else{
-						mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); //QAQA ADD USERNAME
-						mainScreen.createScreen();	
-					}
+					mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); //QAQA ADD USERNAME
+					mainScreen.createScreen();	
 				}
 			});
 			
@@ -387,8 +331,7 @@ public class RecomendationsScreen extends Screen {
 				public void run() {
 
 					//here call to run recommendations
-					engine.InitalizeRecommender();  //qaqa is this a problem to call to build all the songs and users every time
-					
+					engine.InitalizeRecommender();  					
 					// Get Recommendations From RecommenderEngine
 					runRecommendations();
 					
@@ -396,24 +339,23 @@ public class RecomendationsScreen extends Screen {
 
 						@Override
 						public void run() {
-							// TODO Auto-generated method stub
-					// Update UI
-					for (String recommendedUsername : recommendedFriends) {
-						friendList.add(recommendedUsername);	
-					}
-					// Update UI
-					for (Pair<String, String> song : recommendedSongs) {
-						TableItem item = new TableItem(songList_t, SWT.NONE);
-						item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-						item.setText(0, song.getLeft());
-						item.setText(1, song.getRight());
-					}
-						pool.remove(t13);
-						if(pool.isEmpty()){
-							closeWaiting();
-							showScreen();
-							//PopUpinfo(getShell(),"added Friend", "qaqa-succes!!!");
-					}
+						
+							// Update UI
+							for (String recommendedUsername : recommendedFriends) {
+								friendList.add(recommendedUsername);	
+							}
+							// Update UI
+							for (Pair<String, String> song : recommendedSongs) {
+								TableItem item = new TableItem(songList_t, SWT.NONE);
+								item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+								item.setText(0, song.getLeft());
+								item.setText(1, song.getRight());
+							}
+								pool.remove(t13);
+								if(pool.isEmpty()){
+									getShell().layout();
+
+							}
 							
 					}
 						
@@ -428,12 +370,9 @@ public class RecomendationsScreen extends Screen {
 		
 			
 		t13 = new Thread(new runRecommendations());
-		pool.add(t13);
-		
+		pool.add(t13);	
 		t13.start();
-				
-	
-		openWaiting();
+
 		this.getShell().layout();
 		
 		
@@ -463,29 +402,19 @@ public class RecomendationsScreen extends Screen {
 	
 	@Override
 	protected void disposeScreen() {
-		System.out.println("RecomendationsScreen-disposeScreen()");
 		this.c1.dispose();
 		this.c2.dispose();
 		this.head.dispose();
 		this.song_list_label.dispose();
-	this.friend_list_label.dispose();
-	this.add_new_song.dispose();
-	this.add_new_friend.dispose();
-	this.songList_t.dispose();
-	this.friendList.dispose();
-	this.back_button.dispose();
+		this.friend_list_label.dispose();
+		this.add_new_song.dispose();
+		this.add_new_friend.dispose();
+		this.songList_t.dispose();
+		this.friendList.dispose();
+		this.back_button.dispose();
 		
-
 	}
 
-	@Override
-	protected void hideScreen() {
-		System.out.println("RecomendationsScreen-hideScreen()");
-	}
 
-	@Override
-	protected void showScreen() {
-		System.out.println("RecomendationsScreen-showScreen()");
-	}
 
 }

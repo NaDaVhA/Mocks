@@ -28,8 +28,7 @@ import utilities.Pair;
 
 public class addNewFriendScreen extends Screen {
 	
-	//add members here
-
+	//members
 	private Label head=null;
 	private Label search_label=null;
 	private Text search_text=null;
@@ -44,7 +43,6 @@ public class addNewFriendScreen extends Screen {
 	private Button search_button=null;
 	private String name_to_search;
 	
-	//private String username;
 	private String friend_name_to_show;
 	
 	private Thread t5,t6,t7;
@@ -56,7 +54,6 @@ public class addNewFriendScreen extends Screen {
 	
 	public addNewFriendScreen(Display display, Shell shell,ApplicationInterface engine){
 		super(display, shell,engine);	
-		//username=user;
 	}
 
 	@Override
@@ -112,16 +109,13 @@ public class addNewFriendScreen extends Screen {
 				@Override
 				public void run() {
 					final  Pair<Integer, ArrayList<String>> list_p;
-					if(theMusicalNetwork.qaqa){
-						 list_p=theMusicalNetwork.nadav.getSearchResultsFriends(name_to_search);
-					}
-					else{//true code
-						 list_p=engine.getSearchResultsFriends(name_to_search);
-					}
+					
+					list_p=engine.getSearchResultsFriends(name_to_search);
+					
 					
 					getDisplay().asyncExec(new Runnable() {
 						public void run() {
-							//status_song=status;
+							
 							if(checkConnection(getShell(), list_p.getLeft())){
 								friend_result_list.removeAll();
 								if(list_p.getRight().isEmpty()){
@@ -141,8 +135,7 @@ public class addNewFriendScreen extends Screen {
 							
 							pool.remove(t5);
 							if(pool.isEmpty()){
-								closeWaiting();
-								showScreen();
+								getShell().layout(); 
 							}
 						}
 					});
@@ -160,22 +153,19 @@ public class addNewFriendScreen extends Screen {
 		search_button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed search friend");
 				friend_name_to_show="";
-				name_to_search=null; //qaqa ?? check search function
+				name_to_search=null; 
 				name_to_search=search_text.getText();
 				
-				System.out.println("qaqa - name to search: "+name_to_search);
-				
 				if(name_to_search.compareTo("")==0){
-					errorPop("Error", "you didnt enter a name to search.\nPlease enter the name.");
+					errorPop("Search error", "You didnt enter a name to search.\nPlease enter the name.");
 				}
 				else{
-					//friend_result_list.removeAll();
+					
 					friend_status_song.setText("");
 					friend_songs.removeAll();
-					openWaiting();
 					
+					getShell().layout();
 					 t5 = new Thread(new searchFriends());
 					 pool.add(t5);
 					 t5.start();
@@ -215,20 +205,12 @@ public class addNewFriendScreen extends Screen {
 						final Pair<Integer, Pair<String, String>> friend_song;
 						final  Pair<Integer, java.util.List<Pair<String, String>>> list_p;
 						
-						if(theMusicalNetwork.qaqa){
-							 friend_song=theMusicalNetwork.nadav.getStatusSong(friend_name_to_show);
-							 list_p= theMusicalNetwork.nadav.getSongList(friend_name_to_show);
-						}
-						else{ //true code
-						 friend_song=engine.getStatusSong(friend_name_to_show); //1.6.14	
-						 list_p= engine.getSongList(friend_name_to_show); //1.6.14
-							
-						}
-						
-						
+						friend_song=engine.getStatusSong(friend_name_to_show); 	
+						list_p= engine.getSongList(friend_name_to_show); 
+
 						getDisplay().asyncExec(new Runnable() {
 							public void run() {
-								//status_song=status;
+								
 								if(checkConnection(getShell(),friend_song.getLeft())&&checkConnection(getShell(),list_p.getLeft())){
 									
 									friend_status_song.setText(friend_song.getRight().getLeft()+" "+friend_song.getRight().getRight());
@@ -248,8 +230,7 @@ public class addNewFriendScreen extends Screen {
 								//
 								pool.remove(t6);
 								if(pool.isEmpty()){
-									closeWaiting();
-									showScreen();
+									getShell().layout();
 								}
 							}
 						});
@@ -276,10 +257,10 @@ public class addNewFriendScreen extends Screen {
 				int[] selection = friend_result_list.getSelectionIndices();
 				
 				for (int i=0; i<selection.length; i++) {
-					System.out.println(friend_result_list.getItem(selection[i])); //qaqa
+					
 						friend_name_to_show=friend_result_list.getItem(selection[i]);
 					}
-				//openWaiting();
+				
 				
 				 t6 = new Thread(new updateFriendShow());
 				 pool.add(t6);
@@ -366,29 +347,22 @@ public class addNewFriendScreen extends Screen {
 			@Override
 			public void run() {
 				final Pair<Integer,Boolean> add;
-				if(theMusicalNetwork.qaqa){
-					add=theMusicalNetwork.nadav.addFriend(friend_name_to_show);
-				}
-				else{
-					add=engine.addFriend(friend_name_to_show);
-				}
+				add=engine.addFriend(friend_name_to_show);
 				
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						//status_song=status;
+						
 						if(checkConnection(getShell(), add.getLeft())){
 							if(!add.getRight()){
-								closeWaiting();
-								showScreen();
-								errorPop("Error", "Failed to add friend.");	
+								getShell().layout();
+								errorPop("Add friend error", "Failed to add friend.");	
 								pool.remove(t7);
 							}
 							else{
 								
 								pool.remove(t7);
 								if(pool.isEmpty()){
-									closeWaiting();
-									showScreen();
+									getShell().layout();
 									PopUpinfo(getShell(),"Added Friend", "The friend was added to your friend list successfully!");
 								}
 								
@@ -397,8 +371,7 @@ public class addNewFriendScreen extends Screen {
 						else{//connection is not good and want to stay
 							pool.remove(t7);
 							if(pool.isEmpty()){
-								closeWaiting();
-								showScreen();
+								getShell().layout();
 							}
 						}
 				
@@ -422,17 +395,15 @@ public class addNewFriendScreen extends Screen {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				
-			//	System.out.println("qaqa - pressed add friend - "+friend_name_to_show);
-
 				if(friend_name_to_show.compareTo("")==0){
 					errorPop("Error", "Please selet a friend first.");
 				}
 				else{
-					openWaiting();
 					
-					 t7 = new Thread(new addFriend());
-					 pool.add(t7);
-					 t7.start();
+					getShell().layout();
+					t7 = new Thread(new addFriend());
+					pool.add(t7);
+					t7.start();
 				}
 			}
 		});
@@ -445,15 +416,13 @@ public class addNewFriendScreen extends Screen {
 		FormData data12 = new FormData ();
 		data12.width=180;
 		data12.height=30;
-		//data12.right = new FormAttachment (87, 0);
 		data12.bottom = new FormAttachment (100, 0);
 		back_button.setLayoutData(data12); 
 		back_button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed back home");
 				disposeScreen();
-				mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); //QAQA ADD USERNAME
+				mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); 
 				mainScreen.createScreen();
 			}
 		});
@@ -483,49 +452,5 @@ public class addNewFriendScreen extends Screen {
 		
 	}
 
-	@Override
-	protected void hideScreen() {
-		// TODO Auto-generated method stub
-		this.add_friend_button.setVisible(false);
-		this.back_button.setVisible(false);
-		this.friend_result_label.setVisible(false);
-		this.friend_result_list.setVisible(false);
-		this.friend_songs.setVisible(false);
-		this.friend_status_label.setVisible(false);
-		this.friend_status_song.setVisible(false);
-		this.head.setVisible(false);
-		this.search_button.setVisible(false);
-		this.search_label.setVisible(false);
-		this.search_text.setVisible(false);
-		this.songs_list_label.setVisible(false);
-		this.c.setVisible(false);
-		this.c1.setVisible(false);
-		this.c2.setVisible(false);
-		this.c3.setVisible(false);
-		this.getShell().layout();
-		
-	}
 
-	@Override
-	protected void showScreen() {
-		// TODO Auto-generated method stub
-		this.add_friend_button.setVisible(true);
-		this.back_button.setVisible(true);
-		this.friend_result_label.setVisible(true);
-		this.friend_result_list.setVisible(true);
-		this.friend_songs.setVisible(true);
-		this.friend_status_label.setVisible(true);
-		this.friend_status_song.setVisible(true);
-		this.head.setVisible(true);
-		this.search_button.setVisible(true);
-		this.search_label.setVisible(true);
-		this.search_text.setVisible(true);
-		this.songs_list_label.setVisible(true);
-		this.c.setVisible(true);
-		this.c1.setVisible(true);
-		this.c2.setVisible(true);
-		this.c3.setVisible(true);
-		this.getShell().layout();
-		
-	}
 }

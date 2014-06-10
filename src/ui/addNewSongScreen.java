@@ -34,7 +34,7 @@ import utilities.Pair;
 
 public class addNewSongScreen extends Screen{
 	
-	//add members here
+	//members 
 	private Label head=null;
 	private Label search_label=null;
 	private Text search_box=null;
@@ -130,16 +130,12 @@ public class addNewSongScreen extends Screen{
 	combo.addSelectionListener(new SelectionAdapter() {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			System.out.println("Item selected");
-			//System.out.println(combo.getSelectionIndex());
 			if(combo.getSelectionIndex()==1){
 				searchByArtist=false;
 			}
 			else{
 				searchByArtist=true;
 			}
-			
-			System.out.println(searchByArtist);//qaqa
 		}
 	});
 			
@@ -151,26 +147,14 @@ public class addNewSongScreen extends Screen{
 				public void run() {
 					final Pair<Integer,ArrayList<Pair<String, String>>> list ;
 					if(searchByArtist){
-						if(theMusicalNetwork.qaqa){
-							list=theMusicalNetwork.nadav.getSearchResultsByArtist(text_to_search);
-						}
-						else{ //true code
-							 list=engine.getSearchResultsByArtist(text_to_search);
-						}
-					
+						list=engine.getSearchResultsByArtist(text_to_search);
 					}
 					else{
-						if(theMusicalNetwork.qaqa){
-							 list=theMusicalNetwork.nadav.getSearchResultsBySong(text_to_search);
-						}
-						else{//real code
-							list=engine.getSearchResultsBySong(text_to_search);
-						}
-							 
+						list=engine.getSearchResultsBySong(text_to_search);	 
 					}
 					getDisplay().asyncExec(new Runnable() {
 						public void run() {
-							//status_song=status;
+							
 							if(checkConnection(getShell(), list.getLeft())){
 								result_list.removeAll();
 								if(list.getRight().isEmpty()){
@@ -193,8 +177,7 @@ public class addNewSongScreen extends Screen{
 							
 							pool.remove(t8);
 							if(pool.isEmpty()){
-								closeWaiting();
-								showScreen();
+								getShell().layout();
 							}
 						}
 					});
@@ -211,15 +194,13 @@ public class addNewSongScreen extends Screen{
 		search_songs_button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed search");
 				song_chosen=null;
 				text_to_search=search_box.getText();
-				System.out.println("qaqa - search with :"+text_to_search);
 				if(text_to_search.isEmpty()){
 					errorPop("Search error", "You didnt enter any text to search.\nPlease enter text and try again.");
 				}
-				else{		
-				 openWaiting();			
+				else{				
+				 getShell().layout();
 				 t8 = new Thread(new searchSongs());
 				 pool.add(t8);
 				 t8.start();
@@ -279,12 +260,9 @@ public class addNewSongScreen extends Screen{
 				int [] selection = result_list.getSelectionIndices ();
 				
 				for (int i=0; i<selection.length; i++) {
-					System.out.println(result_list.getItem(selection[i])); //qaqa
 						song_chosen=new Pair<String, String>(result_list.getItem(selection[i]).getText(0)
 								, result_list.getItem(selection[i]).getText(1));
 					}
-				//openWaiting();
-				
 				
 			}
 		});
@@ -295,29 +273,22 @@ public class addNewSongScreen extends Screen{
 			@Override
 			public void run() {
 				final Pair<Integer,Boolean> b;
-				if(theMusicalNetwork.qaqa){
-					b=theMusicalNetwork.nadav.addSong(song_chosen.getRight(),song_chosen.getLeft());
-				}
-				else{//true code
-					b=engine.addSong(song_chosen.getRight(),song_chosen.getLeft());
-				}
-				;
+				b=engine.addSong(song_chosen.getRight(),song_chosen.getLeft());
+			
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						//status_song=status;
+						
 						if(checkConnection(getShell(), b.getLeft())){
 							if(!b.getRight()){
-								closeWaiting();
-								showScreen();
-								errorPop("Error", "Failed to add song.");	
+								getShell().layout();
+								errorPop("Add song error", "Failed to add song.");	
 								pool.remove(t8);
 							}
 							else{
 								
 								pool.remove(t8);
 								if(pool.isEmpty()){
-									closeWaiting();
-									showScreen();
+									getShell().layout();
 									PopUpinfo(getShell(),"Added Song", "The song was added to your song list successfully!");
 								}
 							}
@@ -348,7 +319,7 @@ public class addNewSongScreen extends Screen{
 		add_song_button.addSelectionListener(new SelectionAdapter() {
 		@Override
 		public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed Add song");
+				
 				if(song_chosen==null){
 					errorPop("Error", "Please choose a song first.");
 				}
@@ -368,15 +339,13 @@ public class addNewSongScreen extends Screen{
 		FormData data12 = new FormData ();
 		data12.width=180;
 		data12.height=30;
-		//data12.right = new FormAttachment (87, 0);
 		data12.bottom = new FormAttachment (100, 0);
 		back_button.setLayoutData(data12); 
 		back_button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed back home");
 				disposeScreen();
-				mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); //QAQA ADD USERNAME
+				mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); 
 				mainScreen.createScreen();
 			}
 		});
@@ -402,40 +371,5 @@ public class addNewSongScreen extends Screen{
 		
 	}
 
-	@Override
-	protected void hideScreen() {
-		// TODO Auto-generated method stub
-		this.add_song_button.setVisible(false);
-		this.back_button.setVisible(false);
-		this.head.setVisible(false);
-		this.result_list.setVisible(false);
-		this.search_box.setVisible(false);
-		this.search_label.setVisible(false);
-		this.search_results_label.setVisible(false);
-		this.search_songs_button.setVisible(false);
-		this.combo.setVisible(false);
-		this.c.setVisible(false);
-		this.c1.setVisible(false);
-		this.getShell().layout();
-		
-	}
-
-	@Override
-	protected void showScreen() {
-		// TODO Auto-generated method stub
-		this.add_song_button.setVisible(true);
-		this.back_button.setVisible(true);
-		this.head.setVisible(true);
-		this.result_list.setVisible(true);
-		this.search_box.setVisible(true);
-		this.search_label.setVisible(true);
-		this.search_results_label.setVisible(true);
-		this.search_songs_button.setVisible(true);
-		this.combo.setVisible(true);
-		this.c.setVisible(true);
-		this.c1.setVisible(true);
-		this.getShell().layout();
-		
-	}
 
 }

@@ -2,20 +2,12 @@ package ui;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.wb.swt.SWTResourceManager;
-
 import core.ApplicationInterface;
+
 
 public abstract class Screen {
 	
@@ -106,58 +98,45 @@ public abstract class Screen {
 	 */
 	protected boolean checkConnection(Shell shell,int conection_value){
 		boolean val;
-		System.out.println("QAQA - CONNECTION VALUE: "+conection_value);
 		if(conection_value==0){
 			return true;
 		}
 		else{
-			
-			val=PopUpWarning(shell,"Connection Problem", "Connection to the db was lost.\nPlease fix your connection and press ok to try again\n or cancel to exit the program.");
-			if(val){
-				return false;
+			if(conection_value==-2){
+				val=PopUpWarning(shell,"Yago path Problem", "Path to Yago files is wrong.\nPlease check configuration and press ok to try again\n or cancel to exit the program.");
+				if(val){
+					return false;
+				}
+				else{
+					display.dispose();
+					engine.terminateDBConnection();
+					System.exit(0);
+					return val;
+				}
 			}
 			else{
-				display.dispose();
-				engine.terminateDBConnection();//qaqa - i think it not necessary because there is no connection!!
-				System.exit(0);
-				return val;
+				val=PopUpWarning(shell,"Connection Problem", "Connection to the db was lost.\nPlease fix your connection and press ok to try again\n or cancel to exit the program.");
+				if(val){
+					return false;
+				}
+				else{
+					display.dispose();
+					engine.terminateDBConnection();
+					System.exit(0);
+					return val;
+				}	
 			}
+			
 			
 		}	
 	}
 	
-	protected void openWaiting(){
-	//	this.hideScreen();   //qaqa 1.6.14
-	/*	waiting= new Label(getShell(), SWT.INHERIT_DEFAULT);
-		waiting.setAlignment(SWT.CENTER);
-		waiting.setText("Please wait while we are processing your request");
-		waiting.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE)); //change color to white
-		waiting.setFont(SWTResourceManager.getFont("MV Boli", 22, SWT.BOLD));
+	
 
-		FormData data = new FormData ();
-		data.width=1000;
-		data.right = new FormAttachment (100, 0);
-		data.bottom = new FormAttachment (15, 0);
-		waiting.setLayoutData(data);*/
-		
-		this.getShell().layout();    //qaqa 1.6.14
-		
-	}
 	
-	protected void closeWaiting(){
-		
-		//this.waiting.dispose();
-	
-		//this.showScreen();
-	}
-	
-	//QAQA - maybe add create screen method
 	public abstract void createScreen();
 	
 	protected abstract void disposeScreen();
 	
-	protected abstract  void hideScreen();
-	
-	protected abstract void showScreen();
 
 }

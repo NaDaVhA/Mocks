@@ -3,7 +3,6 @@ package ui;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridData;
@@ -20,15 +19,10 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.wb.swt.SWTResourceManager;
-
 import core.ApplicationInterface;
 import utilities.Pair;
-
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
+
 
 
 public class mainScreen extends Screen{
@@ -46,21 +40,16 @@ public class mainScreen extends Screen{
 	private Button change_status_song=null;
 	private Table  songList_t=null;
 	private List friendList=null;
-	
 	private Button recommend_me=null;
 	private Button view_friend=null;
 	private String friend_name;
-	
 	private Button delete_song=null;
 	private Button delete_friend=null;
-	
 	private Composite c=null;
 	private Composite c1=null;
 	private Composite c2=null;
 	
-	private Thread t1,t2,t3,t4,t5,t6,t7;
-	
-	//QAQA add here the rest
+	private Thread t1,t2,t3,t4,t6,t7;
 	private Pair<String, String> song_selcted_table=null;
 	
 	
@@ -81,52 +70,25 @@ public class mainScreen extends Screen{
 
 			@Override
 			public void run() {
-				//final Pair<String,String> status=theMusicalNetwork.nadav.getStatusSong(username);
-				//final Pair<String,String> status=engine.getStatusSong(username); //1.6.14
+
 				final Pair<Integer, Pair<String, String>> status;
-				if(theMusicalNetwork.qaqa){
-					status=theMusicalNetwork.nadav.getStatusSong("nadav");
-				}
-				else{ //real code
-					
-					// status=engine.getStatusSong();//7.6
-					status=engine.getStatusSong(engine.getUsername());
-				}
-				//final Pair<String,String> status=engine.getStatusSong();
+				status=engine.getStatusSong(engine.getUsername());
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						//status_song=status;
-						//7.6
-					/*	status_song_label.setText("Status song:  "+status.getLeft()+" "+status.getRight());
-						updateStatusSong(status);
-						//Thread.currentThread();
-						pool.remove(t1);
-						if(pool.isEmpty()){
-							
-							closeWaiting();
-							showScreen();
-						}*/
-						//7.6
 						if(checkConnection(getShell(), status.getLeft())){
 							status_song_label.setText("Status song:  "+status.getRight().getLeft()+" "+status.getRight().getRight());
 							updateStatusSong(status.getRight());
-							//Thread.currentThread();
+							
 							pool.remove(t1);
 							if(pool.isEmpty()){
-								
-								closeWaiting();
-								showScreen();
+								getShell().layout();
 							}
 						}
-						else{
-							//qaqa back to log in
+						else{			
 							pool.remove(t1);
 							disposeScreen();
 							logInScreen logIn=new logInScreen(getDisplay(),getShell(),engine);
 							logIn.createScreen();
-							
-							
-							
 						}
 					}
 				});
@@ -147,45 +109,12 @@ public class mainScreen extends Screen{
 		
 		user_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		user_label.setFont(SWTResourceManager.getFont("MV Boli", 12, SWT.BOLD));
-		user_label.setText("Username:  "+this.username); //qaqa 8.6 maybe change to engine.getusername()
+		user_label.setText("Username:  "+engine.getUsername());
 		FormData data1 = new FormData ();
 		data1.width=700;
 		user_label.setLayoutData(data1);
 		
-		/*******/
-		class signout implements Runnable {
 
-			@Override
-			public void run() {
-		
-				final boolean status;
-				if(theMusicalNetwork.qaqa){
-					status=theMusicalNetwork.nadav.signOutUser(theMusicalNetwork.nadav.getUsername());
-				}
-				else{ //real code
-					 status=engine.signOutUser(engine.getUsername());
-				}
-				
-				getDisplay().asyncExec(new Runnable() {
-					public void run() {
-						
-						disposeScreen();
-						logInScreen logIn=new logInScreen(getDisplay(),getShell(),engine);
-						logIn.createScreen();
-						
-						pool.remove(t5);
-						if(pool.isEmpty()){
-							
-							closeWaiting();
-							
-						}
-					}
-				});
-				
-			}
-		}
-		
-		/*******/
 		
 		
 		//sign out button
@@ -195,16 +124,13 @@ public class mainScreen extends Screen{
 		data2.width=110;
 		data2.height=40;
 		data2.left = new FormAttachment (user_label, 160);
-		//data2.bottom = new FormAttachment (98, 0);
 		sign_out.setLayoutData(data2); 
 		sign_out.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed sign out");
-				//signOutUser in interface qaqa
-				t5 = new Thread(new signout());
-				pool.add(t5);
-				t5.start();
+				disposeScreen();
+				logInScreen logIn=new logInScreen(getDisplay(),getShell(),engine);
+				logIn.createScreen();
 			}
 		});
 		
@@ -215,7 +141,6 @@ public class mainScreen extends Screen{
 		data3.width=1000;
 		data3.height=40;
 		data3.top=new FormAttachment (user_label, 45);
-		//data3.right = new FormAttachment (user_label, 10);
 		c.setLayoutData(data3);
 		c.setLayout(new GridLayout(2, false));
 		
@@ -235,20 +160,12 @@ public class mainScreen extends Screen{
 
 			@Override
 			public void run() {
-				
-				
 				final Pair<Integer,Boolean> b;
-				if(theMusicalNetwork.qaqa){
-					b=theMusicalNetwork.nadav.changeStatusSong(song_selcted_table);
-				}
-				else{
-					b=engine.changeStatusSong(song_selcted_table);
-				}
-				
-				
+				b=engine.changeStatusSong(song_selcted_table);
+
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						//status_song=status;
+						
 						if(checkConnection(getShell(), b.getLeft())){
 							if(b.getRight()){
 								status_song_label.setText("Status song:  "+song_selcted_table.getLeft()+" "+song_selcted_table.getRight());
@@ -256,18 +173,14 @@ public class mainScreen extends Screen{
 								
 									pool.remove(t4);
 									if(pool.isEmpty()){
-										
-										closeWaiting();
-										showScreen();
+										getShell().layout();
 									}
 								}
 								else{
 									pool.remove(t4);
 									if(pool.isEmpty()){
-										
-										closeWaiting();
-										showScreen();
-										errorPop("Error", "Failed to update status song");
+										getShell().layout();
+										errorPop("Status song error", "Failed to update status song");
 									}
 									
 									
@@ -277,9 +190,7 @@ public class mainScreen extends Screen{
 						else{ //problem with connection want to cont.
 							pool.remove(t4);
 							if(pool.isEmpty()){
-								
-								closeWaiting();
-								showScreen();
+								getShell().layout();
 							}
 						}
 					
@@ -299,12 +210,11 @@ public class mainScreen extends Screen{
 		change_status_song.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed change status song");
 				if(song_selcted_table==null){
 					errorPop("Error", "Please select a song from song list.\nIf you want to search for a new song press Add new Song.");
 				}
 				else{
-				openWaiting();
+				getShell().layout();
 				t4 = new Thread(new changeStatusSong());
 				pool.add(t4);
 				t4.start();
@@ -368,10 +278,7 @@ public class mainScreen extends Screen{
 		songList_t.addListener(SWT.Selection, new Listener () {
 			@Override
 			public void handleEvent (Event event) {
-				//System.out.println(event.item);//qaqa
 				TableItem item=(TableItem)event.item;
-				//System.out.println(item.getText(0));//qaqa
-				//System.out.println(item.getText(1));//qaqa
 				Pair<String, String> s=new Pair<String, String>(item.getText(0), item.getText(1));
 				song_selcted_table=s;
 			}
@@ -386,9 +293,7 @@ public class mainScreen extends Screen{
 		add_new_song.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed add new song");
 				disposeScreen();
-				//hideScreen();
 				addNewSongScreen newSong=new addNewSongScreen(getDisplay(), getShell(),engine);
 				newSong.createScreen();
 			}
@@ -400,36 +305,27 @@ public class mainScreen extends Screen{
 			@Override
 			public void run() {
 				
-				final Pair<Integer, Boolean> b; //removeSongFromUser(String songname ,  String artistname)
-				if(theMusicalNetwork.qaqa){
-					b=theMusicalNetwork.nadav.removeSongFromUser(song_selcted_table.getRight(), song_selcted_table.getLeft());
-				}
-				else{
-					b=engine.removeSongFromUser(song_selcted_table.getRight(), song_selcted_table.getLeft());
-				}
+				final Pair<Integer, Boolean> b; 
+				b=engine.removeSongFromUser(song_selcted_table.getRight(), song_selcted_table.getLeft());
 
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						//status_song=status;
+						
 						if(checkConnection(getShell(), b.getLeft())){
 							if(b.getRight()){
-								//qaqa remove the item from table and update atble
+								
 								songList_t.remove(songList_t.getSelectionIndices());
 										
 									pool.remove(t6);
 									if(pool.isEmpty()){
-										
-										closeWaiting();
-										showScreen();
+										getShell().layout();
 									}
 								}
 								else{
 									pool.remove(t6);
 									if(pool.isEmpty()){
-										
-										closeWaiting();
-										showScreen();
-										errorPop("Error", "Failed to delete song");
+										getShell().layout();
+										errorPop("Delete song error", "Failed to delete song");
 									}
 										
 								}
@@ -438,9 +334,7 @@ public class mainScreen extends Screen{
 						else{ //problem with connection want to cont.
 							pool.remove(t6);
 							if(pool.isEmpty()){
-								
-								closeWaiting();
-								showScreen();
+								getShell().layout();
 							}
 						}
 					
@@ -461,16 +355,15 @@ public class mainScreen extends Screen{
 		delete_song.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed delete_song");
 				if(song_selcted_table==null){
 					errorPop("Error", "Please select a song from song list.\nIf you want to search for a new song press Add new Song.");
 				}
 				else{
-					 t6 = new Thread(new deleteSong());
-						pool.add(t6);
-						t6.start();
+					t6 = new Thread(new deleteSong());
+					pool.add(t6);
+					t6.start();
 				}
-			}  //qaqa what to do if the song we are deleting is the status song
+			}  
 		});
 		
 		
@@ -501,12 +394,11 @@ public class mainScreen extends Screen{
 		view_friend.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed view friend");
+				
 				if(friend_name==null){
 					errorPop("Error", "Please select a friend first.");
 				}
 				else{
-				//hideScreen();
 				viewFriendScreen view=new viewFriendScreen(getDisplay(),getShell(),engine,friend_name);
 				disposeScreen();
 				view.createScreen();
@@ -528,7 +420,6 @@ public class mainScreen extends Screen{
 			public void handleEvent (Event event) {
 				int [] selection = friendList.getSelectionIndices();
 				for (int i=0; i<selection.length; i++) {
-					System.out.println(friendList.getItem(selection[i])); //qaqa
 					friend_name=friendList.getItem(selection[i]);
 					}
 			}
@@ -544,7 +435,6 @@ public class mainScreen extends Screen{
 		add_new_friend.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed add new friend");
 				disposeScreen();
 				addNewFriendScreen newFriend=new addNewFriendScreen(getDisplay(), getShell(),engine);
 				newFriend.createScreen();
@@ -555,39 +445,28 @@ public class mainScreen extends Screen{
 	class deleteFriend implements Runnable {
 
 		@Override
-		public void run() {
-			
-			final Pair<Integer, Boolean> b; //removeSongFromUser(String songname ,  String artistname)
-			if(theMusicalNetwork.qaqa){
-				b=theMusicalNetwork.nadav.removeFriendFromUser(friend_name);
-			}
-			else{
-				b=engine.removeFriendFromUser(friend_name);
-			}
+		public void run() {	
+			final Pair<Integer, Boolean> b; 
+			b=engine.removeFriendFromUser(friend_name);
 
 			getDisplay().asyncExec(new Runnable() {
 				public void run() {
-					//status_song=status;
+
 					if(checkConnection(getShell(), b.getLeft())){
 						if(b.getRight()){
-							//qaqa remove the item from table and update atble
-							//songList_t.remove(songList_t.getSelectionIndices());
 							friendList.remove(friendList.getSelectionIndices());
 							
 								pool.remove(t7);
 								if(pool.isEmpty()){
-									
-									closeWaiting();
-									showScreen();
+
+								getShell().layout();
 								}
 							}
 							else{
 								pool.remove(t7);
 								if(pool.isEmpty()){
-									
-									closeWaiting();
-									showScreen();
-									errorPop("Error", "Failed to delete song");
+									getShell().layout();
+									errorPop("Delete song error", "Failed to delete song");
 								}
 								
 								
@@ -597,9 +476,7 @@ public class mainScreen extends Screen{
 					else{ //problem with connection want to cont.
 						pool.remove(t7);
 						if(pool.isEmpty()){
-							
-							closeWaiting();
-							showScreen();
+							getShell().layout();
 						}
 					}
 				
@@ -621,7 +498,6 @@ public class mainScreen extends Screen{
 			delete_friend.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected (SelectionEvent e) {
-					System.out.println("qaqa - pressed delete_friend");
 					if(friend_name==null){
 						errorPop("Error", "Please select a friend first.");
 					}
@@ -644,59 +520,24 @@ public class mainScreen extends Screen{
 			public void run() {
 				
 				final Pair<Integer, java.util.List<Pair<String, String>>> f;
-				if(theMusicalNetwork.qaqa){
-					f=  theMusicalNetwork.nadav.getSongList("TT");
-				}
-				else{
-					//f= (ArrayList<Pair<String, String>>) engine.getSongList(); //7.6
-					f=  engine.getSongList(engine.getUsername());
-					
-				}
-				//final ArrayList<Pair<String,String>> f= (ArrayList<Pair<String, String>>) engine.getSongList();
+				f=  engine.getSongList(engine.getUsername());
+
 						
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						
-					//7.6
-					/*	for(Pair<String,String> s:f){
-							//friendList.add (s);
-							TableItem item = new TableItem (songList_t, SWT.NONE);
-							item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-							//item.setText(0, "artist "+s.getLeft());
-							//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
-							item.setText(0, s.getLeft());
-							item.setText(1, s.getRight());
-						}
-						
-						
-						//System.out.println(pool.size());
-						
-						pool.remove(t2);
-						if(pool.isEmpty()){
-							
-							closeWaiting();
-							showScreen();
-						}*/
-						//7.6
+
 					if(checkConnection(getShell(), f.getLeft())){
 							for(Pair<String,String> s:f.getRight()){
-								//friendList.add (s);
 								TableItem item = new TableItem (songList_t, SWT.NONE);
 								item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-								//item.setText(0, "artist "+s.getLeft());
-								//item.setText(1, "songggggggggggggggggggggggggggggggggggg "+s.getRight());
 								item.setText(0, s.getLeft());
 								item.setText(1, s.getRight());
 							}
-							
-							
-							//System.out.println(pool.size());
+
 							
 							pool.remove(t2);
 							if(pool.isEmpty()){
-								
-								closeWaiting();
-								showScreen();
+								getShell().layout();
 							}
 						}
 					
@@ -726,32 +567,10 @@ public class mainScreen extends Screen{
 			@Override
 			public void run() {
 				final Pair<Integer, ArrayList<String>> f;
-				if(theMusicalNetwork.qaqa){
-					 f=theMusicalNetwork.nadav.getFriendList("TT");
-				}
-				else{
-					//f=engine.getFriendList(); //7.6
-					f=engine.getFriendList(engine.getUsername());
-				}
-				
-				//final ArrayList<String> f=engine.getFriendList();
+				f=engine.getFriendList(engine.getUsername());
 						
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						//7.6
-					/*	for(String s:f){
-							friendList.add (s);
-						}
-						
-						pool.remove(t3);
-						
-						System.out.println(pool.size());
-						if(pool.isEmpty()){
-							
-							closeWaiting();
-							showScreen();
-						}*/
-						//7.6
 					if(checkConnection(getShell(), f.getLeft())){
 							for(String s:f.getRight()){
 								friendList.add (s);
@@ -759,11 +578,8 @@ public class mainScreen extends Screen{
 							
 							pool.remove(t3);
 							
-							System.out.println(pool.size());
 							if(pool.isEmpty()){
-								
-								closeWaiting();
-								showScreen();
+								getShell().layout();
 							}	
 						}
 						else{
@@ -784,9 +600,7 @@ public class mainScreen extends Screen{
 		pool.add(t3);
 		
 		t3.start();
-		
 
-		openWaiting();
 		this.getShell().layout();
 		
 	}
@@ -808,63 +622,12 @@ public class mainScreen extends Screen{
 		this.user_label.dispose();
 		this.view_friend.dispose();
 		this.recommend_me.dispose();
-		//this.recommendBtn.dispose();
 		this.delete_friend.dispose();
 		this.delete_song.dispose();
 
 	}
 
 
-
-	@Override
-	protected void hideScreen() {
-		// TODO Auto-generated method stub
-		this.add_new_friend.setVisible(false);
-		this.add_new_song.setVisible(false);
-		this.change_status_song.setVisible(false);
-		this.friend_list_label.setVisible(false);
-		this.friendList.setVisible(false);
-		this.sign_out.setVisible(false);
-		this.song_list_label.setVisible(false);
-		this.songList_t.setVisible(false);
-		this.status_song_label.setVisible(false);
-		this.user_label.setVisible(false);
-		this.view_friend.setVisible(false);
-		this.recommend_me.setVisible(false);
-		this.delete_friend.setVisible(false);
-		this.delete_song.setVisible(false);
-		this.c.setVisible(false);
-		this.c1.setVisible(false);
-		this.c2.setVisible(false);
-		this.getShell().layout();
-	}
-
-
-
-	@Override
-	protected void showScreen() {
-		// TODO Auto-generated method stub
-		this.add_new_friend.setVisible(true);
-		this.add_new_song.setVisible(true);
-		this.change_status_song.setVisible(true);
-		this.friend_list_label.setVisible(true);
-		this.friendList.setVisible(true);
-		this.sign_out.setVisible(true);
-		this.song_list_label.setVisible(true);
-		this.songList_t.setVisible(true);
-		this.status_song_label.setVisible(true);
-		this.user_label.setVisible(true);
-		this.view_friend.setVisible(true);
-		this.recommend_me.setVisible(true);
-		this.delete_friend.setVisible(true);
-		this.delete_song.setVisible(true);
-		this.c.setVisible(true);
-		this.c1.setVisible(true);
-		this.c2.setVisible(true);
-		this.getShell().layout();
-		
-	}
-	
 	private void updateStatusSong(Pair<String, String> song){
 		this.status_song=song;
 	

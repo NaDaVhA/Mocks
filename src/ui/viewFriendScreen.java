@@ -28,9 +28,7 @@ import core.ApplicationInterface;
 
 public class viewFriendScreen extends Screen {
 	
-	private String username;
-	private Pair<String,String> status_song;
-	
+
 	private Label user_label=null;
 	private Label status_song_label=null;
 	private Label song_list_label=null;
@@ -39,30 +37,24 @@ public class viewFriendScreen extends Screen {
 	private Button add_new_friend=null;
 	private Table  songList_t=null;
 	private List friendList=null;
-		
 	private Button back_button=null;
-	
 	private Table  messages_table=null;
 	private Text message_text=null;
-	private Button send_msg_button=null;
-	
-	private String msg;
-	
-	
+	private Button send_msg_button=null;	
+
 	private Composite c=null;
 	private Composite c1=null;
 	private Composite c2=null;
 	private Composite c3=null;
-	
-	
-	
-private Thread t11,t12,t13,t14,t15,t16,t17;
-	
-	//QAQA add here the rest
+
+	private Thread t11,t12,t13,t14,t15,t16,t17;
+
 	private Pair<String, String> song_selcted_table=null;
-	
 	private String friend_user_name;
 	private String friend_name_selected;
+	private String msg;
+	
+	
 	
 	public viewFriendScreen(Display display,Shell shell , ApplicationInterface engine,String username){
 		super(display, shell, engine);
@@ -80,43 +72,25 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 			public void run() {
 				
 				final Pair<Integer,Pair<String,String>> status;
-				if(theMusicalNetwork.qaqa){
-					status=theMusicalNetwork.nadav.getStatusSong(friend_user_name);
-				}
-				else{ //real code
-					 status=engine.getStatusSong(friend_user_name);
-				}
+				status=engine.getStatusSong(friend_user_name);
 				
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						//status_song=status;
 						if(checkConnection(getShell(), status.getLeft())){
 							status_song_label.setText("Status song:  "+status.getRight().getLeft()+" "+status.getRight().getRight());
-							//updateStatusSong(status);
-							//Thread.currentThread();
+							
 							pool.remove(t11);
 							if(pool.isEmpty()){
-								
-								closeWaiting();
-								showScreen();
+								getShell().layout();
 							}
 						}
 						
 						else{//want to cont.
 							pool.remove(t11);
 							if(pool.isEmpty()){
-								
-								//back to main screen
-								closeWaiting();
 								disposeScreen();
-								if(theMusicalNetwork.qaqa){
-									mainScreen main=new mainScreen(getDisplay(), getShell(), engine, theMusicalNetwork.nadav.getUsername());
-									main.createScreen();
-								}
-								else{
-									mainScreen main=new mainScreen(getDisplay(), getShell(), engine, engine.getUsername());
-									main.createScreen();	
-								}
+								mainScreen main=new mainScreen(getDisplay(), getShell(), engine, engine.getUsername());
+								main.createScreen();	
 								
 							}
 						}
@@ -151,7 +125,6 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 		data3.width=900;
 		data3.height=40;
 		data3.top=new FormAttachment (user_label, 15);
-		//data3.right = new FormAttachment (user_label, 10);
 		c.setLayoutData(data3);
 		c.setLayout(new GridLayout(1, false));
 		
@@ -200,53 +173,34 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 
 			@Override
 			public void run() {
-				
-			//	final ArrayList<Pair<String,String>> f= engine.getSongList(username); //1.6.14
-				final Pair<Integer, java.util.List<Pair<String, String>>> f;
-				if(theMusicalNetwork.qaqa){
-					f=  theMusicalNetwork.nadav.getSongList(friend_user_name);
-				}
-				else{
-					f=  engine.getSongList(friend_user_name);
-				}
-				//final ArrayList<Pair<String,String>> f= (ArrayList<Pair<String, String>>) engine.getSongList();
+
+			final Pair<Integer, java.util.List<Pair<String, String>>> f;
+			f=  engine.getSongList(friend_user_name);;
 						
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						if(checkConnection(getShell(), f.getLeft())){
 							for(Pair<String,String> s:f.getRight()){
-								//friendList.add (s);
 								TableItem item = new TableItem (songList_t, SWT.NONE);
 								item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 															
 								item.setText(0, s.getLeft());
 								item.setText(1, s.getRight());
 							}
-							
-							
-							//System.out.println(pool.size());
+
 							
 							pool.remove(t12);
 							if(pool.isEmpty()){
-								
-								closeWaiting();
-								showScreen();
+								getShell().layout();
 							}
 						}
 						
 						
 						else{ //want to cont..
-							//back to main screen
-							closeWaiting();
 							disposeScreen();
-							if(theMusicalNetwork.qaqa){
-								mainScreen main=new mainScreen(getDisplay(), getShell(), engine, theMusicalNetwork.nadav.getUsername());
-								main.createScreen();
-							}
-							else{
-								mainScreen main=new mainScreen(getDisplay(), getShell(), engine, engine.getUsername());
-								main.createScreen();	
-							}
+							mainScreen main=new mainScreen(getDisplay(), getShell(), engine, engine.getUsername());
+							main.createScreen();	
+
 						}
 					
 				
@@ -279,10 +233,7 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 			songList_t.addListener(SWT.Selection, new Listener () {
 				@Override
 				public void handleEvent (Event event) {
-					System.out.println(event.item);//qaqa
 					TableItem item=(TableItem)event.item;
-					System.out.println(item.getText(0));//qaqa
-					System.out.println(item.getText(1));//qaqa
 					Pair<String, String> s=new Pair<String, String>(item.getText(0), item.getText(1));
 					song_selcted_table=s;
 				}
@@ -298,22 +249,15 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 				@Override
 				public void run() {
 					final Pair<Integer,Boolean> b;
-					if(theMusicalNetwork.qaqa){
-						b=theMusicalNetwork.nadav.addSong(song_selcted_table.getRight(),song_selcted_table.getLeft());
-					}
-					else{//true code
-						b=engine.addSong(song_selcted_table.getRight(),song_selcted_table.getLeft());
-					}
-					//final boolean b=theMusicalNetwork.nadav.addSong("qaqa", song_chosen.getLeft(), song_chosen.getRight());
-					//final boolean b=engine.addSong(song_chosen.getLeft(), song_chosen.getRight());
+					b=engine.addSong(song_selcted_table.getRight(),song_selcted_table.getLeft());
+
 					getDisplay().asyncExec(new Runnable() {
 						public void run() {
-							//status_song=status;
+
 							if(checkConnection(getShell(), b.getLeft())){
 								if(!b.getRight()){
-									closeWaiting();
-									showScreen();
-									errorPop("Error", "Failed to add song.");	
+									getShell().layout();
+									errorPop("Add song error", "Failed to add song.");	
 									pool.remove(t14);
 								}
 								else{
@@ -321,22 +265,17 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 									PopUpinfo(getShell(),"Added Song", "The song was added to your song list successfully!");
 									pool.remove(t14);
 									if(pool.isEmpty()){
-										closeWaiting();
-										showScreen();
-										
+										getShell().layout();
 									}
 									
 								}	
 							}
 							
 							else{//want to cont.
-								//stay in screen
-								//popSync=false;
+
 								pool.remove(t14);
 								if(pool.isEmpty()){
-									closeWaiting();
-									showScreen();
-									
+									getShell().layout();
 								}
 							}
 							
@@ -358,11 +297,7 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 				add_new_song.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected (SelectionEvent e) {
-						System.out.println("qaqa - pressed add song");
-						//disposeScreen();
-						//hideScreen();
-						//addNewSongScreen newSong=new addNewSongScreen(getDisplay(), getShell(),engine);
-						//newSong.createScreen();
+
 						if(song_selcted_table==null){
 							errorPop("Error", "Please select a song first");
 						}
@@ -374,18 +309,16 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 					}
 				});
 				
-				c2=new Composite(getShell(), SWT.NONE);
-				FormData data5 = new FormData ();
-				data5.width=300;
-				data5.height=300;
-				data5.top=new FormAttachment (c1, 0,SWT.TOP);
-				data5.left = new FormAttachment (c1, 200);
-				c2.setLayoutData(data5);
-				c2.setLayout(new GridLayout(2, false));
-		
-
-		
-		
+				
+		//Composite	
+		c2=new Composite(getShell(), SWT.NONE);
+		FormData data5 = new FormData ();
+		data5.width=300;
+		data5.height=300;
+		data5.top=new FormAttachment (c1, 0,SWT.TOP);
+		data5.left = new FormAttachment (c1, 200);
+		c2.setLayoutData(data5);
+		c2.setLayout(new GridLayout(2, false));
 		
 		
 		//friend list label
@@ -403,14 +336,7 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 		@Override
 		public void run() {
 			final Pair <Integer,ArrayList<String>> f;
-			if(theMusicalNetwork.qaqa){
-				 f=theMusicalNetwork.nadav.getFriendList(friend_user_name);
-			}
-			else{
-				f=engine.getFriendList(friend_user_name);
-			}
-			
-			//final ArrayList<String> f=engine.getFriendList();
+			f=engine.getFriendList(friend_user_name);
 					
 			getDisplay().asyncExec(new Runnable() {
 				public void run() {
@@ -421,23 +347,14 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 						
 						pool.remove(t13);
 						
-						System.out.println(pool.size());
 						if(pool.isEmpty()){
-							
-							closeWaiting();
-							showScreen();
+							getShell().layout();
 						}
 					}
 					else{ //no connection and want to continue
 						pool.remove(t13);
-						if(theMusicalNetwork.qaqa){
-							mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,"a");
-							mainScreen.createScreen();
-						}
-						else{
 						mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername());
 						mainScreen.createScreen();
-						}
 					}
 					
 				}
@@ -461,11 +378,9 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 		friendList.addListener(SWT.Selection, new Listener () {
 			@Override
 			public void handleEvent (Event event) {
-				//System.out.println(event.data);//qaqa
 				int[] selection = friendList.getSelectionIndices();
 				
 				for (int i=0; i<selection.length; i++) {
-					System.out.println(friendList.getItem(selection[i])); //qaqa
 						friend_name_selected=friendList.getItem(selection[i]);
 					}
 				
@@ -483,30 +398,20 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 		@Override
 		public void run() {
 			final Pair<Integer,Boolean> add;
-			if(theMusicalNetwork.qaqa){
-				add=theMusicalNetwork.nadav.addFriend(friend_name_selected);
-			}
-			else{
-				add=engine.addFriend(friend_name_selected);
-			}
-			//final boolean add=theMusicalNetwork.nadav.addFriend(friend_name_to_show);
-			//final boolean add=engine.addFriend(friend_name_to_show);
+			add=engine.addFriend(friend_name_selected);
+
 			getDisplay().asyncExec(new Runnable() {
 				public void run() {
-					//status_song=status;
 					if(checkConnection(getShell(), add.getLeft())){
 						if(!add.getRight()){
-							closeWaiting();
-							showScreen();
-							errorPop("Error", "Failed to add friend.");	
+							getShell().layout();
+							errorPop("Add friend error", "Failed to add friend.");	
 							pool.remove(t15);
 						}
-						else{
-							
+						else{	
 							pool.remove(t15);
 							if(pool.isEmpty()){
-								closeWaiting();
-								showScreen();
+								getShell().layout();
 								PopUpinfo(getShell(),"Add Friend", "The friend was added to your friend list successfully!!");
 							}
 							
@@ -515,9 +420,7 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 					else{
 						pool.remove(t15);
 						if(pool.isEmpty()){
-							closeWaiting();
-							showScreen();
-							//PopUpinfo(getShell(),"added Friend", "qaqa-succes!!!");
+							getShell().layout();
 						}
 					}
 					
@@ -542,10 +445,10 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 	add_new_friend.addSelectionListener(new SelectionAdapter() {
 		@Override
 		public void widgetSelected (SelectionEvent e) {
-			System.out.println("qaqa - pressed add_new_friend");
-			 t15 = new Thread(new addFriend());
-				pool.add(t15);	
-				t15.start();
+
+			t15 = new Thread(new addFriend());
+			pool.add(t15);	
+			t15.start();
 		}
 	});
 		
@@ -565,52 +468,40 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 		@Override
 		public void run() {
 			final Pair<Integer, ArrayList<String[]>> h;
-			if(theMusicalNetwork.qaqa){
-				h=theMusicalNetwork.nadav.getHistoryMassages("a",friend_user_name);//String username_send,String username_receive,String msg
-			}
-			else{
-				h=engine.getHistoryMassages(engine.getUsername(),friend_user_name);
-			}
-			
+			h=engine.getHistoryMassages(engine.getUsername(),friend_user_name);
+		
 			getDisplay().asyncExec(new Runnable() {
 				public void run() {
-					//status_song=status;
+
 					if(checkConnection(getShell(), h.getLeft())){
 						if(!(h.getRight()==null)){//no problem
 							messages_table.removeAll();
 							for(String[] node:h.getRight()){
 								TableItem item = new TableItem (messages_table, SWT.NONE);
-								item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-															
+								item.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));				
 								item.setText(0, node[0]);
 								item.setText(1, node[2]);
 							}
-							
-							closeWaiting();
-							showScreen();
-							
+
+							getShell().layout();
 							pool.remove(t17);
 						}
 						else{//problem
 							
 							pool.remove(t17);
-							//PopUpinfo(getShell(),"Add Friend", "The friend was added to your friend list successfully!!");
-							errorPop("Error", "Failed to get message history");
-							//qaqa update table
+							errorPop("Chat error", "Failed to get message history");
+
 							if(pool.isEmpty()){
-								closeWaiting();
-								showScreen();
+
+								getShell().layout();
 							}
 							
 						}
 					}
 					else{
-						//stay in screen 
 						pool.remove(t17);
 						if(pool.isEmpty()){
-							closeWaiting();
-							showScreen();
-							
+							getShell().layout();
 						}
 					}
 					
@@ -661,34 +552,26 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 		@Override
 		public void run() {
 			final Pair<Integer,Boolean> send;
-			if(theMusicalNetwork.qaqa){
-				send=theMusicalNetwork.nadav.sendMassage("a",friend_user_name,msg);//String username_send,String username_receive,String msg
-			}
-			else{
-				send=engine.sendMassage(engine.getUsername(),friend_user_name,msg);
-			}
+			send=engine.sendMassage(engine.getUsername(),friend_user_name,msg);
 			
 			getDisplay().asyncExec(new Runnable() {
 				public void run() {
-					//status_song=status;
+
 					if(checkConnection(getShell(), send.getLeft())){
 						if(!send.getRight()){
-							closeWaiting();
-							showScreen();
-							errorPop("Error", "Failed to send the message.");	
+							getShell().layout();
+							errorPop("Chat error", "Failed to send the message.");	
 							pool.remove(t16);
 						}
 						else{
 							
 							pool.remove(t16);
-							//PopUpinfo(getShell(),"Add Friend", "The friend was added to your friend list successfully!!");
-							//qaqa update table
+
 							t17 = new Thread(new msgHistory());
 							pool.add(t17);
 							t17.start();
 							if(pool.isEmpty()){
-								closeWaiting();
-								showScreen();
+								getShell().layout();
 							}
 							
 						}
@@ -697,9 +580,7 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 						//stay in screen 
 						pool.remove(t16);
 						if(pool.isEmpty()){
-							closeWaiting();
-							showScreen();
-							
+							getShell().layout();
 						}
 					}
 					
@@ -722,14 +603,11 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 	send_msg_button.addSelectionListener(new SelectionAdapter() {
 		@Override
 		public void widgetSelected (SelectionEvent e) {
-			
-			System.out.println("qaqa - pressed send_msg_button"); //qaqa
 			msg=message_text.getText();
 			if(msg.isEmpty()){
-				errorPop("Error", "The message field is empty.\nPlease write a message and try again.");
+				errorPop("Chat error", "The message field is empty.\nPlease write a message and try again.");
 			}
 			else{
-				//call thred
 				t16 = new Thread(new sendMessage());
 				pool.add(t16);
 				t16.start();
@@ -746,34 +624,18 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 			FormData data13 = new FormData ();
 			data13.width=180;
 			data13.height=30;
-			//data12.right = new FormAttachment (87, 0);
 			data13.top = new FormAttachment (user_label, 525);
 			back_button.setLayoutData(data13); 
 			back_button.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected (SelectionEvent e) {
-					System.out.println("qaqa - pressed back home");
 					disposeScreen();
-					if(theMusicalNetwork.qaqa){
-					mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,theMusicalNetwork.nadav.getUsername()); //QAQA ADD USERNAME
-					mainScreen.createScreen();
-					}
-					else{
-						mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); //QAQA ADD USERNAME
-						mainScreen.createScreen();	
-					}
+					mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); 
+					mainScreen.createScreen();	
+
 				}
 			});
 		
-		
-		
-
-		
-
-
-		
-	
-		openWaiting();
 		this.getShell().layout();
 		
 	}
@@ -793,42 +655,6 @@ private Thread t11,t12,t13,t14,t15,t16,t17;
 		this.c.dispose();
 		this.c1.dispose();
 		this.c2.dispose();
-	}
-
-	@Override
-	protected void hideScreen() {
-		// TODO Auto-generated method stub
-		this.add_new_friend.setVisible(false);
-		this.add_new_song.setVisible(false);
-		this.friend_list_label.setVisible(false);
-		this.friendList.setVisible(false);
-		this.song_list_label.setVisible(false);
-		this.songList_t.setVisible(false);
-		this.status_song_label.setVisible(false);
-		this.user_label.setVisible(false);
-		this.back_button.setVisible(false);
-		this.c.setVisible(false);
-		this.c1.setVisible(false);
-		this.c2.setVisible(false);
-		this.getShell().layout();
-	}
-
-	@Override
-	protected void showScreen() {
-		// TODO Auto-generated method stub
-		this.add_new_friend.setVisible(true);
-		this.add_new_song.setVisible(true);
-		this.friend_list_label.setVisible(true);
-		this.friendList.setVisible(true);
-		this.song_list_label.setVisible(true);
-		this.songList_t.setVisible(true);
-		this.status_song_label.setVisible(true);
-		this.user_label.setVisible(true);
-		this.back_button.setVisible(true);
-		this.c.setVisible(true);
-		this.c1.setVisible(true);
-		this.c2.setVisible(true);
-		this.getShell().layout();
 	}
 
 }

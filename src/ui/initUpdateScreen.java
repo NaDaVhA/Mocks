@@ -4,9 +4,6 @@ import java.io.File;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
@@ -17,7 +14,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import core.ApplicationInterface;
-import core.NadavDevelopmentClass;
 import utilities.Pair;
 
 public class initUpdateScreen extends Screen{
@@ -29,11 +25,9 @@ public class initUpdateScreen extends Screen{
 	public static boolean finished;
 	private boolean b;
 	private Pair<Integer, Boolean> zookini;
-	
-	
 	private String type;
 	
-	private boolean init;
+
 	
 	
 	public initUpdateScreen(Display display,Shell shell,ApplicationInterface app,String type) {
@@ -43,7 +37,6 @@ public class initUpdateScreen extends Screen{
 		finished=false;
 		b=false;
 		zookini=null;
-		init=false;
 	}
 	
 	public static void updateProgressBar(){
@@ -80,7 +73,7 @@ public class initUpdateScreen extends Screen{
 	}
 	
 	//bg image
-	Image bg1_image=new Image(getDisplay(),npath);	//qaqa put here welcome img
+	Image bg1_image=new Image(getDisplay(),npath);	
 	bar_shell.setBackgroundImage(bg1_image);
 	bar_shell.setBackgroundMode(SWT.INHERIT_FORCE);
 		
@@ -95,10 +88,10 @@ public class initUpdateScreen extends Screen{
 		head_label.setText("Welcome!\nPlease Wait while we are building the db");
 	}
 	
-	head_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE)); //change color to white
+	head_label.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE)); 
 	head_label.setFont(SWTResourceManager.getFont("MV Boli", 16, SWT.BOLD));
 	GridData data = new GridData(GridData.FILL_HORIZONTAL);
-	data.horizontalSpan = 2; // span 2 columns
+	data.horizontalSpan = 2; 
 	data.widthHint=800;
 
 	head_label.setLayoutData(data);
@@ -107,7 +100,7 @@ public class initUpdateScreen extends Screen{
 	bar=new ProgressBar(bar_shell, SWT.SMOOTH);
 	
 	GridData data1 = new GridData(GridData.FILL_HORIZONTAL);
-	data1.horizontalSpan = 2; // span 2 columns
+	data1.horizontalSpan = 2; 
 	bar.setLayoutData(data1);
 	
 	bar.setMaximum(5000);
@@ -121,7 +114,6 @@ public class initUpdateScreen extends Screen{
 
 		@Override
 		public void run() {
-			zookini= getApp().checkInitializationStatus();
 			zookini = getApp().initializeApplication();
 			
 			getDisplay().asyncExec(new Runnable() {
@@ -162,33 +154,16 @@ public class initUpdateScreen extends Screen{
 		new Thread() {
 			@Override
 			public void run() {
-				//here code to initilize
 				if(type.compareTo("update")==0){
 					Thread t = new Thread(new updateApp());
 					t.start();
 				}
 				else{
-					//zookini1=getApp().checkInitializationStatus();
-					//if(zookini1.getLeft()==-1){//no connection
-					//	errorPop("Connection Problem", "you have no Connection to db\nPlease reconnect and try again.");
-					//	getDisplay().dispose();
-					//	System.exit(0);
-					//}
-				//	else{//we have connection
-					//	if(zookini1.getRight()){ //db already initilized
-					//		init=true;
-					//		return;
-					//	}
-					//	else{
-							Thread t = new Thread(new initApp());
-							t.start();
-					//	}
-						
-					//}
-						
+					Thread t = new Thread(new initApp());
+					t.start();
 				}
 								
-				//
+				
 				for (;status <= maximum;) {
 				try {
 					Thread.sleep (1000);
@@ -203,31 +178,25 @@ public class initUpdateScreen extends Screen{
 							}
 						else{
 							if(!finished){
-								//System.out.println(status);
 								bar.setSelection(status);
 							}
 							else{ //finished
 								
-								System.out.println("QAQA finished!!!");
-								//status=maximum+1;
 								if(type.compareTo("update")==0){
 									
 									if(checkConnection(bar_shell,zookini.getLeft())){//no problem in connection
 										b = zookini.getRight();
-										//System.out.println(b);
+										
 										if(b){ 
-											
 											bar.setSelection(maximum);
-											PopUpinfo(bar_shell,"Db update", "Finished to update db.");//qaqa
-
+											PopUpinfo(bar_shell,"Db update info", "Finished to update db.");
 											bar_shell.dispose();
 											return;
 											
 										}
 										else{
 										
-											PopUpinfo(bar_shell,"Db update", "Failed to update db.");//qaqa
-										
+											PopUpinfo(bar_shell,"Db update info", "Failed to update db.");
 											bar_shell.dispose();
 											return;
 										}
@@ -241,22 +210,17 @@ public class initUpdateScreen extends Screen{
 							else{ //type = init
 									if(checkConnectionInit(bar_shell, zookini.getLeft())){
 										b = zookini.getRight();
-										//System.out.println(b);
 										if(b){
 											
 											bar.setSelection(maximum);
-										
-											PopUpinfo(bar_shell,"Db build", "Finished to build db.");//qaqa
-											
+											PopUpinfo(bar_shell,"Db build info", "Finished to build db.");
 											bar_shell.dispose();
 											return;
 											
 										}
 										else{
 											
-											PopUpinfo(bar_shell,"Db build", "Failed to build db.");//qaqa
-										
-											//qaqa maybe exit here???
+											PopUpinfo(bar_shell,"Db build info", "Failed to build db.");
 											bar_shell.dispose();
 											return;
 										}
@@ -295,20 +259,12 @@ public class initUpdateScreen extends Screen{
 	@Override
 	protected void disposeScreen() {
 		// TODO Auto-generated method stub
-		
+		//not relevant for this screen
 	}
 
-	@Override
-	protected void hideScreen() {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	protected void showScreen() {
-		// TODO Auto-generated method stub
-		
-	}
+
+
 	
 	private boolean checkConnectionInit(Shell shell,int conection_value){
 
@@ -316,13 +272,23 @@ public class initUpdateScreen extends Screen{
 			return true;
 		}
 		else{
+			if(conection_value==-2){
+				MessageBox messageBox =   new MessageBox(shell, SWT.OK| SWT.ICON_WARNING);
+				messageBox.setText("Yago path Problem");
+				messageBox.setMessage("Path to Yago files is wrong ,please check configuration.\nThe program will exit, please fix the problem and try again.");
+				if(messageBox.open()==SWT.OK)
+					return false;
+					else return false;
+			}
+		else{
 			MessageBox messageBox =   new MessageBox(shell, SWT.OK| SWT.ICON_WARNING);
 			messageBox.setText("Connection Problem");
 			messageBox.setMessage("Connection to the db was lost.\nThe program will exit, please fix the problem and try again.");
 			if(messageBox.open()==SWT.OK)
 				return false;
 				else return false;
-		}	
+		}
+	}
 	}
 
 }

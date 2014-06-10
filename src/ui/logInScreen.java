@@ -85,8 +85,6 @@ public class logInScreen extends Screen {
 		c=new Composite(getShell(), SWT.NONE);
 		c.setLayout(new GridLayout(3, false));
 		FormData data1 = new FormData ();
-		//data1.width=250;
-		//sdata1.height=150;
 		data1.top= new FormAttachment (headline, 200);
 		data1.right = new FormAttachment (headline,900);
 		c.setLayoutData(data1);
@@ -119,37 +117,25 @@ public class logInScreen extends Screen {
 			@Override
 			public void run() {
 				final Pair<Integer,Boolean> isUserRegisterd;
-				if(theMusicalNetwork.qaqa){
-					isUserRegisterd=theMusicalNetwork.nadav.isUserRegisterd(getUsername_s(), getPassword_s());
-				}
-				else{//real code
-					isUserRegisterd=engine.isUserRegisterd(getUsername_s(), getPassword_s());
-				}
+				isUserRegisterd=engine.isUserRegisterd(getUsername_s(), getPassword_s());
 		
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						if(checkConnection(getShell(),isUserRegisterd.getLeft())){ //want to try again
-							if(isUserRegisterd.getRight()){ //QAQA  - PUT REAL FUNCTION HERE 
-								closeWaiting();
-								disposeScreen(); //he is registerd!
-								//hideScreen();
-								
-								//engine.InitalizeRecommender(); //QAQA add this in seperate thread
-								
+							if(isUserRegisterd.getRight()){ 		
+								disposeScreen(); 
 								mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,getUsername_s());
 								mainScreen.createScreen();
 							}
 							else{
-								closeWaiting();
-								showScreen();
+								getShell().layout();
 								errorPop("Log In Error", "Details given do not match a valid user.\n"+"Retype username and password.");
 								
 							}
 							return;
 						}
 						else{
-							closeWaiting();
-							showScreen();
+							getShell().layout();
 							return;
 						}
 					
@@ -167,7 +153,6 @@ public class logInScreen extends Screen {
 		logIn.setText("Log in");
 		GridData g1=new GridData(SWT.CENTER, SWT.FILL, true, true, 1, 2);
 		g1.widthHint=120;
-		//g.verticalSpan=2;
 		logIn.setLayoutData(g1);
 		logIn.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -182,13 +167,11 @@ public class logInScreen extends Screen {
 				if(getUsername_s().isEmpty() || getPassword_s().isEmpty()){
 					errorPop("Log in Error", "Username or password fields are empty.");
 				}
-				//QAQA - isUserRegistred in the interface
-				//QAQA - use asyncExec or syncExec runnable
+
 								
 				else{
-				// create a thread to check if user registerd
 				Thread t = new Thread(new CheckUserRegisterd());
-				openWaiting();
+				getShell().layout();
 				t.start();
 				
 				}
@@ -212,8 +195,6 @@ public class logInScreen extends Screen {
 		c.pack();
 
 		
-	
-		
 		c1=new Composite(getShell(), SWT.NONE);
 		c1.setLayout(new GridLayout(1, false));
 		
@@ -230,13 +211,11 @@ public class logInScreen extends Screen {
 		signUp.setText("Sign Up!");
 		
 		GridData g2=new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-		//g2.widthHint=100;
 		
 		signUp.setLayoutData(g2);
 		signUp.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed sign up"); //qaqa
 				disposeScreen();
 				//run other screen
 				signUpScreen sign_up=new signUpScreen(getDisplay(), getShell(),engine);
@@ -255,21 +234,10 @@ public class logInScreen extends Screen {
 		updateDb.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				System.out.println("qaqa - pressed update db"); //qaqa
-
-					if(theMusicalNetwork.qaqa){			
-						getShell().setVisible(false);
-						initUpdateScreen update=new initUpdateScreen(getDisplay(), getShell(), theMusicalNetwork.nadav,"update");
-						update.createScreen();
-						getShell().setVisible(true);
-					}
-					else{
-						//disposeScreen();
-						getShell().setVisible(false);
-						initUpdateScreen update=new initUpdateScreen(getDisplay(), getShell(), engine,"update");
-						update.createScreen();
-						getShell().setVisible(true);
-					}
+				getShell().setVisible(false);
+				initUpdateScreen update=new initUpdateScreen(getDisplay(), getShell(), engine,"update");
+				update.createScreen();
+				getShell().setVisible(true);
 
 			}
 		});
@@ -294,41 +262,5 @@ public class logInScreen extends Screen {
 	}
 
 
-	@Override
-	protected void hideScreen() {
-		// TODO Auto-generated method stub
-		this.headline.setVisible(false);
-		this.logIn.setVisible(false);
-		this.password.setVisible(false);
-		this.signUp.setVisible(false);
-		this.username.setVisible(false);
-		this.pass.setVisible(false);
-		this.user.setVisible(false);
-		this.updateDb.setVisible(false);
-		this.c.setVisible(false);
-		this.c1.setVisible(false);
-		
-		this.getShell().layout();
-		
-	}
-
-
-	@Override
-	protected void showScreen() {
-		// TODO Auto-generated method stub
-		this.headline.setVisible(true);
-		this.logIn.setVisible(true);
-		this.password.setVisible(true);
-		this.signUp.setVisible(true);
-		this.username.setVisible(true);
-		this.pass.setVisible(true);
-		this.user.setVisible(true);
-		this.updateDb.setVisible(true);
-		this.c.setVisible(true);
-		this.c1.setVisible(true);
-		this.getShell().layout();
-	}
-	
-	
 
 }
