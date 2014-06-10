@@ -66,6 +66,7 @@ public class AppEngine implements ApplicationInterface{
 		//Verify files
 		if(!verifyYagoFiles(yagoFilesPath)){
 			//Some problem encountered with the files.
+			System.out.println("Yago files path error: Make sure file names are: yagoFacts.tsv and yagoTransitiveType.tsv.");
 			return new Pair<Integer, Boolean>(-2, false);
 		}
 		
