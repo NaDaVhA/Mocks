@@ -117,7 +117,7 @@ public class ConnectionPool {
 	 * Connection is removed from pool.
 	 * if no connections are available, creates and Retrieves a new connection.
 	 * @return a DataBaseConnection object.
-	 * @throws SQLException
+	 * @throws SQLException when connection to database is lost.
 	 */
 	public Connection getConnectionFromPool() throws SQLException{
 		

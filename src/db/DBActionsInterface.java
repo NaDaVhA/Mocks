@@ -7,6 +7,16 @@ import java.util.ArrayList;
 public interface DBActionsInterface {
 
 	
+	/////////////////////////////////////
+	// 		Connection assertion	
+	/////////////////////////////////////
+
+	/**
+	 * Asserts connection to databas.
+	 * @return true if connection is valid, false if connection to database is lost.
+	 */
+	public boolean assertConnectionToDatabase();
+	
 	
 	/////////////////////////////
 	// 		Music Database 	

@@ -19,7 +19,32 @@ public class dbActions implements DBActionsInterface{
 		this.connectionPool = cp;
 	}
 	
+	
 
+	/////////////////////////////////////
+	// 		Connection assertion	
+	/////////////////////////////////////
+	
+	
+	@Override
+	public boolean assertConnectionToDatabase() {
+
+		Connection connection;
+		try {
+			connection = this.connectionPool.getConnectionFromPool();
+		} catch (SQLException e) {
+			
+			// Connection is lost! Unable to get connection. Throw exception.
+			System.out.println("assertConnectionToDatabase: No connection!");
+			e.printStackTrace();
+			
+			return false;
+			
+		}
+		
+		return true;
+	}
+	
 
 	@Override
 	public ArrayList<String[]> getSongsList() throws SQLException{
@@ -718,7 +743,9 @@ public class dbActions implements DBActionsInterface{
 		return history_temp;
 		
 	}
-	
+
+
+
 	
 	
 }

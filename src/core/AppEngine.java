@@ -37,6 +37,13 @@ public class AppEngine implements ApplicationInterface{
 	/////////////////////////////////////////////////
 	
 	
+	@Override
+	public boolean checkConnection() {
+		
+		return this.dbActionRunner.assertConnectionToDatabase();
+	
+	}
+	
 	
 	public Pair<Integer, Boolean> checkInitializationStatus(){
 		
@@ -745,6 +752,9 @@ public class AppEngine implements ApplicationInterface{
 		return List;
 		
 	}
+
+
+
 
 
 
