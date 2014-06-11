@@ -86,9 +86,11 @@ public class mainScreen extends Screen{
 						}
 						else{			
 							pool.remove(t1);
+							if(pool.isEmpty()){
 							disposeScreen();
 							logInScreen logIn=new logInScreen(getDisplay(),getShell(),engine);
 							logIn.createScreen();
+							}
 						}
 					}
 				});
@@ -544,9 +546,11 @@ public class mainScreen extends Screen{
 						else{//problem with connection
 							//back to log in
 							pool.remove(t2);
+							if(pool.isEmpty()){
 							disposeScreen();
 							logInScreen logIn=new logInScreen(getDisplay(),getShell(),engine);
 							logIn.createScreen();
+							}
 						}
 						
 				
@@ -585,9 +589,11 @@ public class mainScreen extends Screen{
 						else{
 							//back to log in
 							pool.remove(t3);
+							if(pool.isEmpty()){
 							disposeScreen();
 							logInScreen logIn=new logInScreen(getDisplay(),getShell(),engine);
 							logIn.createScreen();
+							}
 						}
 					}
 				});

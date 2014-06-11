@@ -395,7 +395,7 @@ public class addNewFriendScreen extends Screen {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				
-				if(friend_name_to_show.compareTo("")==0||friend_name_to_show==null){
+				if(friend_name_to_show==null ||friend_name_to_show.compareTo("")==0){
 					errorPop("Error", "Please selet a friend first.");
 				}
 				else{
