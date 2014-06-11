@@ -13,7 +13,6 @@ public class Main {
 
 		
 		//Create a new ApplicationInterface instance
-		
 		ApplicationInterface app = new AppEngine();
 
 		//run the application
@@ -24,6 +23,7 @@ public class Main {
 
 		System.out.println("End! ...");
 		
+		//Terminate connection sources
 		app.terminateDBConnection();
 	}
 

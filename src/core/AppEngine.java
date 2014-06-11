@@ -60,11 +60,13 @@ public class AppEngine implements ApplicationInterface{
 		
 		boolean status = true;
 		
+		//Get path to yago files
 		String yagoFilesPath =  Configurator.getYagoFolderPath("projectConfig.xml", false); 
 		
-		File f = new File(yagoFilesPath);
-		if(!f.exists()){
-			System.out.println("checkInitializationStatus: Error in given path: " + yagoFilesPath);
+		//Verify files
+		if(!verifyYagoFiles(yagoFilesPath)){
+			//Some problem encountered with the files.
+			System.out.println("Yago files path error: Make sure file names are: yagoFacts.tsv and yagoTransitiveType.tsv.");
 			return new Pair<Integer, Boolean>(-2, false);
 		}
 		
@@ -83,7 +85,7 @@ public class AppEngine implements ApplicationInterface{
 		return new Pair<Integer, Boolean>(0, status);
 		
 	}
-	
+
 	
 	public void terminateDBConnection(){
 		
@@ -91,6 +93,29 @@ public class AppEngine implements ApplicationInterface{
 		
 	}
 	
+	
+	/**
+	 * Verifies whether the yago files exist.
+	 * @param yagoFilesPath
+	 * @return true if files are verified successfully, false otherwise.
+	 */
+	private boolean verifyYagoFiles(String yagoFilesPath) {
+		
+		boolean verified = true;
+		
+		String[] files = {yagoFilesPath + "yagoFacts.tsv", yagoFilesPath + "yagoTransitiveType.tsv"};
+		
+		for(String file : files){
+			File f = new File(file);
+			if(!f.exists()){
+				System.out.println("verifyYagoFiles: Error in given path: " + file);
+				verified = false;
+				break;
+			}
+		}
+		
+		return verified;
+	}
 	
 	
 	///////////////////////////////////////
