@@ -210,6 +210,14 @@ public interface ApplicationInterface {
 	 * the Integer is as * usual
 	 */
 	public Pair<Integer, ArrayList<String[]>> getHistoryMassages(String username_send,String username_receive);
+	
+	
+	/**
+	 * 
+	 * @return true iff there is connection to db
+	 */
+	
+	public boolean checkConnection();
 
 	
 	
