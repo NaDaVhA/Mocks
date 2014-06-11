@@ -161,7 +161,11 @@ public class addNewFriendScreen extends Screen {
 					errorPop("Search error", "You didnt enter a name to search.\nPlease enter the name.");
 				}
 				else{
-					
+					if(!engine.checkConnection()){
+						pop=false;
+						checkConnection(getShell(), -1);
+					}
+					else{
 					friend_status_song.setText("");
 					friend_songs.removeAll();
 					
@@ -169,6 +173,7 @@ public class addNewFriendScreen extends Screen {
 					 t5 = new Thread(new searchFriends());
 					 pool.add(t5);
 					 t5.start();
+					}
 				}
 			}
 		});
@@ -399,11 +404,17 @@ public class addNewFriendScreen extends Screen {
 					errorPop("Error", "Please selet a friend first.");
 				}
 				else{
-					
+					System.out.println(engine.checkConnection());
+					if(!engine.checkConnection()){
+						pop=false;
+						checkConnection(getShell(), -1);
+					}
+					else{
 					getShell().layout();
 					t7 = new Thread(new addFriend());
 					pool.add(t7);
 					t7.start();
+					}
 				}
 			}
 		});
@@ -421,9 +432,15 @@ public class addNewFriendScreen extends Screen {
 		back_button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
+				if(!engine.checkConnection()){
+					pop=false;
+					checkConnection(getShell(), -1);
+				}
+				else{
 				disposeScreen();
 				mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); 
 				mainScreen.createScreen();
+				}
 			}
 		});
 		

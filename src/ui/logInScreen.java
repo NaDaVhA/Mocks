@@ -170,10 +170,15 @@ public class logInScreen extends Screen {
 
 								
 				else{
-				Thread t = new Thread(new CheckUserRegisterd());
-				getShell().layout();
-				t.start();
-				
+					if(!engine.checkConnection()){
+						pop=false;
+						checkConnection(getShell(), -1);
+					}
+					else{
+						Thread t = new Thread(new CheckUserRegisterd());
+						getShell().layout();
+						t.start();
+					}
 				}
 			}
 		});
@@ -216,10 +221,16 @@ public class logInScreen extends Screen {
 		signUp.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				disposeScreen();
-				//run other screen
-				signUpScreen sign_up=new signUpScreen(getDisplay(), getShell(),engine);
-				sign_up.createScreen();
+				if(!engine.checkConnection()){
+					pop=false;
+					checkConnection(getShell(), -1);
+				}
+				else{
+					disposeScreen();
+					//run other screen
+					signUpScreen sign_up=new signUpScreen(getDisplay(), getShell(),engine);
+					sign_up.createScreen();
+				}
 			}
 		});
 		

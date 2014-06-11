@@ -303,9 +303,15 @@ public class viewFriendScreen extends Screen {
 							errorPop("Error", "Please select a song first");
 						}
 						else{
-						t14 = new Thread(new addSong());
-						pool.add(t14);
-						t14.start();
+							if(!engine.checkConnection()){
+								pop=false;
+								checkConnection(getShell(), -1);
+							}
+							else{
+								t14 = new Thread(new addSong());
+								pool.add(t14);
+								t14.start();
+							}
 						}
 					}
 				});
@@ -449,10 +455,21 @@ public class viewFriendScreen extends Screen {
 	add_new_friend.addSelectionListener(new SelectionAdapter() {
 		@Override
 		public void widgetSelected (SelectionEvent e) {
-
+			
+			if(friend_name_selected==null ||friend_name_selected.compareTo("")==0){
+				errorPop("Error", "Please selet a friend first.");
+			}
+			else{
+			if(!engine.checkConnection()){
+				pop=false;
+				checkConnection(getShell(), -1);
+			}
+			else{
 			t15 = new Thread(new addFriend());
 			pool.add(t15);	
 			t15.start();
+			}
+			}
 		}
 	});
 		
@@ -612,9 +629,15 @@ public class viewFriendScreen extends Screen {
 				errorPop("Chat error", "The message field is empty.\nPlease write a message and try again.");
 			}
 			else{
+				if(!engine.checkConnection()){
+					pop=false;
+					checkConnection(getShell(), -1);
+				}
+				else{
 				t16 = new Thread(new sendMessage());
 				pool.add(t16);
 				t16.start();
+				}
 			}
 
 		}
@@ -633,10 +656,15 @@ public class viewFriendScreen extends Screen {
 			back_button.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected (SelectionEvent e) {
+					if(!engine.checkConnection()){
+						pop=false;
+						checkConnection(getShell(), -1);
+					}
+					else{
 					disposeScreen();
 					mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); 
 					mainScreen.createScreen();	
-
+					}
 				}
 			});
 		
@@ -656,9 +684,14 @@ public class viewFriendScreen extends Screen {
 		this.status_song_label.dispose();
 		this.user_label.dispose();
 		this.back_button.dispose();
+		this.message_text.dispose();
+		this.messages_table.dispose();
+		this.send_msg_button.dispose();
 		this.c.dispose();
 		this.c1.dispose();
 		this.c2.dispose();
+		this.c3.dispose();
+		
 	}
 
 }

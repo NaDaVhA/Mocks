@@ -188,9 +188,16 @@ public class RecomendationsScreen extends Screen {
 							errorPop("Error", "Please select a song first");
 						}
 						else{
-						t14 = new Thread(new addSong());
-						pool.add(t14);
-						t14.start();
+							if(!engine.checkConnection()){
+								pop=false;
+								checkConnection(getShell(), -1);
+							}
+							else{
+								t14 = new Thread(new addSong());
+								pool.add(t14);
+								t14.start();
+
+							}
 						}
 					}
 				});
@@ -298,9 +305,22 @@ public class RecomendationsScreen extends Screen {
 	add_new_friend.addSelectionListener(new SelectionAdapter() {
 		@Override
 		public void widgetSelected (SelectionEvent e) {
-			 t15 = new Thread(new addFriend());
+			if(friend_name_selected==null ||friend_name_selected.compareTo("")==0){
+				errorPop("Error", "Please selet a friend first.");
+			}
+			else{
+			if(!engine.checkConnection()){
+				pop=false;
+				checkConnection(getShell(), -1);
+			}
+			else{
+
+				t15 = new Thread(new addFriend());
 				pool.add(t15);	
 				t15.start();
+				
+			}
+		}
 		}
 	});
 		
@@ -318,9 +338,15 @@ public class RecomendationsScreen extends Screen {
 			back_button.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected (SelectionEvent e) {
+					if(!engine.checkConnection()){
+						pop=false;
+						checkConnection(getShell(), -1);
+					}
+					else{
 					disposeScreen();
-					mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); //QAQA ADD USERNAME
+					mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); 
 					mainScreen.createScreen();	
+					}
 				}
 			});
 			
@@ -331,10 +357,16 @@ public class RecomendationsScreen extends Screen {
 				public void run() {
 
 					//here call to run recommendations
+					if(!engine.checkConnection()){
+						pop=false;
+						checkConnection(getShell(), -1);
+						return;
+					}
+					else{
 					engine.InitalizeRecommender();  					
 					// Get Recommendations From RecommenderEngine
 					runRecommendations();
-					
+					}
 					getDisplay().asyncExec(new Runnable() {
 
 						@Override

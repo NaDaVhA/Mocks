@@ -234,11 +234,15 @@ public class signUpScreen extends Screen{
 						errorPop("Sign up Error", "One or more of the passwords fields are empty.\nPlease try again.");
 					}
 					else{
-
+						if(!engine.checkConnection()){
+							pop=false;
+							checkConnection(getShell(), -1);
+						}
+						else{
 						Thread t = new Thread(new CheckUserTaken());
 						getShell().layout();
 						t.start();
-
+						}
 					}
 				}
 			}

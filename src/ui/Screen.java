@@ -17,6 +17,8 @@ public abstract class Screen {
 
 	protected Set<Thread> pool;
 	
+	protected boolean pop ;
+	
 
 	
 	
@@ -30,7 +32,7 @@ public abstract class Screen {
 		this.shell=shell;
 		this.engine=engine;
 		pool=new HashSet<Thread>();
-		
+		pop=false;
 	}
 	
 	/**
@@ -103,8 +105,11 @@ public abstract class Screen {
 		}
 		else{
 			if(conection_value==-2){
+				if(!pop){
+					pop=true;
 				val=PopUpWarning(shell,"Yago path Problem", "Path to Yago files is wrong.\nPlease check configuration and press ok to try again\n or cancel to exit the program.");
 				if(val){
+					pop=true;
 					return false;
 				}
 				else{
@@ -113,8 +118,11 @@ public abstract class Screen {
 					System.exit(0);
 					return val;
 				}
+				}
 			}
 			else{
+				if(!pop){
+					pop=true;
 				val=PopUpWarning(shell,"Connection Problem", "Connection to the db was lost.\nPlease fix your connection and press ok to try again\n or cancel to exit the program.");
 				if(val){
 					return false;
@@ -124,10 +132,12 @@ public abstract class Screen {
 					engine.terminateDBConnection();
 					System.exit(0);
 					return val;
-				}	
+				}
 			}
 			
+			}
 			
+			return false;
 		}	
 	}
 	

@@ -193,11 +193,17 @@ public class addNewSongScreen extends Screen{
 				if(text_to_search.isEmpty()){
 					errorPop("Search error", "You didnt enter any text to search.\nPlease enter text and try again.");
 				}
-				else{				
-				 getShell().layout();
-				 t8 = new Thread(new searchSongs());
-				 pool.add(t8);
-				 t8.start();
+				else{		
+					if(!engine.checkConnection()){
+						pop=false;
+						checkConnection(getShell(), -1);
+					}
+					else{
+						 getShell().layout();
+						 t8 = new Thread(new searchSongs());
+						 pool.add(t8);
+						 t8.start();
+					}
 				}
 				
 			}
@@ -322,9 +328,15 @@ public class addNewSongScreen extends Screen{
 					errorPop("Error", "Please choose a song first.");
 				}
 				else{
+					if(!engine.checkConnection()){
+						pop=false;
+						checkConnection(getShell(), -1);
+					}
+					else{
 					t8 = new Thread(new addSong());
 					pool.add(t8);
 					t8.start();
+					}
 				}
 			}
 		});
@@ -342,9 +354,15 @@ public class addNewSongScreen extends Screen{
 		back_button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
+				if(!engine.checkConnection()){
+					pop=false;
+					checkConnection(getShell(), -1);
+				}
+				else{
 				disposeScreen();
 				mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername()); 
 				mainScreen.createScreen();
+				}
 			}
 		});
 				

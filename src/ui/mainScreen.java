@@ -216,10 +216,16 @@ public class mainScreen extends Screen{
 					errorPop("Error", "Please select a song from song list.\nIf you want to search for a new song press Add new Song.");
 				}
 				else{
-				getShell().layout();
-				t4 = new Thread(new changeStatusSong());
-				pool.add(t4);
-				t4.start();
+					if(!engine.checkConnection()){
+						pop=false;
+						checkConnection(getShell(), -1);
+					}
+					else{
+						getShell().layout();
+						t4 = new Thread(new changeStatusSong());
+						pool.add(t4);
+						t4.start();
+					}
 				}
 			}
 		});
@@ -253,10 +259,15 @@ public class mainScreen extends Screen{
 		recommend_me.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
-				
+				if(!engine.checkConnection()){
+					pop=false;
+					checkConnection(getShell(), -1);
+				}
+				else{
 				RecomendationsScreen recomendationsScreen = new RecomendationsScreen(getDisplay(),getShell(),engine);
 				disposeScreen();
 				recomendationsScreen.createScreen();
+				}
 			}
 		});
 			
@@ -295,9 +306,15 @@ public class mainScreen extends Screen{
 		add_new_song.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
+				if(!engine.checkConnection()){
+					pop=false;
+					checkConnection(getShell(), -1);
+				}
+				else{
 				disposeScreen();
 				addNewSongScreen newSong=new addNewSongScreen(getDisplay(), getShell(),engine);
 				newSong.createScreen();
+				}
 			}
 		});
 		
@@ -361,9 +378,15 @@ public class mainScreen extends Screen{
 					errorPop("Error", "Please select a song from song list.\nIf you want to search for a new song press Add new Song.");
 				}
 				else{
+					if(!engine.checkConnection()){
+						pop=false;
+						checkConnection(getShell(), -1);
+					}
+					else{
 					t6 = new Thread(new deleteSong());
 					pool.add(t6);
 					t6.start();
+					}
 				}
 			}  
 		});
@@ -401,9 +424,15 @@ public class mainScreen extends Screen{
 					errorPop("Error", "Please select a friend first.");
 				}
 				else{
-				viewFriendScreen view=new viewFriendScreen(getDisplay(),getShell(),engine,friend_name);
-				disposeScreen();
-				view.createScreen();
+					if(!engine.checkConnection()){
+						pop=false;
+						checkConnection(getShell(), -1);
+					}
+					else{
+						viewFriendScreen view=new viewFriendScreen(getDisplay(),getShell(),engine,friend_name);
+						disposeScreen();
+						view.createScreen();
+					}
 				}
 			}
 		});
@@ -437,9 +466,15 @@ public class mainScreen extends Screen{
 		add_new_friend.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
+				if(!engine.checkConnection()){
+					pop=false;
+					checkConnection(getShell(), -1);
+				}
+				else{
 				disposeScreen();
 				addNewFriendScreen newFriend=new addNewFriendScreen(getDisplay(), getShell(),engine);
 				newFriend.createScreen();
+				}
 			}
 		});
 		
@@ -504,9 +539,15 @@ public class mainScreen extends Screen{
 						errorPop("Error", "Please select a friend first.");
 					}
 					else{
+						if(!engine.checkConnection()){
+							pop=false;
+							checkConnection(getShell(), -1);
+						}
+						else{
 						t7 = new Thread(new deleteFriend());
 						pool.add(t7);
 						t7.start();
+						}
 					
 					}
 				}
