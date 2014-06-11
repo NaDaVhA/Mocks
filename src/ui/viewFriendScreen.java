@@ -91,7 +91,6 @@ public class viewFriendScreen extends Screen {
 								disposeScreen();
 								mainScreen main=new mainScreen(getDisplay(), getShell(), engine, engine.getUsername());
 								main.createScreen();	
-								
 							}
 						}
 						
@@ -197,10 +196,12 @@ public class viewFriendScreen extends Screen {
 						
 						
 						else{ //want to cont..
+							pool.remove(t12);
+							if(pool.isEmpty()){
 							disposeScreen();
 							mainScreen main=new mainScreen(getDisplay(), getShell(), engine, engine.getUsername());
 							main.createScreen();	
-
+							}
 						}
 					
 				
@@ -353,8 +354,11 @@ public class viewFriendScreen extends Screen {
 					}
 					else{ //no connection and want to continue
 						pool.remove(t13);
+						if(pool.isEmpty()){
+							disposeScreen();
 						mainScreen mainScreen=new mainScreen(getDisplay(),getShell(),engine,engine.getUsername());
 						mainScreen.createScreen();
+						}
 					}
 					
 				}

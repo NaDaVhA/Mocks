@@ -291,6 +291,10 @@ public class addNewSongScreen extends Screen{
 						else{ //problem with connection want to cont..
 							
 							//do nothing - stay on the screen
+							pool.remove(t8);
+							if(pool.isEmpty()){
+								getShell().layout();
+							}
 						}
 				
 					
